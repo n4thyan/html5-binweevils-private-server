@@ -6,6 +6,7 @@ const chatForm = document.getElementById('chatForm');
 const chatInput = document.getElementById('chatInput');
 
 const urlParams = new URLSearchParams(window.location.search);
+const now = () => performance.now();
 
 const state = {
   room: null,
@@ -17,9 +18,11 @@ const state = {
     targetX: 0,
     targetZ: 0,
     dir: -180,
+    visualDir: -180,
     message: '',
     messageUntil: 0,
-    speed: 135
+    speed: 135,
+    walkStartedAt: 0
   },
   weevilRenderer: {
     status: 'not-loaded',
@@ -32,7 +35,7 @@ const state = {
     lastKey: ''
   },
   notices: [],
-  lastTime: performance.now(),
+  lastTime: now(),
   debug: urlParams.get('debug') === '1'
 };
 
@@ -52,6 +55,20 @@ function addNotice(message) {
   state.notices = state.notices.slice(0, 10);
 }
 
+function normaliseAngle(value) {
+  return ((value % 360) + 360) % 360;
+}
+
+function angleDelta(from, to) {
+  return ((normaliseAngle(to) - normaliseAngle(from) + 540) % 360) - 180;
+}
+
+function approachAngle(current, target, maxStep) {
+  const delta = angleDelta(current, target);
+  if (Math.abs(delta) <= maxStep) return normaliseAngle(target);
+  return normaliseAngle(current + Math.sign(delta) * maxStep);
+}
+
 function updateDebug() {
   if (!state.room) return;
   const p = state.player;
@@ -61,6 +78,7 @@ function updateDebug() {
     `weevil renderer: ${state.weevilRenderer.status}  (/weevil to toggle)`,
     `player x/z: ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`,
     `target x/z: ${p.targetX.toFixed(1)}, ${p.targetZ.toFixed(1)}`,
+    `direction: ${p.dir.toFixed(1)} visual ${p.visualDir.toFixed(1)}`,
     `floor: ${state.floorReady ? 'loaded' : 'placeholder'}`,
     '',
     ...state.notices
@@ -74,24 +92,16 @@ function getBoundary() {
 function worldExtents() {
   const [minX, minZ, maxX, maxZ] = getBoundary();
   const pad = state.room.stage.worldPadding ?? 80;
-  return {
-    minX: minX - pad,
-    minZ: minZ - pad,
-    maxX: maxX + pad,
-    maxZ: maxZ + pad
-  };
+  return { minX: minX - pad, minZ: minZ - pad, maxX: maxX + pad, maxZ: maxZ + pad };
 }
 
-// This is only a milestone-002 flat mapping.
-// The original InksOrange data includes camera fields, so this will later be replaced with a source-aware projection pass.
+// Milestone 002 uses a flat temporary projection.
+// The original InksOrange source has camera data, so a later pass should replace this with source-aware projection.
 function worldToScreen(x, z) {
   const ext = worldExtents();
   const nx = (x - ext.minX) / (ext.maxX - ext.minX);
   const nz = (z - ext.minZ) / (ext.maxZ - ext.minZ);
-  return {
-    x: nx * canvas.width,
-    y: nz * canvas.height
-  };
+  return { x: nx * canvas.width, y: nz * canvas.height };
 }
 
 function screenToWorld(sx, sy) {
@@ -107,10 +117,7 @@ function screenToWorld(sx, sy) {
 
 function clampToBoundary(x, z) {
   const [minX, minZ, maxX, maxZ] = getBoundary();
-  return {
-    x: Math.max(minX, Math.min(maxX, x)),
-    z: Math.max(minZ, Math.min(maxZ, z))
-  };
+  return { x: Math.max(minX, Math.min(maxX, x)), z: Math.max(minZ, Math.min(maxZ, z)) };
 }
 
 function pointHitsNoGo(x, z) {
@@ -128,20 +135,28 @@ function isWalkable(x, z) {
   return !pointHitsNoGo(x, z);
 }
 
+function isWalking() {
+  const dx = state.player.targetX - state.player.x;
+  const dz = state.player.targetZ - state.player.z;
+  return Math.sqrt(dx * dx + dz * dz) > 1.5;
+}
+
 function setTarget(x, z) {
   const clamped = clampToBoundary(x, z);
   if (!isWalkable(clamped.x, clamped.z)) {
     addNotice(`Blocked: ${clamped.x.toFixed(0)}, ${clamped.z.toFixed(0)}`);
     return;
   }
+
+  const dx = clamped.x - state.player.x;
+  const dz = clamped.z - state.player.z;
+  if (Math.sqrt(dx * dx + dz * dz) > 1.5) {
+    state.player.dir = Math.atan2(dx, dz) * (180 / Math.PI);
+    state.player.walkStartedAt = now();
+  }
+
   state.player.targetX = clamped.x;
   state.player.targetZ = clamped.z;
-}
-
-function isWalking() {
-  const dx = state.player.targetX - state.player.x;
-  const dz = state.player.targetZ - state.player.z;
-  return Math.sqrt(dx * dx + dz * dz) > 1.5;
 }
 
 function loadImage(src) {
@@ -164,6 +179,7 @@ async function loadRoom() {
   state.player.targetX = entryX;
   state.player.targetZ = entryZ;
   state.player.dir = state.room.entry.direction;
+  state.player.visualDir = state.room.entry.direction;
 
   try {
     state.floorImage = await loadImage(`./assets/rooms/inks-orange/${state.room.floor.path}`);
@@ -183,8 +199,8 @@ async function loadWeevilRenderer() {
   try {
     const module = await import('./room-weevil-renderer.js');
     const spriteCanvas = document.createElement('canvas');
-    spriteCanvas.width = 220;
-    spriteCanvas.height = 220;
+    spriteCanvas.width = 240;
+    spriteCanvas.height = 240;
     state.weevilRenderer.canvas = spriteCanvas;
     state.weevilRenderer.renderer = module.createRoomWeevilRenderer(spriteCanvas);
     state.weevilRenderer.status = 'ready';
@@ -283,21 +299,30 @@ function drawObjectPlaceholders() {
 
 function makeWalkPose() {
   if (!isWalking()) return null;
-  const phase = Math.floor(performance.now() / 95) % 6;
+
+  const elapsed = now() - state.player.walkStartedAt;
+  const phase = Math.floor(elapsed / 85) % 8;
+  const bodyBob = Math.sin(elapsed / 55) * 5;
+  const bodyTwist = Math.sin(elapsed / 90) * 3;
+
+  // Temporary visible walk loop. The real values should be replaced after the AS3 movement audit.
   const poses = [
-    [3, 5, 4, 5, 3, 4],
-    [4, 5, 3, 4, 5, 3],
-    [5, 4, 3, 3, 4, 5],
-    [5, 3, 4, 4, 5, 3],
-    [4, 3, 5, 5, 4, 3],
-    [3, 4, 5, 5, 3, 4]
+    [14, 4, 7, 16, 4, 6],
+    [15, 5, 6, 17, 3, 5],
+    [16, 6, 4, 14, 4, 7],
+    [17, 5, 3, 15, 5, 6],
+    [16, 4, 6, 14, 4, 7],
+    [15, 3, 5, 17, 5, 4],
+    [14, 4, 7, 16, 4, 6],
+    [7, 4, 14, 6, 4, 16]
   ];
+
   return {
-    creatureY: Math.sin(performance.now() / 110) * 2,
-    creatureRotY: 0,
-    headRotX: 0,
-    headRotY: 0,
-    shadowAlpha: 1,
+    creatureY: bodyBob,
+    creatureRotY: bodyTwist,
+    headRotX: Math.sin(elapsed / 130) * 1.5,
+    headRotY: Math.sin(elapsed / 160) * 4,
+    shadowAlpha: 0.92 + Math.abs(Math.sin(elapsed / 80)) * 0.08,
     legs: poses[phase]
   };
 }
@@ -306,20 +331,22 @@ function requestRenderedWeevilSprite() {
   const wr = state.weevilRenderer;
   if (!wr.enabled || wr.status !== 'ready' || !wr.renderer || wr.pending) return;
 
-  const yaw = ((state.player.dir + 302) % 360 + 360) % 360;
   const poseState = makeWalkPose();
+  const yaw = normaliseAngle(state.player.visualDir + 302);
   const key = JSON.stringify({
-    yaw: Math.round(yaw),
+    yaw: Math.round(yaw / 3) * 3,
     walking: Boolean(poseState),
-    phase: poseState?.legs?.join(',') ?? 'idle'
+    legs: poseState?.legs?.join(',') ?? 'idle',
+    bob: Math.round((poseState?.creatureY ?? 0) * 2) / 2,
+    twist: Math.round((poseState?.creatureRotY ?? 0) * 2) / 2
   });
   if (key === wr.lastKey && wr.metrics) return;
 
   wr.pending = true;
   wr.lastKey = key;
   wr.renderer.paint(demoAvatar, {
-    width: 220,
-    height: 220,
+    width: 240,
+    height: 240,
     yaw,
     pitch: 18,
     poseState
@@ -337,20 +364,18 @@ function requestRenderedWeevilSprite() {
 
 function drawWeevil() {
   const p = worldToScreen(state.player.x, state.player.z);
-
   requestRenderedWeevilSprite();
 
   if (state.weevilRenderer.enabled && state.weevilRenderer.status === 'ready' && state.weevilRenderer.canvas && state.weevilRenderer.metrics) {
     drawRenderedWeevil(p);
-    return;
+  } else {
+    drawPlaceholderWeevil(p);
   }
-
-  drawPlaceholderWeevil(p);
 }
 
 function drawRenderedWeevil(p) {
   const wr = state.weevilRenderer;
-  const scale = 0.72;
+  const scale = 0.7;
   const width = wr.canvas.width * scale;
   const height = wr.canvas.height * scale;
   const anchorX = (wr.metrics?.anchorX ?? wr.canvas.width * 0.5) * scale;
@@ -359,7 +384,7 @@ function drawRenderedWeevil(p) {
   ctx.save();
   ctx.drawImage(wr.canvas, p.x - anchorX, p.y - anchorY, width, height);
 
-  if (state.player.message && performance.now() < state.player.messageUntil) {
+  if (state.player.message && now() < state.player.messageUntil) {
     const bubbleY = p.y - anchorY + ((wr.metrics?.topY ?? 20) * scale) - 8;
     drawChatBubble(state.player.message, p.x, bubbleY);
   }
@@ -411,7 +436,7 @@ function drawPlaceholderWeevil(p) {
   ctx.fillStyle = '#254a11';
   ctx.fillRect(-bodyW * 0.45, bodyH * 0.1, bodyW * 0.9, bodyH * 0.08);
 
-  if (state.player.message && performance.now() < state.player.messageUntil) {
+  if (state.player.message && now() < state.player.messageUntil) {
     drawChatBubble(state.player.message, 0, -bodyH * 0.95);
   }
 
@@ -462,9 +487,7 @@ function drawChatBubble(message, x, y) {
   ctx.fillStyle = '#2b1202';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  lines.forEach((text, index) => {
-    ctx.fillText(text, x, by + paddingY + 9 + index * 18);
-  });
+  lines.forEach((text, index) => ctx.fillText(text, x, by + paddingY + 9 + index * 18));
   ctx.restore();
 }
 
@@ -483,7 +506,14 @@ function update(deltaSeconds) {
   const dx = p.targetX - p.x;
   const dz = p.targetZ - p.z;
   const distance = Math.sqrt(dx * dx + dz * dz);
-  if (distance <= 1) return;
+
+  p.visualDir = approachAngle(p.visualDir, p.dir, 420 * deltaSeconds);
+
+  if (distance <= 1) {
+    p.x = p.targetX;
+    p.z = p.targetZ;
+    return;
+  }
 
   const step = Math.min(distance, p.speed * deltaSeconds);
   const nx = p.x + (dx / distance) * step;
@@ -511,9 +541,9 @@ function draw() {
   drawWeevil();
 }
 
-function frame(now) {
-  const deltaSeconds = Math.min(0.05, (now - state.lastTime) / 1000);
-  state.lastTime = now;
+function frame(timestamp) {
+  const deltaSeconds = Math.min(0.05, (timestamp - state.lastTime) / 1000);
+  state.lastTime = timestamp;
   update(deltaSeconds);
   draw();
   updateDebug();
@@ -535,7 +565,7 @@ chatForm.addEventListener('submit', (event) => {
     handleCommand(text);
   } else {
     state.player.message = text;
-    state.player.messageUntil = performance.now() + 5500;
+    state.player.messageUntil = now() + 5500;
     addNotice(`chat: ${text}`);
   }
 
@@ -564,7 +594,7 @@ function handleCommand(text) {
     }
     case 'say':
       state.player.message = args.join(' ') || 'Hello from Ink\'s Orange!';
-      state.player.messageUntil = performance.now() + 5500;
+      state.player.messageUntil = now() + 5500;
       break;
     case 'debug':
       state.debug = !state.debug;
@@ -573,9 +603,7 @@ function handleCommand(text) {
     case 'weevil':
       state.weevilRenderer.enabled = !state.weevilRenderer.enabled;
       addNotice(`weevil renderer ${state.weevilRenderer.enabled ? 'enabled' : 'disabled'}`);
-      if (state.weevilRenderer.enabled && state.weevilRenderer.status === 'not-loaded') {
-        loadWeevilRenderer();
-      }
+      if (state.weevilRenderer.enabled && state.weevilRenderer.status === 'not-loaded') loadWeevilRenderer();
       break;
     default:
       addNotice(`unknown command: /${command}`);
