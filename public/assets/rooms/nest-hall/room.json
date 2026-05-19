@@ -47,8 +47,12 @@
   "entry": {
     "position": [0, 200],
     "direction": -180,
+    "idleDirection": -180,
+    "walkSpeed": 88,
     "weevilScale": 0.45,
-    "renderScale": 0.56
+    "renderScale": 0.52,
+    "renderYawOffset": 180,
+    "renderPitch": 18
   },
   "floor": {
     "path": "background/nest-hall.png",
