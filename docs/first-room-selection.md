@@ -2,29 +2,26 @@
 
 The first playable HTML5 slice should port one real Bin Weevils room with the smallest amount of guesswork.
 
-## Candidate 1: Ink's Orange Peel / The Peel
+## Selected first room: Ink's Orange / Orange Peel
 
-Status: preferred, pending source audit.
+Status: selected for milestone 002.
 
-Why this is preferred:
+Why this is now selected:
 
-- It is thematically strong for the first public room slice.
-- The uploaded HTML5 prototype already contains a `the_peel` style room shell and related room renderer work.
-- If the original source contains matching room art/config, this gives us the most direct path to a faithful first demo.
+- The original source contains a full `location` block for `id="106" name="InksOrange"`.
+- The location has a real floor reference: `floors/inks.jpg`.
+- The location has movement data: rectangular boundary, entry position, entry direction, camera values, and weevil scale.
+- The location has door definitions and a radial no-go area.
+- The location has object placements for `orangePeel.swf`, `orangeSegment.swf`, `orangeBlob.swf`, `cottonReel.swf`, `needle.swf`, `signMsgBoard.swf`, arrows, and mini-game slots.
+- The source also includes matching room asset files under `cdn.binw.net/assets3D/`.
 
-Needs verification from `legacy-reference/Binweevils-main/`:
+Detailed room audit:
 
-- original background image or SWF
-- floor/walkable layer, if present
-- foreground layer, if present
-- original room dimensions/stage scale
-- spawn/movement bounds
-- chat bubble placement style
-- UI chrome used around the room
+- `docs/rooms/inks-orange.md`
 
 ## Candidate 2: Peel Park
 
-Status: fallback if its original files are cleaner than The Peel.
+Status: fallback/later public-room port.
 
 Needs verification:
 
@@ -35,25 +32,29 @@ Needs verification:
 
 ## Candidate 3: Nest room
 
-Status: technical fallback only.
+Status: technical fallback/later private-room port.
 
-Use this if public-room assets are too hard to isolate during the first pass. A nest may be easier because it can prove account/session/avatar rendering without immediately solving every public room layer.
+A nest room may still be useful for account/session/avatar rendering, but it is no longer needed as the first room because Orange Peel has enough original config data to drive a real port.
 
-## Decision rule
+## Milestone 002 target
 
-Choose the first room only after the audit has real file paths for assets/config.
-
-The chosen first room must have enough evidence to support:
+Build a small Apache/XAMPP-served HTML5 Orange Peel room shell using source data from:
 
 ```text
-Apache/XAMPP-served HTML5 client
-real source room background
-real or source-derived UI frame
-HTML5 weevil renderer using real weevil assets where possible
-click-to-move
+legacy-reference/Binweevils-main/game-full/binConfig/getFile/1/uk/locationDefinitions.xml
+```
+
+The first playable demo should support:
+
+```text
+real source room floor/reference asset
+source-derived room JSON
+source-derived object placement data
+HTML5 room renderer in original coordinate space
+click-to-move using boundary and no-go data
+existing HTML5 weevil renderer placed at entryPos
 original-style chat bubble
-basic chat transport
-basic hidden/admin command parser
+basic local chat/admin command parser
 ```
 
 ## Not part of first slice
@@ -68,3 +69,5 @@ These systems are important, but should wait until the room foundation feels rig
 - inventory
 - mulch/XP/level bank/prestige UI
 - minigames
+- functional door transitions
+- external UI popups
