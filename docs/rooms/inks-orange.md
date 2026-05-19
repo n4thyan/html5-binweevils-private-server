@@ -42,6 +42,18 @@ Observed location block:
 <floor path="floors/inks.jpg"/>
 ```
 
+Confirmed local source file:
+
+```text
+legacy-reference/Binweevils-main/game-full/cdn.binw.net/floors/inks.jpg
+```
+
+Observed size:
+
+```text
+82375 bytes
+```
+
 ## Movement/no-go data
 
 ```xml
@@ -54,6 +66,35 @@ Doors:
 <door id="1" toLoc="111" toDoor="2" x1="-180" z1="424" x2="-360" z2="424" entryDir="90"/>
 <door id="2" toLoc="109" toDoor="1" x1="60" z1="630" x2="60" z2="800" entryDir="0"/>
 <door id="3" toLoc="121" toDoor="2" x1="250" z1="606" x2="310" z2="606" entryDir="-90"/>
+```
+
+## Confirmed source asset inventory
+
+All listed files were found under:
+
+```text
+legacy-reference/Binweevils-main/game-full/cdn.binw.net/assets3D/
+```
+
+```text
+arrow.swf             55826
+connectMulch.swf     227095
+cottonReel.swf        27122
+cottonReel_1.swf        921
+flipMulch.swf         72879
+needle.swf           297583
+needle_2.swf            740
+orangeBlob.swf         2873
+orangePeel.swf      1710351
+orangePeel_1.swf       5107
+orangeSegment.swf   1031788
+orangeSegment1.swf     9888
+orangeSegment2.swf    11374
+orangeSegment_1.swf    1236
+orangeSegment_2.swf    1867
+poolTable.swf         82052
+signMsgBoard.swf    1247229
+squares.swf           93529
 ```
 
 ## Key room assets
@@ -86,12 +127,16 @@ Other prominent objects:
 
 The room includes original mini-game placements for Konnect-Mulch, Flip-Mulch, 6 Ball, and Squares. These should not be implemented in milestone 002, but their coordinates should be preserved for later.
 
+## Asset-porting note
+
+The HTML5 client should not depend on Flash/Ruffle as the main room runtime. For milestone 002, use the original SWFs as source material and export/derive browser-native image assets where needed. Keep source-derived data and exported images traceable to the original file names.
+
 ## Milestone 002 target
 
 Create an Apache/XAMPP-served HTML5 room shell using this source data:
 
 - parse or manually transcribe the location data into `public/assets/rooms/inks-orange/room.json`
-- copy verified room source assets into `public/assets/rooms/inks-orange/`
+- copy verified/exported room source assets into `public/assets/rooms/inks-orange/`
 - render the floor and object placements in original coordinate space
 - wire click-to-move using `boundary` and `noGoArea`
 - place the existing HTML5 weevil renderer at `entryPos` with `weevilScale`
