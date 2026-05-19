@@ -27,8 +27,8 @@ if (Test-Path $swfSource) {
 }
 
 # This script does not decompile SWF files by itself.
-# If you export the Nest Hall background from JPEXS into the source folder with one of these names,
-# the script will copy it into the browser-used path expected by room.json.
+# It accepts either a hand-named export in the room source folder or a normal JPEXS export folder.
+# For JPEXS, exported/frames/1.png is the full composed Nest Hall frame/stage.
 $candidateExports = @(
     (Join-Path $sourceOut "nest-hall.png"),
     (Join-Path $sourceOut "nestHall_06_05_21.png"),
@@ -37,7 +37,11 @@ $candidateExports = @(
     (Join-Path $sourceOut "nest-hall.jpeg"),
     (Join-Path $sourceOut "nestHall_06_05_21.jpeg"),
     (Join-Path $sourceOut "nest-hall.svg"),
-    (Join-Path $sourceOut "nestHall_06_05_21.svg")
+    (Join-Path $sourceOut "nestHall_06_05_21.svg"),
+    (Join-Path $RepoRoot "exported\frames\1.png"),
+    (Join-Path $RepoRoot "exported\images\1.jpg"),
+    (Join-Path $sourceOut "exported\frames\1.png"),
+    (Join-Path $sourceOut "exported\images\1.jpg")
 )
 
 $copiedExport = $false
@@ -48,6 +52,7 @@ foreach ($candidate in $candidateExports) {
         $dest = Join-Path $backgroundOut $destName
         Copy-Item $candidate $dest -Force
         Write-Host "Copied exported background: $dest"
+        Write-Host "Source export used: $candidate"
         $copiedExport = $true
         break
     }
@@ -61,8 +66,8 @@ if (!$copiedExport) {
     Write-Host "No exported Nest Hall background image was found yet."
     Write-Host "Next manual export step:"
     Write-Host "  1. Open public/assets/rooms/nest-hall/source/nestHall_06_05_21.swf in JPEXS."
-    Write-Host "  2. Export the full background/stage as PNG or SVG."
-    Write-Host "  3. Save it as public/assets/rooms/nest-hall/source/nest-hall.png."
+    Write-Host "  2. Export the full background/stage as PNG."
+    Write-Host "  3. Save it as either exported/frames/1.png at repo root, or public/assets/rooms/nest-hall/source/nest-hall.png."
     Write-Host "  4. Re-run this script."
     Write-Host "Until then, the HTML5 demo uses a source-coordinate placeholder background."
 }
