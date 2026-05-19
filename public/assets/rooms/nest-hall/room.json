@@ -14,7 +14,22 @@
     "worldPadding": 90
   },
   "projection": {
-    "mode": "source-camera"
+    "mode": "fixed-floor",
+    "calibration": {
+      "centerX": 412.5,
+      "topZ": 0,
+      "bottomZ": 420,
+      "topY": 295,
+      "bottomY": 490,
+      "xScaleTop": 0.82,
+      "xScaleBottom": 2.28,
+      "xScalePower": 1.05,
+      "yPower": 1.18,
+      "yScreenScale": 0.28,
+      "minScale": 0.76,
+      "maxScale": 1.18,
+      "zScaleInfluence": 0.36
+    }
   },
   "camera": {
     "camPos": [0, 145, -115],
@@ -33,7 +48,7 @@
     "position": [0, 200],
     "direction": -180,
     "weevilScale": 0.45,
-    "renderScale": 0.82
+    "renderScale": 0.56
   },
   "floor": {
     "path": "background/nest-hall.png",
