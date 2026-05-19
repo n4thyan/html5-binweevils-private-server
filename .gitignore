@@ -14,6 +14,14 @@ data/*.json
 logs/
 *.log
 
+# Local copied/exported game assets for testing
+# These are generated from legacy-reference or JPEXS locally and should be reviewed before force-adding.
+public/assets/rooms/**/floors/*.jpg
+public/assets/rooms/**/source-swfs/
+public/assets/rooms/**/objects/**/*.png
+public/assets/rooms/**/objects/**/*.webp
+public/assets/rooms/**/objects/**/*.svg
+
 # OS/editor noise
 .DS_Store
 Thumbs.db
