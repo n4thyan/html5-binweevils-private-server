@@ -49,6 +49,19 @@ function toScreenPoint(canvas, x, y) {
   };
 }
 
+function getBoundaryExtents(room) {
+  const pad = room.stage.worldPadding ?? 80;
+  const boundary = room.bounds.boundary;
+
+  if (room.bounds.type === 'rad') {
+    const [cx, cz, r] = boundary;
+    return { minX: cx - r - pad, minZ: cz - r - pad, maxX: cx + r + pad, maxZ: cz + r + pad };
+  }
+
+  const [minX, minZ, maxX, maxZ] = boundary;
+  return { minX: minX - pad, minZ: minZ - pad, maxX: maxX + pad, maxZ: maxZ + pad };
+}
+
 export function createRoomProjection(room, canvas, mode = ProjectionModes.FLAT) {
   if (mode === ProjectionModes.SOURCE_CAMERA) {
     return new SourceCameraProjection(room, canvas);
@@ -64,9 +77,7 @@ export class FlatRoomProjection {
   }
 
   worldExtents() {
-    const [minX, minZ, maxX, maxZ] = this.room.bounds.boundary;
-    const pad = this.room.stage.worldPadding ?? 80;
-    return { minX: minX - pad, minZ: minZ - pad, maxX: maxX + pad, maxZ: maxZ + pad };
+    return getBoundaryExtents(this.room);
   }
 
   worldToScreen(x, z, y = 0) {
@@ -111,8 +122,8 @@ export class SourceCameraProjection {
     this.forward = normalise(subtract(this.camAim, this.camPos));
 
     // Camera basis using Y-up 3D room coordinates.
-    // The sign here is intentionally isolated in the projection module so it can be corrected
-    // once the exact AS3 fixedCam/preRend3D projection code is found.
+    // Fixed-camera rooms such as Nest Hall are expected to work from this single source camera.
+    // Rotatable rooms such as Ink's Orange still need their room-specific camera rotation logic ported later.
     this.right = normalise(cross(this.forward, WORLD_UP));
     this.up = normalise(cross(this.right, this.forward));
 
