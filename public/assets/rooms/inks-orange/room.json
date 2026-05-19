@@ -1,0 +1,66 @@
+{
+  "id": 106,
+  "slug": "inks-orange",
+  "name": "InksOrange",
+  "displayName": "Ink's Orange",
+  "source": {
+    "config": "legacy-reference/Binweevils-main/game-full/binConfig/getFile/1/uk/locationDefinitions.xml",
+    "floor": "legacy-reference/Binweevils-main/game-full/cdn.binw.net/floors/inks.jpg"
+  },
+  "stage": {
+    "width": 960,
+    "height": 600,
+    "worldPadding": 80
+  },
+  "camera": {
+    "camPos": [-42, 197, -37],
+    "camAim": [-66, 15, 436],
+    "camBounds": [-90, 35, -150, 525, 240, 530]
+  },
+  "bounds": {
+    "type": "rect",
+    "boundary": [-150, 188, 450, 440],
+    "xWall": 0,
+    "zWall": 0
+  },
+  "entry": {
+    "position": [-93, 320],
+    "direction": -180,
+    "weevilScale": 0.18
+  },
+  "floor": {
+    "path": "floors/inks.jpg"
+  },
+  "noGoAreas": [
+    {
+      "type": "rad",
+      "x": 74,
+      "z": 270,
+      "r": 35
+    }
+  ],
+  "doors": [
+    { "id": 1, "toLoc": 111, "toDoor": 2, "x1": -180, "z1": 424, "x2": -360, "z2": 424, "entryDir": 90 },
+    { "id": 2, "toLoc": 109, "toDoor": 1, "x1": 60, "z1": 630, "x2": 60, "z2": 800, "entryDir": 0 },
+    { "id": 3, "toLoc": 121, "toDoor": 2, "x1": 250, "z1": 606, "x2": 310, "z2": 606, "entryDir": -90 }
+  ],
+  "objects": [
+    { "type": "preRend3D", "path": "assets3D/arrow.swf", "label": "Door 1 arrow", "bg": true, "doorID": 1, "x": -210, "y": 0, "z": 424, "scale": 0.13, "ry": 90, "rxMin": 9, "rxMax": 39, "ryMin": 0, "ryMax": 360, "framesY": 61, "symAxes": 1, "rIncr": 3 },
+    { "type": "preRend3D", "path": "assets3D/arrow.swf", "label": "Door 2 arrow", "bg": true, "doorID": 2, "x": 60, "y": 0, "z": 700, "scale": 0.13, "ry": 0, "rxMin": 9, "rxMax": 39, "ryMin": 0, "ryMax": 360, "framesY": 61, "symAxes": 1, "rIncr": 3 },
+    { "type": "preRend3D", "path": "assets3D/arrow.swf", "label": "Door 3 arrow", "bg": true, "doorID": 3, "x": 221, "y": 0, "z": 611, "scale": 0.13, "ry": -90, "rxMin": 9, "rxMax": 39, "ryMin": 0, "ryMax": 360, "framesY": 61, "symAxes": 1, "rIncr": 3 },
+    { "type": "preRend3D", "path": "assets3D/orangeSegment.swf", "path1": "assets3D/orangeSegment_1.swf", "label": "Orange segment left", "depthOffset": -32, "x": -200, "y": 0, "z": 290, "scale": 0.4, "ry": 270, "rxMin": 6, "rxMax": 38, "ryMin": 90, "ryMax": 270, "framesY": 46, "symAxes": 1, "rIncr": 2 },
+    { "type": "preRend3D", "path": "assets3D/orangeSegment.swf", "path1": "assets3D/orangeSegment_2.swf", "label": "Orange segment right", "x": 230, "y": 0, "z": 700, "scale": 0.4, "ry": 180, "rxMin": 6, "rxMax": 38, "ryMin": 90, "ryMax": 270, "framesY": 46, "symAxes": 1, "rIncr": 2 },
+    { "type": "preRend3D", "path": "assets3D/orangePeel.swf", "path1": "assets3D/orangePeel.swf", "label": "Orange peel", "depthOffset": -128, "x": -162, "y": 0, "z": 640, "scale": 0.84, "ry": 225, "rxMin": 6, "rxMax": 38, "ryMin": 141, "ryMax": 219, "framesY": 21, "symAxes": 1, "rIncr": 2 },
+    { "type": "preRend3D", "path": "assets3D/signMsgBoard.swf", "path1": "assets3D/signMsgBoard.swf", "label": "Message board sign", "x": 126, "y": 0, "z": 650, "scale": 0.4, "ry": 90, "rxMin": 10, "rxMax": 40, "ryMin": 15, "ryMax": 165, "framesY": 51, "symAxes": 0, "rIncr": 3 },
+    { "type": "preRend3D", "path": "assets3D/cottonReel.swf", "path1": "assets3D/cottonReel.swf", "label": "Cotton reel", "x": 74, "y": 0, "z": 270, "scale": 0.8, "ry": 0, "rxMin": 9, "rxMax": 45, "ryMin": 0, "ryMax": 1, "framesY": 1, "symAxes": 0, "rIncr": 1.5 },
+    { "type": "preRend3D", "path": "assets3D/needle.swf", "path1": "assets3D/orangeBlob.swf", "label": "Needle", "x": 315, "y": 0, "z": 175, "scale": 0.36, "ry": -40, "rxMin": 9, "rxMax": 51, "ryMin": 0, "ryMax": 360, "framesY": 31, "symAxes": 2, "rIncr": 3 },
+    { "type": "preRend3D", "path": "assets3D/orangeBlob.swf", "label": "Orange blob", "x": 37, "y": 0, "z": 266, "scale": 0.05, "ry": 0, "rxMin": 9, "rxMax": 45, "ryMin": 0, "ryMax": 1, "framesY": 1, "symAxes": 0, "rIncr": 1.5 }
+  ],
+  "gameSlots": [
+    { "path": "assets3D/connectMulch.swf", "label": "Play Konnect-Mulch!", "gamePath": "multiplayerGames/mulch4_08_07_11.swf", "slot": 1, "arrivalPoints": [25, 400, 95, 400], "x": 60, "y": 0, "z": 400, "scale": 0.19, "ry": 90 },
+    { "path": "assets3D/connectMulch.swf", "label": "Play Konnect-Mulch!", "gamePath": "multiplayerGames/mulch4_08_07_11.swf", "slot": 2, "arrivalPoints": [85, 520, 155, 520], "x": 120, "y": 0, "z": 520, "scale": 0.19, "ry": 90 },
+    { "path": "assets3D/flipMulch.swf", "label": "Play Flip-Mulch!", "gamePath": "multiplayerGames/reversi_08_07_11.swf", "slot": 6, "arrivalPoints": [155, 500, 225, 500], "x": 190, "y": 0, "z": 500, "scale": 0.19, "ry": 45 },
+    { "path": "assets3D/poolTable.swf", "label": "Play 6 Ball!", "gamePath": "multiplayerGames/ballGame/BallGame6Ball_08_07_11.swf", "slot": 4, "arrivalPoints": [-53, 562, -50, 483], "x": -51, "y": 0, "z": 513, "scale": 0.19, "ry": 90 },
+    { "path": "assets3D/squares.swf", "label": "Play Squares!", "gamePath": "multiplayerGames/squares_08_07_11.swf", "slot": 0, "arrivalPoints": [-168, 519, -98, 519], "x": -133, "y": 0, "z": 519, "scale": 0.14, "ry": 45 }
+  ]
+}
