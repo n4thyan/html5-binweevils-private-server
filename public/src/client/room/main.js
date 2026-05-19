@@ -21,9 +21,26 @@ const state = {
     messageUntil: 0,
     speed: 135
   },
+  weevilRenderer: {
+    status: 'not-loaded',
+    enabled: true,
+    renderer: null,
+    canvas: null,
+    metrics: null,
+    pending: false,
+    error: null,
+    lastKey: ''
+  },
   notices: [],
   lastTime: performance.now(),
   debug: urlParams.get('debug') === '1'
+};
+
+const demoAvatar = {
+  weevilDef: '401135129001323200',
+  hatId: 0,
+  hatColour: 7620096,
+  expression: 0
 };
 
 function setStatus(message) {
@@ -41,6 +58,7 @@ function updateDebug() {
   debugEl.textContent = [
     `room: ${state.room.displayName} (${state.room.id})`,
     `debug overlays: ${state.debug ? 'on' : 'off'}  (/debug to toggle)`,
+    `weevil renderer: ${state.weevilRenderer.status}  (/weevil to toggle)`,
     `player x/z: ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`,
     `target x/z: ${p.targetX.toFixed(1)}, ${p.targetZ.toFixed(1)}`,
     `floor: ${state.floorReady ? 'loaded' : 'placeholder'}`,
@@ -120,6 +138,12 @@ function setTarget(x, z) {
   state.player.targetZ = clamped.z;
 }
 
+function isWalking() {
+  const dx = state.player.targetX - state.player.x;
+  const dz = state.player.targetZ - state.player.z;
+  return Math.sqrt(dx * dx + dz * dz) > 1.5;
+}
+
 function loadImage(src) {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -149,6 +173,27 @@ async function loadRoom() {
     state.floorReady = false;
     setStatus('Room loaded - copy inks.jpg into assets/rooms/inks-orange/floors/');
     addNotice('Floor image missing; using placeholder background');
+  }
+}
+
+async function loadWeevilRenderer() {
+  if (!state.weevilRenderer.enabled) return;
+  state.weevilRenderer.status = 'loading';
+
+  try {
+    const module = await import('./room-weevil-renderer.js');
+    const spriteCanvas = document.createElement('canvas');
+    spriteCanvas.width = 220;
+    spriteCanvas.height = 220;
+    state.weevilRenderer.canvas = spriteCanvas;
+    state.weevilRenderer.renderer = module.createRoomWeevilRenderer(spriteCanvas);
+    state.weevilRenderer.status = 'ready';
+    addNotice('Prototype weevil renderer loaded');
+  } catch (error) {
+    state.weevilRenderer.status = 'fallback';
+    state.weevilRenderer.error = error;
+    addNotice('Prototype weevil renderer unavailable; using placeholder');
+    console.warn('Prototype weevil renderer unavailable', error);
   }
 }
 
@@ -236,8 +281,92 @@ function drawObjectPlaceholders() {
   }
 }
 
+function makeWalkPose() {
+  if (!isWalking()) return null;
+  const phase = Math.floor(performance.now() / 95) % 6;
+  const poses = [
+    [3, 5, 4, 5, 3, 4],
+    [4, 5, 3, 4, 5, 3],
+    [5, 4, 3, 3, 4, 5],
+    [5, 3, 4, 4, 5, 3],
+    [4, 3, 5, 5, 4, 3],
+    [3, 4, 5, 5, 3, 4]
+  ];
+  return {
+    creatureY: Math.sin(performance.now() / 110) * 2,
+    creatureRotY: 0,
+    headRotX: 0,
+    headRotY: 0,
+    shadowAlpha: 1,
+    legs: poses[phase]
+  };
+}
+
+function requestRenderedWeevilSprite() {
+  const wr = state.weevilRenderer;
+  if (!wr.enabled || wr.status !== 'ready' || !wr.renderer || wr.pending) return;
+
+  const yaw = ((state.player.dir + 302) % 360 + 360) % 360;
+  const poseState = makeWalkPose();
+  const key = JSON.stringify({
+    yaw: Math.round(yaw),
+    walking: Boolean(poseState),
+    phase: poseState?.legs?.join(',') ?? 'idle'
+  });
+  if (key === wr.lastKey && wr.metrics) return;
+
+  wr.pending = true;
+  wr.lastKey = key;
+  wr.renderer.paint(demoAvatar, {
+    width: 220,
+    height: 220,
+    yaw,
+    pitch: 18,
+    poseState
+  }).then((metrics) => {
+    wr.metrics = metrics;
+    wr.pending = false;
+  }).catch((error) => {
+    wr.status = 'fallback';
+    wr.error = error;
+    wr.pending = false;
+    addNotice('Renderer failed; reverted to placeholder');
+    console.error('Weevil renderer failed', error);
+  });
+}
+
 function drawWeevil() {
   const p = worldToScreen(state.player.x, state.player.z);
+
+  requestRenderedWeevilSprite();
+
+  if (state.weevilRenderer.enabled && state.weevilRenderer.status === 'ready' && state.weevilRenderer.canvas && state.weevilRenderer.metrics) {
+    drawRenderedWeevil(p);
+    return;
+  }
+
+  drawPlaceholderWeevil(p);
+}
+
+function drawRenderedWeevil(p) {
+  const wr = state.weevilRenderer;
+  const scale = 0.72;
+  const width = wr.canvas.width * scale;
+  const height = wr.canvas.height * scale;
+  const anchorX = (wr.metrics?.anchorX ?? wr.canvas.width * 0.5) * scale;
+  const anchorY = (wr.metrics?.anchorY ?? wr.canvas.height - 10) * scale;
+
+  ctx.save();
+  ctx.drawImage(wr.canvas, p.x - anchorX, p.y - anchorY, width, height);
+
+  if (state.player.message && performance.now() < state.player.messageUntil) {
+    const bubbleY = p.y - anchorY + ((wr.metrics?.topY ?? 20) * scale) - 8;
+    drawChatBubble(state.player.message, p.x, bubbleY);
+  }
+  ctx.restore();
+}
+
+function drawPlaceholderWeevil(p) {
   const scale = state.room.entry.weevilScale;
   const bodyW = 170 * scale;
   const bodyH = 260 * scale;
@@ -441,12 +570,19 @@ function handleCommand(text) {
       state.debug = !state.debug;
       addNotice(`debug overlays ${state.debug ? 'on' : 'off'}`);
       break;
+    case 'weevil':
+      state.weevilRenderer.enabled = !state.weevilRenderer.enabled;
+      addNotice(`weevil renderer ${state.weevilRenderer.enabled ? 'enabled' : 'disabled'}`);
+      if (state.weevilRenderer.enabled && state.weevilRenderer.status === 'not-loaded') {
+        loadWeevilRenderer();
+      }
+      break;
     default:
       addNotice(`unknown command: /${command}`);
   }
 }
 
-loadRoom()
+Promise.all([loadRoom(), loadWeevilRenderer()])
   .then(() => {
     addNotice('Loaded source-derived Orange Peel room definition');
     if (!state.debug) addNotice('Type /debug to show source coordinate overlays');
