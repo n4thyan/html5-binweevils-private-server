@@ -1,0 +1,66 @@
+{
+  "id": 5,
+  "slug": "nest-hall",
+  "name": "nest",
+  "displayName": "Nest Hall",
+  "source": {
+    "config": "legacy-reference/Binweevils-main/game-full/binConfig/getFile/1/uk/nestLocDefs.xml",
+    "locationId": 5,
+    "roomBG": "legacy-reference/Binweevils-main/game-full/cdn.binw.net/assetsNest/nestHall_06_05_21.swf"
+  },
+  "stage": {
+    "width": 960,
+    "height": 600,
+    "worldPadding": 90
+  },
+  "projection": {
+    "mode": "source-camera"
+  },
+  "camera": {
+    "camPos": [0, 145, -115],
+    "camAim": [0, 15, 500],
+    "noZoom": true,
+    "upSideDown": false,
+    "screenCenter": [480, 352],
+    "focalLength": 820
+  },
+  "bounds": {
+    "type": "rad",
+    "boundary": [0, 185, 168],
+    "keepFree": [1, 6, 5, 10]
+  },
+  "entry": {
+    "position": [0, 200],
+    "direction": -180,
+    "weevilScale": 0.45,
+    "renderScale": 0.95
+  },
+  "floor": {
+    "path": "background/nest-hall.png",
+    "sourceSwf": "source/nestHall_06_05_21.swf",
+    "exportNote": "Export nestHall_06_05_21.swf from JPEXS as a single PNG/SVG background and place it here. The prep script copies a PNG/JPG/SVG export if present."
+  },
+  "noGoAreas": [],
+  "doors": [
+    { "id": 1, "toLoc": 4, "toDoor": 1, "x1": -160, "z1": 190, "x2": -240, "z2": 190 },
+    { "id": 2, "toLoc": 6, "toDoor": 1, "x1": 160, "z1": 190, "x2": 240, "z2": 190 },
+    { "id": 3, "toLoc": 2, "toDoor": 1, "x1": -15, "z1": 360, "x2": -15, "z2": 480 },
+    { "id": 4, "toLoc": 8, "toDoor": 1, "x1": 0, "z1": 160, "x2": 0, "z2": 10 },
+    { "id": 5, "toLoc": 1, "toDoor": 1, "x1": -131, "z1": 266, "x2": -235, "z2": 325 },
+    { "id": 6, "toLoc": 3, "toDoor": 1, "x1": 155, "z1": 245, "x2": 240, "z2": 262 },
+    { "id": 7, "toLoc": 7, "toDoor": 2, "x1": -64, "z1": 150, "x2": -157, "z2": 10 },
+    { "id": 8, "toLoc": 9, "toDoor": 2, "x1": 50, "z1": 150, "x2": 140, "z2": 10 },
+    { "id": 9, "toLoc": 20, "toDoor": 1, "x1": -100, "z1": 220, "x2": -101, "y2": 500, "z2": 220 },
+    { "id": 10, "toLoc": 10, "toDoor": 1, "x1": 155, "z1": 130, "x2": 155, "y2": -150, "z2": 130 }
+  ],
+  "interactives": [
+    { "type": "door", "path": "portalFront_mc.blades_mc", "actRect": [-130, 300, 90, 100] },
+    { "type": "door", "path": "portal_mc", "actRect": [-200, 450, 80, 100] }
+  ],
+  "objects": [
+    { "type": "nestObject", "name": "portalFront_mc", "label": "Portal front", "x": 0, "y": 0, "z": 400 },
+    { "type": "nestObject", "name": "msgBox", "label": "Message box", "x": -180, "y": 0, "z": 90 },
+    { "type": "nestObject", "name": "levelupSignAnim_mc", "label": "Level-up sign", "x": 0, "y": 0, "z": 0 }
+  ],
+  "gameSlots": []
+}
