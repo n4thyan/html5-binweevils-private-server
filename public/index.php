@@ -17,7 +17,7 @@
     </header>
 
     <section class="bw-stage-wrap">
-      <canvas id="roomCanvas" width="960" height="600" aria-label="Room canvas"></canvas>
+      <canvas id="roomCanvas" width="825" height="490" aria-label="Room canvas"></canvas>
     </section>
 
     <form class="bw-chat" id="chatForm" autocomplete="off">
