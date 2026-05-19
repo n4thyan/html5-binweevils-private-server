@@ -2,7 +2,7 @@ import { SourceWalkBehaviour } from './weevil-behaviour.js';
 import { ProjectionModes, createRoomProjection } from './room-projection.js';
 
 const canvas = document.getElementById('roomCanvas');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
 const statusEl = document.getElementById('roomStatus');
 const roomTitleEl = document.getElementById('roomTitle');
 const roomSubtitleEl = document.getElementById('roomSubtitle');
@@ -13,6 +13,19 @@ const chatInput = document.getElementById('chatInput');
 const urlParams = new URLSearchParams(window.location.search);
 const now = () => performance.now();
 
+function finiteNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function normaliseAngle(value) {
+  return ((value % 360) + 360) % 360;
+}
+
 const state = {
   registry: null,
   roomSlug: urlParams.get('room') || null,
@@ -21,6 +34,7 @@ const state = {
   projectionMode: urlParams.get('projection') || null,
   floorImage: null,
   floorReady: false,
+  renderYawOffset: finiteNumber(urlParams.get('yaw'), null),
   player: {
     x: 0,
     z: 0,
@@ -29,7 +43,7 @@ const state = {
     dir: -180,
     message: '',
     messageUntil: 0,
-    speed: 135,
+    speed: finiteNumber(urlParams.get('speed'), 88),
     walk: new SourceWalkBehaviour(),
     walkSnapshot: null
   },
@@ -61,11 +75,23 @@ function setStatus(message) {
 
 function addNotice(message) {
   state.notices.unshift(`[${new Date().toLocaleTimeString()}] ${message}`);
-  state.notices = state.notices.slice(0, 10);
+  state.notices = state.notices.slice(0, 12);
 }
 
-function normaliseAngle(value) {
-  return ((value % 360) + 360) % 360;
+function getIdleDirection() {
+  return Number(state.room?.entry?.idleDirection ?? state.room?.entry?.direction ?? -180);
+}
+
+function getRenderYawOffset() {
+  return Number(state.renderYawOffset ?? state.room?.entry?.renderYawOffset ?? 180);
+}
+
+function getRenderScale() {
+  return Number(state.room?.entry?.renderScale ?? 0.52);
+}
+
+function resetRendererCache() {
+  state.weevilRenderer.lastKey = '';
 }
 
 function updateDebug() {
@@ -78,9 +104,12 @@ function updateDebug() {
     `projection: ${state.projectionMode}  (/projection to toggle)`,
     `debug overlays: ${state.debug ? 'on' : 'off'}  (/debug to toggle)`,
     `weevil renderer: ${state.weevilRenderer.status}  (/weevil to toggle)`,
+    `speed: ${p.speed.toFixed(0)}  (/speed 80)`,
+    `yaw offset: ${getRenderYawOffset().toFixed(0)}  (/yaw 180)`,
+    `render scale: ${getRenderScale().toFixed(2)}  (/scale 0.50)`,
     `player x/z: ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`,
     `target x/z: ${p.targetX.toFixed(1)}, ${p.targetZ.toFixed(1)}`,
-    `walk: ${walk?.moving ? 'moving' : 'idle'} turning ${walk?.turning ? 'yes' : 'no'} rotY ${p.dir.toFixed(1)}`,
+    `walk: ${walk?.moving ? 'moving' : 'idle'} turning ${walk?.turning ? 'yes' : 'no'} rotY ${p.dir.toFixed(1)} idle ${getIdleDirection().toFixed(1)}`,
     `floor: ${state.floorReady ? 'loaded' : 'placeholder'}`,
     '',
     ...state.notices
@@ -116,31 +145,27 @@ function clampToBoundary(x, z) {
     const [cx, cz, r] = state.room.bounds.boundary;
     const dx = x - cx;
     const dz = z - cz;
-    const distance = Math.sqrt(dx * dx + dz * dz);
+    const distance = Math.hypot(dx, dz);
     if (distance <= r) return { x, z };
     const scale = r / (distance || 1);
     return { x: cx + dx * scale, z: cz + dz * scale };
   }
 
   const [minX, minZ, maxX, maxZ] = state.room.bounds.boundary;
-  return { x: Math.max(minX, Math.min(maxX, x)), z: Math.max(minZ, Math.min(maxZ, z)) };
+  return { x: clamp(x, minX, maxX), z: clamp(z, minZ, maxZ) };
 }
 
 function pointHitsNoGo(x, z) {
   return state.room.noGoAreas.some((area) => {
     if (area.type !== 'rad') return false;
-    const dx = x - area.x;
-    const dz = z - area.z;
-    return Math.sqrt(dx * dx + dz * dz) < area.r;
+    return Math.hypot(x - area.x, z - area.z) < area.r;
   });
 }
 
 function isInsideBoundary(x, z) {
   if (state.room.bounds.type === 'rad') {
     const [cx, cz, r] = state.room.bounds.boundary;
-    const dx = x - cx;
-    const dz = z - cz;
-    return Math.sqrt(dx * dx + dz * dz) <= r;
+    return Math.hypot(x - cx, z - cz) <= r;
   }
 
   const [minX, minZ, maxX, maxZ] = state.room.bounds.boundary;
@@ -162,6 +187,20 @@ function syncPlayerFromWalk(snapshot) {
   state.player.dir = snapshot.rotY;
 }
 
+function initialiseWalkState(x, z, rotY = getIdleDirection()) {
+  state.player.walk.reset();
+  syncPlayerFromWalk(state.player.walk.init({
+    x,
+    z,
+    rotY,
+    targetX: x,
+    targetZ: z,
+    targetRotY: rotY,
+    speed: state.player.speed / 60,
+    reverse: false
+  }));
+}
+
 function startWalkTo(x, z) {
   const clamped = clampToBoundary(x, z);
   if (!isWalkable(clamped.x, clamped.z)) {
@@ -171,22 +210,21 @@ function startWalkTo(x, z) {
 
   const dx = clamped.x - state.player.x;
   const dz = clamped.z - state.player.z;
-  if (Math.sqrt(dx * dx + dz * dz) <= 1.5) return;
+  if (Math.hypot(dx, dz) <= 1.5) return;
 
   state.player.targetX = clamped.x;
   state.player.targetZ = clamped.z;
 
-  const snapshot = state.player.walk.init({
+  syncPlayerFromWalk(state.player.walk.init({
     x: state.player.x,
     z: state.player.z,
     rotY: state.player.dir,
     targetX: clamped.x,
     targetZ: clamped.z,
-    targetRotY: state.player.dir,
+    targetRotY: getIdleDirection(),
     speed: state.player.speed / 60,
     reverse: false
-  });
-  syncPlayerFromWalk(snapshot);
+  }));
 }
 
 function loadImage(src) {
@@ -215,29 +253,20 @@ async function loadRoom() {
   state.room = await response.json();
   applyRoomStageSize();
 
+  state.player.speed = finiteNumber(urlParams.get('speed'), Number(state.room.entry?.walkSpeed ?? state.player.speed));
   state.projectionMode = state.projectionMode || state.room.projection?.mode || ProjectionModes.FLAT;
   state.projection = createRoomProjection(state.room, canvas, state.projectionMode);
 
   roomTitleEl.textContent = state.room.displayName;
-  roomSubtitleEl.textContent = `Milestone 003 fixed-camera room slice`;
+  roomSubtitleEl.textContent = 'Milestone 003 fixed-camera room slice';
 
   const [entryX, entryZ] = state.room.entry.position;
   state.player.x = entryX;
   state.player.z = entryZ;
   state.player.targetX = entryX;
   state.player.targetZ = entryZ;
-  state.player.dir = state.room.entry.direction;
-  state.player.walk.reset();
-  state.player.walkSnapshot = state.player.walk.init({
-    x: entryX,
-    z: entryZ,
-    rotY: state.room.entry.direction,
-    targetX: entryX,
-    targetZ: entryZ,
-    targetRotY: state.room.entry.direction,
-    speed: state.player.speed / 60,
-    reverse: false
-  });
+  state.player.dir = getIdleDirection();
+  initialiseWalkState(entryX, entryZ, getIdleDirection());
 
   try {
     state.floorImage = await loadImage(`./assets/rooms/${state.room.slug}/${state.room.floor.path}`);
@@ -304,29 +333,38 @@ function drawFloor() {
   ctx.fillText(`Place exported image at public/assets/rooms/${state.room?.slug}/${target}`, 28, 66);
 }
 
+function drawProjectedCircle(cx, cz, r, fillStyle, strokeStyle) {
+  const steps = 96;
+  ctx.beginPath();
+  for (let i = 0; i <= steps; i += 1) {
+    const angle = (i / steps) * Math.PI * 2;
+    const p = worldToScreen(cx + Math.cos(angle) * r, cz + Math.sin(angle) * r);
+    if (i === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+  }
+  ctx.closePath();
+  if (fillStyle) {
+    ctx.fillStyle = fillStyle;
+    ctx.fill();
+  }
+  if (strokeStyle) {
+    ctx.strokeStyle = strokeStyle;
+    ctx.stroke();
+  }
+}
+
 function drawBoundary() {
   ctx.save();
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
   ctx.lineWidth = 2;
   ctx.setLineDash([8, 6]);
 
   if (state.room.bounds.type === 'rad') {
     const [cx, cz, r] = state.room.bounds.boundary;
-    const steps = 96;
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i += 1) {
-      const angle = (i / steps) * Math.PI * 2;
-      const p = worldToScreen(cx + Math.cos(angle) * r, cz + Math.sin(angle) * r);
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    drawProjectedCircle(cx, cz, r, 'rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.45)');
   } else {
     const [minX, minZ, maxX, maxZ] = state.room.bounds.boundary;
     const corners = [worldToScreen(minX, minZ), worldToScreen(maxX, minZ), worldToScreen(maxX, maxZ), worldToScreen(minX, maxZ)];
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.beginPath();
     ctx.moveTo(corners[0].x, corners[0].y);
     for (const corner of corners.slice(1)) ctx.lineTo(corner.x, corner.y);
@@ -338,22 +376,9 @@ function drawBoundary() {
 
 function drawNoGoAreas() {
   ctx.save();
+  ctx.lineWidth = 2;
   for (const area of state.room.noGoAreas) {
-    if (area.type !== 'rad') continue;
-    const steps = 64;
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.16)';
-    ctx.strokeStyle = 'rgba(255, 60, 60, 0.65)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i += 1) {
-      const angle = (i / steps) * Math.PI * 2;
-      const p = worldToScreen(area.x + Math.cos(angle) * area.r, area.z + Math.sin(angle) * area.r);
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    if (area.type === 'rad') drawProjectedCircle(area.x, area.z, area.r, 'rgba(255, 0, 0, 0.16)', 'rgba(255, 60, 60, 0.65)');
   }
   ctx.restore();
 }
@@ -419,9 +444,7 @@ function drawObjectPlaceholders() {
 }
 
 function getRendererPoseState() {
-  const snapshot = state.player.walkSnapshot;
-  if (!snapshot) return null;
-  return snapshot.poseState;
+  return state.player.walkSnapshot?.poseState ?? null;
 }
 
 function requestRenderedWeevilSprite() {
@@ -429,7 +452,7 @@ function requestRenderedWeevilSprite() {
   if (!wr.enabled || wr.status !== 'ready' || !wr.renderer || wr.pending) return;
 
   const poseState = getRendererPoseState();
-  const yaw = normaliseAngle(state.player.dir + 302);
+  const yaw = normaliseAngle(state.player.dir + getRenderYawOffset());
   const key = JSON.stringify({
     yaw: Math.round(yaw / 3) * 3,
     walking: isWalking(),
@@ -445,7 +468,7 @@ function requestRenderedWeevilSprite() {
     width: 240,
     height: 240,
     yaw,
-    pitch: 18,
+    pitch: Number(state.room?.entry?.renderPitch ?? 18),
     poseState
   }).then((metrics) => {
     wr.metrics = metrics;
@@ -473,7 +496,7 @@ function drawWeevil() {
 function drawRenderedWeevil(p) {
   const wr = state.weevilRenderer;
   const projectionScale = state.projection.scaleForWorld(state.player.x, state.player.z, 0);
-  const scale = 0.7 * projectionScale * (state.room.entry.renderScale ?? 1);
+  const scale = 0.7 * projectionScale * getRenderScale();
   const width = wr.canvas.width * scale;
   const height = wr.canvas.height * scale;
   const anchorX = (wr.metrics?.anchorX ?? wr.canvas.width * 0.5) * scale;
@@ -577,10 +600,9 @@ function roundRect(context, x, y, width, height, radius) {
 
 function update(deltaSeconds) {
   const frameScale = deltaSeconds * 60;
-  const snapshot = state.player.walk.step(frameScale, {
+  syncPlayerFromWalk(state.player.walk.step(frameScale, {
     isForbidden: (x, z) => !isWalkable(x, z)
-  });
-  syncPlayerFromWalk(snapshot);
+  }));
 }
 
 function draw() {
@@ -641,17 +663,7 @@ function handleCommand(text) {
         state.player.z = z;
         state.player.targetX = x;
         state.player.targetZ = z;
-        state.player.walk.reset();
-        syncPlayerFromWalk(state.player.walk.init({
-          x,
-          z,
-          rotY: state.player.dir,
-          targetX: x,
-          targetZ: z,
-          targetRotY: state.player.dir,
-          speed: state.player.speed / 60,
-          reverse: false
-        }));
+        initialiseWalkState(x, z, getIdleDirection());
         addNotice(`teleported to ${x},${z}`);
       } else {
         addNotice('usage: /goto <x> <z> inside walkable area');
@@ -672,6 +684,44 @@ function handleCommand(text) {
       setProjectionMode(modes[(index + 1) % modes.length]);
       break;
     }
+    case 'speed': {
+      const speed = Number(args[0]);
+      if (!Number.isFinite(speed)) {
+        addNotice(`speed is ${state.player.speed.toFixed(0)}`);
+      } else {
+        state.player.speed = clamp(speed, 30, 180);
+        addNotice(`speed set to ${state.player.speed.toFixed(0)}`);
+      }
+      break;
+    }
+    case 'yaw': {
+      const yaw = Number(args[0]);
+      if (!Number.isFinite(yaw)) {
+        addNotice(`yaw offset is ${getRenderYawOffset().toFixed(0)}`);
+      } else {
+        state.renderYawOffset = normaliseAngle(yaw);
+        resetRendererCache();
+        addNotice(`yaw offset set to ${state.renderYawOffset.toFixed(0)}`);
+      }
+      break;
+    }
+    case 'scale': {
+      const scale = Number(args[0]);
+      if (!Number.isFinite(scale)) {
+        addNotice(`scale is ${getRenderScale().toFixed(2)}`);
+      } else {
+        state.room.entry.renderScale = clamp(scale, 0.25, 1.2);
+        resetRendererCache();
+        addNotice(`scale set to ${state.room.entry.renderScale.toFixed(2)}`);
+      }
+      break;
+    }
+    case 'front':
+    case 'face':
+      initialiseWalkState(state.player.x, state.player.z, getIdleDirection());
+      resetRendererCache();
+      addNotice(`facing idle direction ${getIdleDirection().toFixed(0)}`);
+      break;
     case 'room':
       addNotice(`rooms: ${Object.keys(state.registry.rooms).join(', ')}`);
       addNotice('switch with ?room=nest-hall or ?room=inks-orange');
@@ -689,6 +739,7 @@ function handleCommand(text) {
 Promise.all([loadRoom(), loadWeevilRenderer()])
   .then(() => {
     addNotice(`Loaded source-derived ${state.room.displayName} room definition`);
+    addNotice('Type /speed 80, /yaw 180, /scale 0.50 for avatar tuning');
     addNotice('Type /projection to compare fixed-floor, source-camera, and flat projection');
     if (!state.debug) addNotice('Type /debug to show source coordinate overlays');
     requestAnimationFrame(frame);
