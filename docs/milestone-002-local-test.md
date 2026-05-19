@@ -13,15 +13,34 @@ git checkout milestone-002-inks-orange-room-shell
 git pull
 ```
 
-## Copy the original floor asset
+## Prepare local room assets
 
-The room shell expects this file:
+The repo does not commit the original game assets directly.
+
+The current demo can run without extracted SWF objects because it draws labelled placeholders at the original XML coordinates. The only real asset it uses immediately is the floor image:
 
 ```text
 public/assets/rooms/inks-orange/floors/inks.jpg
 ```
 
-Copy it from the local legacy reference:
+Use the helper script to copy the floor and the source SWFs locally:
+
+```powershell
+.\tools\prepare-inks-orange-assets.ps1
+```
+
+This copies:
+
+```text
+floors/inks.jpg -> public/assets/rooms/inks-orange/floors/inks.jpg
+assets3D/*.swf -> public/assets/rooms/inks-orange/source-swfs/
+```
+
+The copied SWFs are only local source material for JPEXS/FFDec export. The HTML5 room does not render those SWFs directly.
+
+These copied/exported assets are ignored by Git by default.
+
+Manual floor-only copy if needed:
 
 ```powershell
 Copy-Item .\legacy-reference\Binweevils-main\game-full\cdn.binw.net\floors\inks.jpg .\public\assets\rooms\inks-orange\floors\inks.jpg -Force
