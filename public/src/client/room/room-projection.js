@@ -122,15 +122,15 @@ export class SourceCameraProjection {
     this.forward = normalise(subtract(this.camAim, this.camPos));
 
     // Camera basis using Y-up 3D room coordinates.
-    // Fixed-camera rooms such as Nest Hall are expected to work from this single source camera.
+    // The cross order is WORLD_UP x forward so positive source X remains screen-right.
     // Rotatable rooms such as Ink's Orange still need their room-specific camera rotation logic ported later.
-    this.right = normalise(cross(this.forward, WORLD_UP));
-    this.up = normalise(cross(this.right, this.forward));
+    this.right = normalise(cross(WORLD_UP, this.forward));
+    this.up = normalise(cross(this.forward, this.right));
 
     const distanceToAim = length(subtract(this.camAim, this.camPos));
-    this.focalLength = room.camera?.focalLength ?? Math.max(560, Math.min(980, distanceToAim * 1.55));
+    this.focalLength = room.camera?.focalLength ?? Math.max(520, Math.min(900, distanceToAim * 1.15));
     this.centerX = room.camera?.screenCenter?.[0] ?? canvas.width / 2;
-    this.centerY = room.camera?.screenCenter?.[1] ?? canvas.height * 0.58;
+    this.centerY = room.camera?.screenCenter?.[1] ?? canvas.height * 0.62;
     this.baseDepth = Math.max(1, dot(subtract([room.entry.position[0], 0, room.entry.position[1]], this.camPos), this.forward));
   }
 
