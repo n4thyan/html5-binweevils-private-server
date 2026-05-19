@@ -1,0 +1,26 @@
+# Local/private source references
+legacy-reference/
+
+# Local environment and dependencies
+node_modules/
+vendor/
+.env
+.env.*
+!.env.example
+
+# Runtime/generated data
+data/*.json
+!data/.gitkeep
+logs/
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build/output folders
+dist/
+build/
+.cache/
