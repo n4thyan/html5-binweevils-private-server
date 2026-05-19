@@ -1,6 +1,7 @@
 export const ProjectionModes = Object.freeze({
   FLAT: 'flat',
-  SOURCE_CAMERA: 'source-camera'
+  SOURCE_CAMERA: 'source-camera',
+  FIXED_FLOOR: 'fixed-floor'
 });
 
 const WORLD_UP = [0, 1, 0];
@@ -42,6 +43,14 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function clamp01(value) {
+  return clamp(value, 0, 1);
+}
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
 function toScreenPoint(canvas, x, y) {
   return {
     x: clamp(x, -canvas.width * 4, canvas.width * 5),
@@ -63,6 +72,9 @@ function getBoundaryExtents(room) {
 }
 
 export function createRoomProjection(room, canvas, mode = ProjectionModes.FLAT) {
+  if (mode === ProjectionModes.FIXED_FLOOR) {
+    return new FixedFloorProjection(room, canvas);
+  }
   if (mode === ProjectionModes.SOURCE_CAMERA) {
     return new SourceCameraProjection(room, canvas);
   }
@@ -106,6 +118,82 @@ export class FlatRoomProjection {
 
   scaleForWorld() {
     return 1;
+  }
+}
+
+export class FixedFloorProjection {
+  constructor(room, canvas) {
+    this.room = room;
+    this.canvas = canvas;
+    this.mode = ProjectionModes.FIXED_FLOOR;
+
+    const cal = room.projection?.calibration ?? {};
+    this.topZ = cal.topZ ?? 0;
+    this.bottomZ = cal.bottomZ ?? 480;
+    this.topY = cal.topY ?? canvas.height * 0.55;
+    this.bottomY = cal.bottomY ?? canvas.height + 10;
+    this.centerX = cal.centerX ?? canvas.width / 2;
+    this.xScaleTop = cal.xScaleTop ?? 0.7;
+    this.xScaleBottom = cal.xScaleBottom ?? 2.2;
+    this.xScalePower = cal.xScalePower ?? 1;
+    this.yPower = cal.yPower ?? 1;
+    this.yScreenScale = cal.yScreenScale ?? 0.28;
+    this.minScale = cal.minScale ?? 0.78;
+    this.maxScale = cal.maxScale ?? 1.22;
+    this.zScaleInfluence = cal.zScaleInfluence ?? 0.38;
+    this.entryZ = room.entry?.position?.[1] ?? 200;
+    this.entryZN = this.zToNormal(this.entryZ);
+  }
+
+  zToNormal(z) {
+    return clamp01((z - this.topZ) / ((this.bottomZ - this.topZ) || 1));
+  }
+
+  normalToZ(n) {
+    return this.topZ + clamp01(n) * (this.bottomZ - this.topZ);
+  }
+
+  xScaleForNormal(n) {
+    const eased = Math.pow(clamp01(n), this.xScalePower);
+    return lerp(this.xScaleTop, this.xScaleBottom, eased);
+  }
+
+  yForNormal(n) {
+    const eased = Math.pow(clamp01(n), this.yPower);
+    return lerp(this.topY, this.bottomY, eased);
+  }
+
+  worldToScreen(x, z, y = 0) {
+    const n = this.zToNormal(z);
+    const xScale = this.xScaleForNormal(n);
+    const floorY = this.yForNormal(n);
+
+    return {
+      ...toScreenPoint(this.canvas, this.centerX + x * xScale, floorY - y * this.yScreenScale),
+      depth: z + y * 0.001
+    };
+  }
+
+  screenToWorld(screenX, screenY) {
+    const yNorm = clamp01((screenY - this.topY) / ((this.bottomY - this.topY) || 1));
+    const zNorm = Math.pow(yNorm, 1 / (this.yPower || 1));
+    const xScale = this.xScaleForNormal(zNorm) || 1;
+
+    return {
+      x: (screenX - this.centerX) / xScale,
+      y: 0,
+      z: this.normalToZ(zNorm)
+    };
+  }
+
+  depthForWorld(x, z, y = 0) {
+    return z + y * 0.001;
+  }
+
+  scaleForWorld(x, z) {
+    const n = this.zToNormal(z);
+    const scale = 1 + (n - this.entryZN) * this.zScaleInfluence;
+    return clamp(scale, this.minScale, this.maxScale);
   }
 }
 
