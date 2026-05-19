@@ -22,6 +22,11 @@ public/assets/rooms/**/objects/**/*.png
 public/assets/rooms/**/objects/**/*.webp
 public/assets/rooms/**/objects/**/*.svg
 
+# Local imported prototype weevil renderer/assets
+# The clean repo can load these for testing, but they are copied from the previous prototype locally.
+public/weevil-creator/
+public/src/client/room/room-weevil-renderer.js
+
 # OS/editor noise
 .DS_Store
 Thumbs.db
