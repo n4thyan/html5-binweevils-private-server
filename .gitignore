@@ -18,6 +18,11 @@ logs/
 # These are generated from legacy-reference or JPEXS locally and should be reviewed before force-adding.
 public/assets/rooms/**/floors/*.jpg
 public/assets/rooms/**/source-swfs/
+public/assets/rooms/**/source/
+public/assets/rooms/**/background/*.png
+public/assets/rooms/**/background/*.jpg
+public/assets/rooms/**/background/*.jpeg
+public/assets/rooms/**/background/*.svg
 public/assets/rooms/**/objects/**/*.png
 public/assets/rooms/**/objects/**/*.webp
 public/assets/rooms/**/objects/**/*.svg
