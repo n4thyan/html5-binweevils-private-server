@@ -1,3 +1,5 @@
+import { SourceWalkBehaviour } from './weevil-behaviour.js';
+
 const canvas = document.getElementById('roomCanvas');
 const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('roomStatus');
@@ -18,11 +20,11 @@ const state = {
     targetX: 0,
     targetZ: 0,
     dir: -180,
-    visualDir: -180,
     message: '',
     messageUntil: 0,
     speed: 135,
-    walkStartedAt: 0
+    walk: new SourceWalkBehaviour(),
+    walkSnapshot: null
   },
   weevilRenderer: {
     status: 'not-loaded',
@@ -59,26 +61,17 @@ function normaliseAngle(value) {
   return ((value % 360) + 360) % 360;
 }
 
-function angleDelta(from, to) {
-  return ((normaliseAngle(to) - normaliseAngle(from) + 540) % 360) - 180;
-}
-
-function approachAngle(current, target, maxStep) {
-  const delta = angleDelta(current, target);
-  if (Math.abs(delta) <= maxStep) return normaliseAngle(target);
-  return normaliseAngle(current + Math.sign(delta) * maxStep);
-}
-
 function updateDebug() {
   if (!state.room) return;
   const p = state.player;
+  const walk = p.walkSnapshot;
   debugEl.textContent = [
     `room: ${state.room.displayName} (${state.room.id})`,
     `debug overlays: ${state.debug ? 'on' : 'off'}  (/debug to toggle)`,
     `weevil renderer: ${state.weevilRenderer.status}  (/weevil to toggle)`,
     `player x/z: ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`,
     `target x/z: ${p.targetX.toFixed(1)}, ${p.targetZ.toFixed(1)}`,
-    `direction: ${p.dir.toFixed(1)} visual ${p.visualDir.toFixed(1)}`,
+    `walk: ${walk?.moving ? 'moving' : 'idle'} turning ${walk?.turning ? 'yes' : 'no'} rotY ${p.dir.toFixed(1)}`,
     `floor: ${state.floorReady ? 'loaded' : 'placeholder'}`,
     '',
     ...state.notices
@@ -136,12 +129,17 @@ function isWalkable(x, z) {
 }
 
 function isWalking() {
-  const dx = state.player.targetX - state.player.x;
-  const dz = state.player.targetZ - state.player.z;
-  return Math.sqrt(dx * dx + dz * dz) > 1.5;
+  return Boolean(state.player.walkSnapshot?.moving || state.player.walkSnapshot?.turning);
 }
 
-function setTarget(x, z) {
+function syncPlayerFromWalk(snapshot) {
+  state.player.walkSnapshot = snapshot;
+  state.player.x = snapshot.x;
+  state.player.z = snapshot.z;
+  state.player.dir = snapshot.rotY;
+}
+
+function startWalkTo(x, z) {
   const clamped = clampToBoundary(x, z);
   if (!isWalkable(clamped.x, clamped.z)) {
     addNotice(`Blocked: ${clamped.x.toFixed(0)}, ${clamped.z.toFixed(0)}`);
@@ -150,13 +148,24 @@ function setTarget(x, z) {
 
   const dx = clamped.x - state.player.x;
   const dz = clamped.z - state.player.z;
-  if (Math.sqrt(dx * dx + dz * dz) > 1.5) {
-    state.player.dir = Math.atan2(dx, dz) * (180 / Math.PI);
-    state.player.walkStartedAt = now();
-  }
+  if (Math.sqrt(dx * dx + dz * dz) <= 1.5) return;
 
   state.player.targetX = clamped.x;
   state.player.targetZ = clamped.z;
+
+  // The source Walk.as behaviour is frame-step based. We keep the room speed in units/sec,
+  // then feed the behaviour speed as units/frame and step it with a 60fps frame scale.
+  const snapshot = state.player.walk.init({
+    x: state.player.x,
+    z: state.player.z,
+    rotY: state.player.dir,
+    targetX: clamped.x,
+    targetZ: clamped.z,
+    targetRotY: state.player.dir,
+    speed: state.player.speed / 60,
+    reverse: false
+  });
+  syncPlayerFromWalk(snapshot);
 }
 
 function loadImage(src) {
@@ -179,7 +188,17 @@ async function loadRoom() {
   state.player.targetX = entryX;
   state.player.targetZ = entryZ;
   state.player.dir = state.room.entry.direction;
-  state.player.visualDir = state.room.entry.direction;
+  state.player.walk.reset();
+  state.player.walkSnapshot = state.player.walk.init({
+    x: entryX,
+    z: entryZ,
+    rotY: state.room.entry.direction,
+    targetX: entryX,
+    targetZ: entryZ,
+    targetRotY: state.room.entry.direction,
+    speed: state.player.speed / 60,
+    reverse: false
+  });
 
   try {
     state.floorImage = await loadImage(`./assets/rooms/inks-orange/${state.room.floor.path}`);
@@ -297,48 +316,24 @@ function drawObjectPlaceholders() {
   }
 }
 
-function makeWalkPose() {
-  if (!isWalking()) return null;
-
-  const elapsed = now() - state.player.walkStartedAt;
-  const phase = Math.floor(elapsed / 85) % 8;
-  const bodyBob = Math.sin(elapsed / 55) * 5;
-  const bodyTwist = Math.sin(elapsed / 90) * 3;
-
-  // Temporary visible walk loop. The real values should be replaced after the AS3 movement audit.
-  const poses = [
-    [14, 4, 7, 16, 4, 6],
-    [15, 5, 6, 17, 3, 5],
-    [16, 6, 4, 14, 4, 7],
-    [17, 5, 3, 15, 5, 6],
-    [16, 4, 6, 14, 4, 7],
-    [15, 3, 5, 17, 5, 4],
-    [14, 4, 7, 16, 4, 6],
-    [7, 4, 14, 6, 4, 16]
-  ];
-
-  return {
-    creatureY: bodyBob,
-    creatureRotY: bodyTwist,
-    headRotX: Math.sin(elapsed / 130) * 1.5,
-    headRotY: Math.sin(elapsed / 160) * 4,
-    shadowAlpha: 0.92 + Math.abs(Math.sin(elapsed / 80)) * 0.08,
-    legs: poses[phase]
-  };
+function getRendererPoseState() {
+  const snapshot = state.player.walkSnapshot;
+  if (!snapshot) return null;
+  return snapshot.poseState;
 }
 
 function requestRenderedWeevilSprite() {
   const wr = state.weevilRenderer;
   if (!wr.enabled || wr.status !== 'ready' || !wr.renderer || wr.pending) return;
 
-  const poseState = makeWalkPose();
-  const yaw = normaliseAngle(state.player.visualDir + 302);
+  const poseState = getRendererPoseState();
+  const yaw = normaliseAngle(state.player.dir + 302);
   const key = JSON.stringify({
     yaw: Math.round(yaw / 3) * 3,
-    walking: Boolean(poseState),
+    walking: isWalking(),
     legs: poseState?.legs?.join(',') ?? 'idle',
-    bob: Math.round((poseState?.creatureY ?? 0) * 2) / 2,
-    twist: Math.round((poseState?.creatureRotY ?? 0) * 2) / 2
+    headY: Math.round((poseState?.headRotY ?? 0) * 2) / 2,
+    bodyY: Math.round((poseState?.creatureRotY ?? 0) * 2) / 2
   });
   if (key === wr.lastKey && wr.metrics) return;
 
@@ -502,31 +497,11 @@ function roundRect(context, x, y, width, height, radius) {
 }
 
 function update(deltaSeconds) {
-  const p = state.player;
-  const dx = p.targetX - p.x;
-  const dz = p.targetZ - p.z;
-  const distance = Math.sqrt(dx * dx + dz * dz);
-
-  p.visualDir = approachAngle(p.visualDir, p.dir, 420 * deltaSeconds);
-
-  if (distance <= 1) {
-    p.x = p.targetX;
-    p.z = p.targetZ;
-    return;
-  }
-
-  const step = Math.min(distance, p.speed * deltaSeconds);
-  const nx = p.x + (dx / distance) * step;
-  const nz = p.z + (dz / distance) * step;
-
-  if (isWalkable(nx, nz)) {
-    p.x = nx;
-    p.z = nz;
-    p.dir = Math.atan2(dx, dz) * (180 / Math.PI);
-  } else {
-    p.targetX = p.x;
-    p.targetZ = p.z;
-  }
+  const frameScale = deltaSeconds * 60;
+  const snapshot = state.player.walk.step(frameScale, {
+    isForbidden: (x, z) => !isWalkable(x, z)
+  });
+  syncPlayerFromWalk(snapshot);
 }
 
 function draw() {
@@ -553,7 +528,7 @@ function frame(timestamp) {
 canvas.addEventListener('click', (event) => {
   if (!state.room) return;
   const point = screenToWorld(event.clientX, event.clientY);
-  setTarget(point.x, point.z);
+  startWalkTo(point.x, point.z);
 });
 
 chatForm.addEventListener('submit', (event) => {
@@ -586,6 +561,17 @@ function handleCommand(text) {
         state.player.z = z;
         state.player.targetX = x;
         state.player.targetZ = z;
+        state.player.walk.reset();
+        syncPlayerFromWalk(state.player.walk.init({
+          x,
+          z,
+          rotY: state.player.dir,
+          targetX: x,
+          targetZ: z,
+          targetRotY: state.player.dir,
+          speed: state.player.speed / 60,
+          reverse: false
+        }));
         addNotice(`teleported to ${x},${z}`);
       } else {
         addNotice('usage: /goto <x> <z> inside walkable area');
