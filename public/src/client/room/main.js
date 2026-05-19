@@ -1,8 +1,11 @@
 import { SourceWalkBehaviour } from './weevil-behaviour.js';
+import { ProjectionModes, createRoomProjection } from './room-projection.js';
 
 const canvas = document.getElementById('roomCanvas');
 const ctx = canvas.getContext('2d');
 const statusEl = document.getElementById('roomStatus');
+const roomTitleEl = document.getElementById('roomTitle');
+const roomSubtitleEl = document.getElementById('roomSubtitle');
 const debugEl = document.getElementById('debugOutput');
 const chatForm = document.getElementById('chatForm');
 const chatInput = document.getElementById('chatInput');
@@ -11,7 +14,11 @@ const urlParams = new URLSearchParams(window.location.search);
 const now = () => performance.now();
 
 const state = {
+  registry: null,
+  roomSlug: urlParams.get('room') || null,
   room: null,
+  projection: null,
+  projectionMode: urlParams.get('projection') === 'flat' ? ProjectionModes.FLAT : ProjectionModes.SOURCE_CAMERA,
   floorImage: null,
   floorReady: false,
   player: {
@@ -67,6 +74,7 @@ function updateDebug() {
   const walk = p.walkSnapshot;
   debugEl.textContent = [
     `room: ${state.room.displayName} (${state.room.id})`,
+    `projection: ${state.projectionMode}  (/projection to toggle)`,
     `debug overlays: ${state.debug ? 'on' : 'off'}  (/debug to toggle)`,
     `weevil renderer: ${state.weevilRenderer.status}  (/weevil to toggle)`,
     `player x/z: ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`,
@@ -78,38 +86,35 @@ function updateDebug() {
   ].join('\n');
 }
 
-function getBoundary() {
-  return state.room.bounds.boundary;
+function setProjectionMode(mode) {
+  state.projectionMode = mode;
+  if (state.room) state.projection = createRoomProjection(state.room, canvas, mode);
+  addNotice(`projection: ${mode}`);
 }
 
-function worldExtents() {
-  const [minX, minZ, maxX, maxZ] = getBoundary();
-  const pad = state.room.stage.worldPadding ?? 80;
-  return { minX: minX - pad, minZ: minZ - pad, maxX: maxX + pad, maxZ: maxZ + pad };
-}
-
-// Milestone 002 uses a flat temporary projection.
-// The original InksOrange source has camera data, so a later pass should replace this with source-aware projection.
-function worldToScreen(x, z) {
-  const ext = worldExtents();
-  const nx = (x - ext.minX) / (ext.maxX - ext.minX);
-  const nz = (z - ext.minZ) / (ext.maxZ - ext.minZ);
-  return { x: nx * canvas.width, y: nz * canvas.height };
+function worldToScreen(x, z, y = 0) {
+  return state.projection.worldToScreen(x, z, y);
 }
 
 function screenToWorld(sx, sy) {
   const rect = canvas.getBoundingClientRect();
   const px = (sx - rect.left) * (canvas.width / rect.width);
   const py = (sy - rect.top) * (canvas.height / rect.height);
-  const ext = worldExtents();
-  return {
-    x: ext.minX + (px / canvas.width) * (ext.maxX - ext.minX),
-    z: ext.minZ + (py / canvas.height) * (ext.maxZ - ext.minZ)
-  };
+  return state.projection.screenToWorld(px, py);
 }
 
 function clampToBoundary(x, z) {
-  const [minX, minZ, maxX, maxZ] = getBoundary();
+  if (state.room.bounds.type === 'rad') {
+    const [cx, cz, r] = state.room.bounds.boundary;
+    const dx = x - cx;
+    const dz = z - cz;
+    const distance = Math.sqrt(dx * dx + dz * dz);
+    if (distance <= r) return { x, z };
+    const scale = r / (distance || 1);
+    return { x: cx + dx * scale, z: cz + dz * scale };
+  }
+
+  const [minX, minZ, maxX, maxZ] = state.room.bounds.boundary;
   return { x: Math.max(minX, Math.min(maxX, x)), z: Math.max(minZ, Math.min(maxZ, z)) };
 }
 
@@ -122,10 +127,20 @@ function pointHitsNoGo(x, z) {
   });
 }
 
+function isInsideBoundary(x, z) {
+  if (state.room.bounds.type === 'rad') {
+    const [cx, cz, r] = state.room.bounds.boundary;
+    const dx = x - cx;
+    const dz = z - cz;
+    return Math.sqrt(dx * dx + dz * dz) <= r;
+  }
+
+  const [minX, minZ, maxX, maxZ] = state.room.bounds.boundary;
+  return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
+}
+
 function isWalkable(x, z) {
-  const [minX, minZ, maxX, maxZ] = getBoundary();
-  if (x < minX || x > maxX || z < minZ || z > maxZ) return false;
-  return !pointHitsNoGo(x, z);
+  return isInsideBoundary(x, z) && !pointHitsNoGo(x, z);
 }
 
 function isWalking() {
@@ -153,8 +168,6 @@ function startWalkTo(x, z) {
   state.player.targetX = clamped.x;
   state.player.targetZ = clamped.z;
 
-  // The source Walk.as behaviour is frame-step based. We keep the room speed in units/sec,
-  // then feed the behaviour speed as units/frame and step it with a 60fps frame scale.
   const snapshot = state.player.walk.init({
     x: state.player.x,
     z: state.player.z,
@@ -177,10 +190,29 @@ function loadImage(src) {
   });
 }
 
+async function loadRegistry() {
+  const response = await fetch('./assets/rooms/room-registry.json', { cache: 'no-store' });
+  if (!response.ok) throw new Error(`room-registry.json failed: ${response.status}`);
+  state.registry = await response.json();
+  state.roomSlug = state.roomSlug || state.registry.defaultRoom;
+  return state.registry.rooms[state.roomSlug];
+}
+
 async function loadRoom() {
-  const response = await fetch('./assets/rooms/inks-orange/room.json', { cache: 'no-store' });
-  if (!response.ok) throw new Error(`room.json failed: ${response.status}`);
+  const roomEntry = await loadRegistry();
+  if (!roomEntry) throw new Error(`Unknown room: ${state.roomSlug}`);
+
+  const response = await fetch(roomEntry.definition, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`${roomEntry.definition} failed: ${response.status}`);
   state.room = await response.json();
+
+  if (state.room.projection?.mode === ProjectionModes.SOURCE_CAMERA && urlParams.get('projection') !== 'flat') {
+    state.projectionMode = ProjectionModes.SOURCE_CAMERA;
+  }
+  state.projection = createRoomProjection(state.room, canvas, state.projectionMode);
+
+  roomTitleEl.textContent = state.room.displayName;
+  roomSubtitleEl.textContent = `Milestone 003 fixed-camera room slice`;
 
   const [entryX, entryZ] = state.room.entry.position;
   state.player.x = entryX;
@@ -201,13 +233,13 @@ async function loadRoom() {
   });
 
   try {
-    state.floorImage = await loadImage(`./assets/rooms/inks-orange/${state.room.floor.path}`);
+    state.floorImage = await loadImage(`./assets/rooms/${state.room.slug}/${state.room.floor.path}`);
     state.floorReady = true;
-    setStatus('Room loaded with source floor asset');
+    setStatus(`${state.room.displayName} loaded with source-export background`);
   } catch (error) {
     state.floorReady = false;
-    setStatus('Room loaded - copy inks.jpg into assets/rooms/inks-orange/floors/');
-    addNotice('Floor image missing; using placeholder background');
+    setStatus(`${state.room.displayName} loaded - export ${state.room.floor.sourceSwf || 'room SWF'} to ${state.room.floor.path}`);
+    addNotice('Room background image missing; using source-coordinate placeholder');
   }
 }
 
@@ -239,33 +271,57 @@ function drawFloor() {
   }
 
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, '#d07a19');
-  gradient.addColorStop(0.5, '#8f4a0d');
-  gradient.addColorStop(1, '#3f2108');
+  gradient.addColorStop(0, '#4b260a');
+  gradient.addColorStop(0.42, '#a45d18');
+  gradient.addColorStop(1, '#2e1706');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = 'rgba(255, 235, 150, 0.18)';
-  for (let i = -canvas.width; i < canvas.width * 2; i += 48) {
-    ctx.beginPath();
-    ctx.ellipse(i, canvas.height * 0.68, 220, 44, -0.24, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height * 0.56);
+  ctx.fillStyle = 'rgba(255, 206, 88, 0.2)';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 310, 170, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 245, 190, 0.38)';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.restore();
 
   ctx.fillStyle = '#fff3ce';
   ctx.font = 'bold 18px Verdana, Arial, sans-serif';
-  ctx.fillText('Missing floor asset: public/assets/rooms/inks-orange/floors/inks.jpg', 28, 42);
+  const source = state.room?.floor?.sourceSwf || 'room SWF';
+  const target = state.room?.floor?.path || 'background image';
+  ctx.fillText(`Missing room background export: ${source}`, 28, 42);
+  ctx.font = '14px Verdana, Arial, sans-serif';
+  ctx.fillText(`Place exported image at public/assets/rooms/${state.room?.slug}/${target}`, 28, 66);
 }
 
 function drawBoundary() {
-  const [minX, minZ, maxX, maxZ] = getBoundary();
-  const a = worldToScreen(minX, minZ);
-  const b = worldToScreen(maxX, maxZ);
   ctx.save();
   ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
   ctx.lineWidth = 2;
   ctx.setLineDash([8, 6]);
-  ctx.strokeRect(a.x, a.y, b.x - a.x, b.y - a.y);
+
+  if (state.room.bounds.type === 'rad') {
+    const [cx, cz, r] = state.room.bounds.boundary;
+    const centre = worldToScreen(cx, cz);
+    const edge = worldToScreen(cx + r, cz);
+    const radius = Math.abs(edge.x - centre.x);
+    ctx.beginPath();
+    ctx.arc(centre.x, centre.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    const [minX, minZ, maxX, maxZ] = state.room.bounds.boundary;
+    const corners = [worldToScreen(minX, minZ), worldToScreen(maxX, minZ), worldToScreen(maxX, maxZ), worldToScreen(minX, maxZ)];
+    ctx.beginPath();
+    ctx.moveTo(corners[0].x, corners[0].y);
+    for (const corner of corners.slice(1)) ctx.lineTo(corner.x, corner.y);
+    ctx.closePath();
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -287,14 +343,45 @@ function drawNoGoAreas() {
   ctx.restore();
 }
 
+function drawDoorPlaceholders() {
+  if (!state.debug) return;
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(130, 220, 255, 0.78)';
+  ctx.fillStyle = 'rgba(130, 220, 255, 0.18)';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([4, 4]);
+  ctx.font = 'bold 10px Verdana, Arial, sans-serif';
+  ctx.textAlign = 'center';
+
+  for (const door of state.room.doors || []) {
+    const a = worldToScreen(Number(door.x1), Number(door.z1), 0);
+    const b = worldToScreen(Number(door.x2), Number(door.z2), Number(door.y2 || 0));
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e7f8ff';
+    ctx.fillText(`door ${door.id}`, a.x, a.y - 12);
+    ctx.fillStyle = 'rgba(130, 220, 255, 0.18)';
+  }
+  ctx.restore();
+}
+
 function drawObjectPlaceholders() {
-  const objects = [...state.room.objects, ...state.room.gameSlots.map((slot) => ({ ...slot, type: 'gameSlot' }))];
-  objects.sort((a, b) => (a.z + (a.depthOffset ?? 0)) - (b.z + (b.depthOffset ?? 0)));
+  if (!state.debug) return;
+
+  const objects = [...(state.room.objects || []), ...(state.room.gameSlots || []).map((slot) => ({ ...slot, type: 'gameSlot' }))];
+  objects.sort((a, b) => state.projection.depthForWorld(a.x, a.z, a.y ?? 0) - state.projection.depthForWorld(b.x, b.z, b.y ?? 0));
 
   for (const object of objects) {
-    const point = worldToScreen(object.x, object.z);
+    const point = worldToScreen(object.x, object.z, object.y ?? 0);
     const isGame = object.type === 'gameSlot';
-    const radius = Math.max(5, Math.min(24, (object.scale ?? 0.1) * 34));
+    const projectionScale = state.projection.scaleForWorld(object.x, object.z, object.y ?? 0);
+    const radius = Math.max(5, Math.min(28, (object.scale ?? 0.14) * 40 * projectionScale));
 
     ctx.save();
     ctx.translate(point.x, point.y);
@@ -310,7 +397,7 @@ function drawObjectPlaceholders() {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     ctx.fillStyle = '#1b0b01';
-    const label = object.label || object.path || 'object';
+    const label = object.label || object.name || object.path || 'object';
     ctx.fillText(label.replace('assets3D/', '').replace('.swf', ''), 0, -radius - 4);
     ctx.restore();
   }
@@ -358,7 +445,7 @@ function requestRenderedWeevilSprite() {
 }
 
 function drawWeevil() {
-  const p = worldToScreen(state.player.x, state.player.z);
+  const p = worldToScreen(state.player.x, state.player.z, 0);
   requestRenderedWeevilSprite();
 
   if (state.weevilRenderer.enabled && state.weevilRenderer.status === 'ready' && state.weevilRenderer.canvas && state.weevilRenderer.metrics) {
@@ -370,7 +457,8 @@ function drawWeevil() {
 
 function drawRenderedWeevil(p) {
   const wr = state.weevilRenderer;
-  const scale = 0.7;
+  const projectionScale = state.projection.scaleForWorld(state.player.x, state.player.z, 0);
+  const scale = 0.7 * projectionScale * (state.room.entry.renderScale ?? 1);
   const width = wr.canvas.width * scale;
   const height = wr.canvas.height * scale;
   const anchorX = (wr.metrics?.anchorX ?? wr.canvas.width * 0.5) * scale;
@@ -387,7 +475,7 @@ function drawRenderedWeevil(p) {
 }
 
 function drawPlaceholderWeevil(p) {
-  const scale = state.room.entry.weevilScale;
+  const scale = state.room.entry.weevilScale * state.projection.scaleForWorld(state.player.x, state.player.z, 0);
   const bodyW = 170 * scale;
   const bodyH = 260 * scale;
 
@@ -406,30 +494,6 @@ function drawPlaceholderWeevil(p) {
   ctx.ellipse(0, -bodyH * 0.18, bodyW * 0.45, bodyH * 0.48, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
-
-  ctx.fillStyle = '#fff8df';
-  ctx.beginPath();
-  ctx.arc(-bodyW * 0.17, -bodyH * 0.3, bodyW * 0.12, 0, Math.PI * 2);
-  ctx.arc(bodyW * 0.17, -bodyH * 0.3, bodyW * 0.12, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#1b0b01';
-  ctx.beginPath();
-  ctx.arc(-bodyW * 0.15, -bodyH * 0.29, bodyW * 0.045, 0, Math.PI * 2);
-  ctx.arc(bodyW * 0.19, -bodyH * 0.29, bodyW * 0.045, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.strokeStyle = '#254a11';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(-bodyW * 0.18, -bodyH * 0.62);
-  ctx.quadraticCurveTo(-bodyW * 0.42, -bodyH * 0.86, -bodyW * 0.28, -bodyH * 0.95);
-  ctx.moveTo(bodyW * 0.18, -bodyH * 0.62);
-  ctx.quadraticCurveTo(bodyW * 0.42, -bodyH * 0.86, bodyW * 0.28, -bodyH * 0.95);
-  ctx.stroke();
-
-  ctx.fillStyle = '#254a11';
-  ctx.fillRect(-bodyW * 0.45, bodyH * 0.1, bodyW * 0.9, bodyH * 0.08);
 
   if (state.player.message && now() < state.player.messageUntil) {
     drawChatBubble(state.player.message, 0, -bodyH * 0.95);
@@ -511,6 +575,7 @@ function draw() {
   if (state.debug) {
     drawBoundary();
     drawNoGoAreas();
+    drawDoorPlaceholders();
     drawObjectPlaceholders();
   }
   drawWeevil();
@@ -579,12 +644,19 @@ function handleCommand(text) {
       break;
     }
     case 'say':
-      state.player.message = args.join(' ') || 'Hello from Ink\'s Orange!';
+      state.player.message = args.join(' ') || `Hello from ${state.room.displayName}!`;
       state.player.messageUntil = now() + 5500;
       break;
     case 'debug':
       state.debug = !state.debug;
       addNotice(`debug overlays ${state.debug ? 'on' : 'off'}`);
+      break;
+    case 'projection':
+      setProjectionMode(state.projectionMode === ProjectionModes.FLAT ? ProjectionModes.SOURCE_CAMERA : ProjectionModes.FLAT);
+      break;
+    case 'room':
+      addNotice(`rooms: ${Object.keys(state.registry.rooms).join(', ')}`);
+      addNotice('switch with ?room=nest-hall or ?room=inks-orange');
       break;
     case 'weevil':
       state.weevilRenderer.enabled = !state.weevilRenderer.enabled;
@@ -598,7 +670,8 @@ function handleCommand(text) {
 
 Promise.all([loadRoom(), loadWeevilRenderer()])
   .then(() => {
-    addNotice('Loaded source-derived Orange Peel room definition');
+    addNotice(`Loaded source-derived ${state.room.displayName} room definition`);
+    addNotice('Type /projection to compare flat vs source-camera projection');
     if (!state.debug) addNotice('Type /debug to show source coordinate overlays');
     requestAnimationFrame(frame);
   })
