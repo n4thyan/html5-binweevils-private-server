@@ -9,8 +9,8 @@
     "roomBG": "legacy-reference/Binweevils-main/game-full/cdn.binw.net/assetsNest/nestHall_06_05_21.swf"
   },
   "stage": {
-    "width": 960,
-    "height": 600,
+    "width": 825,
+    "height": 490,
     "worldPadding": 90
   },
   "projection": {
@@ -21,8 +21,8 @@
     "camAim": [0, 15, 500],
     "noZoom": true,
     "upSideDown": false,
-    "screenCenter": [480, 352],
-    "focalLength": 820
+    "screenCenter": [412.5, 320],
+    "focalLength": 560
   },
   "bounds": {
     "type": "rad",
@@ -33,12 +33,12 @@
     "position": [0, 200],
     "direction": -180,
     "weevilScale": 0.45,
-    "renderScale": 0.95
+    "renderScale": 0.82
   },
   "floor": {
     "path": "background/nest-hall.png",
     "sourceSwf": "source/nestHall_06_05_21.swf",
-    "exportNote": "Export nestHall_06_05_21.swf from JPEXS as a single PNG/SVG background and place it here. The prep script copies a PNG/JPG/SVG export if present."
+    "exportNote": "JPEXS full-stage export is exported/frames/1.png at 825x490. The prep script copies it to background/nest-hall.png."
   },
   "noGoAreas": [],
   "doors": [
