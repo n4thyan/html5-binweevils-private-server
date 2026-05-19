@@ -18,7 +18,7 @@ const state = {
   roomSlug: urlParams.get('room') || null,
   room: null,
   projection: null,
-  projectionMode: urlParams.get('projection') === 'flat' ? ProjectionModes.FLAT : ProjectionModes.SOURCE_CAMERA,
+  projectionMode: urlParams.get('projection') || null,
   floorImage: null,
   floorReady: false,
   player: {
@@ -74,6 +74,7 @@ function updateDebug() {
   const walk = p.walkSnapshot;
   debugEl.textContent = [
     `room: ${state.room.displayName} (${state.room.id})`,
+    `stage: ${canvas.width}x${canvas.height}`,
     `projection: ${state.projectionMode}  (/projection to toggle)`,
     `debug overlays: ${state.debug ? 'on' : 'off'}  (/debug to toggle)`,
     `weevil renderer: ${state.weevilRenderer.status}  (/weevil to toggle)`,
@@ -84,6 +85,13 @@ function updateDebug() {
     '',
     ...state.notices
   ].join('\n');
+}
+
+function applyRoomStageSize() {
+  const width = Number(state.room?.stage?.width || canvas.width);
+  const height = Number(state.room?.stage?.height || canvas.height);
+  if (canvas.width !== width) canvas.width = width;
+  if (canvas.height !== height) canvas.height = height;
 }
 
 function setProjectionMode(mode) {
@@ -205,10 +213,9 @@ async function loadRoom() {
   const response = await fetch(roomEntry.definition, { cache: 'no-store' });
   if (!response.ok) throw new Error(`${roomEntry.definition} failed: ${response.status}`);
   state.room = await response.json();
+  applyRoomStageSize();
 
-  if (state.room.projection?.mode === ProjectionModes.SOURCE_CAMERA && urlParams.get('projection') !== 'flat') {
-    state.projectionMode = ProjectionModes.SOURCE_CAMERA;
-  }
+  state.projectionMode = state.projectionMode || state.room.projection?.mode || ProjectionModes.FLAT;
   state.projection = createRoomProjection(state.room, canvas, state.projectionMode);
 
   roomTitleEl.textContent = state.room.displayName;
@@ -281,7 +288,7 @@ function drawFloor() {
   ctx.translate(canvas.width / 2, canvas.height * 0.56);
   ctx.fillStyle = 'rgba(255, 206, 88, 0.2)';
   ctx.beginPath();
-  ctx.ellipse(0, 0, 310, 170, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 0, 270, 150, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = 'rgba(255, 245, 190, 0.38)';
   ctx.lineWidth = 4;
@@ -306,11 +313,15 @@ function drawBoundary() {
 
   if (state.room.bounds.type === 'rad') {
     const [cx, cz, r] = state.room.bounds.boundary;
-    const centre = worldToScreen(cx, cz);
-    const edge = worldToScreen(cx + r, cz);
-    const radius = Math.abs(edge.x - centre.x);
+    const steps = 96;
     ctx.beginPath();
-    ctx.arc(centre.x, centre.y, radius, 0, Math.PI * 2);
+    for (let i = 0; i <= steps; i += 1) {
+      const angle = (i / steps) * Math.PI * 2;
+      const p = worldToScreen(cx + Math.cos(angle) * r, cz + Math.sin(angle) * r);
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
   } else {
@@ -329,14 +340,18 @@ function drawNoGoAreas() {
   ctx.save();
   for (const area of state.room.noGoAreas) {
     if (area.type !== 'rad') continue;
-    const centre = worldToScreen(area.x, area.z);
-    const edge = worldToScreen(area.x + area.r, area.z);
-    const radius = Math.abs(edge.x - centre.x);
+    const steps = 64;
     ctx.fillStyle = 'rgba(255, 0, 0, 0.16)';
     ctx.strokeStyle = 'rgba(255, 60, 60, 0.65)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(centre.x, centre.y, radius, 0, Math.PI * 2);
+    for (let i = 0; i <= steps; i += 1) {
+      const angle = (i / steps) * Math.PI * 2;
+      const p = worldToScreen(area.x + Math.cos(angle) * area.r, area.z + Math.sin(angle) * area.r);
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
     ctx.fill();
     ctx.stroke();
   }
@@ -556,7 +571,7 @@ function roundRect(context, x, y, width, height, radius) {
   context.arcTo(x + width, y, x + width, y + height, radius);
   context.arcTo(x + width, y + height, x, y + height, radius);
   context.arcTo(x, y + height, x, y, radius);
-  context.arcTo(x, y, x + width, y, radius);
+  context.arcTo(x, y, x + radius, y, radius);
   context.closePath();
 }
 
@@ -651,9 +666,12 @@ function handleCommand(text) {
       state.debug = !state.debug;
       addNotice(`debug overlays ${state.debug ? 'on' : 'off'}`);
       break;
-    case 'projection':
-      setProjectionMode(state.projectionMode === ProjectionModes.FLAT ? ProjectionModes.SOURCE_CAMERA : ProjectionModes.FLAT);
+    case 'projection': {
+      const modes = [ProjectionModes.FIXED_FLOOR, ProjectionModes.SOURCE_CAMERA, ProjectionModes.FLAT];
+      const index = modes.indexOf(state.projectionMode);
+      setProjectionMode(modes[(index + 1) % modes.length]);
       break;
+    }
     case 'room':
       addNotice(`rooms: ${Object.keys(state.registry.rooms).join(', ')}`);
       addNotice('switch with ?room=nest-hall or ?room=inks-orange');
@@ -671,7 +689,7 @@ function handleCommand(text) {
 Promise.all([loadRoom(), loadWeevilRenderer()])
   .then(() => {
     addNotice(`Loaded source-derived ${state.room.displayName} room definition`);
-    addNotice('Type /projection to compare flat vs source-camera projection');
+    addNotice('Type /projection to compare fixed-floor, source-camera, and flat projection');
     if (!state.debug) addNotice('Type /debug to show source coordinate overlays');
     requestAnimationFrame(frame);
   })
