@@ -1,0 +1,14 @@
+{
+  "defaultRoom": "nest-hall",
+  "rooms": {
+    "nest-hall": {
+      "name": "Nest Hall",
+      "definition": "./assets/rooms/nest-hall/room.json"
+    },
+    "inks-orange": {
+      "name": "Ink's Orange",
+      "definition": "./assets/rooms/inks-orange/room.json",
+      "note": "Paused as advanced rotatable-camera room. Use ?room=inks-orange to inspect it."
+    }
+  }
+}
