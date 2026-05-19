@@ -5,6 +5,8 @@ const debugEl = document.getElementById('debugOutput');
 const chatForm = document.getElementById('chatForm');
 const chatInput = document.getElementById('chatInput');
 
+const urlParams = new URLSearchParams(window.location.search);
+
 const state = {
   room: null,
   floorImage: null,
@@ -21,7 +23,7 @@ const state = {
   },
   notices: [],
   lastTime: performance.now(),
-  debug: true
+  debug: urlParams.get('debug') === '1'
 };
 
 function setStatus(message) {
@@ -38,6 +40,7 @@ function updateDebug() {
   const p = state.player;
   debugEl.textContent = [
     `room: ${state.room.displayName} (${state.room.id})`,
+    `debug overlays: ${state.debug ? 'on' : 'off'}  (/debug to toggle)`,
     `player x/z: ${p.x.toFixed(1)}, ${p.z.toFixed(1)}`,
     `target x/z: ${p.targetX.toFixed(1)}, ${p.targetZ.toFixed(1)}`,
     `floor: ${state.floorReady ? 'loaded' : 'placeholder'}`,
@@ -61,6 +64,8 @@ function worldExtents() {
   };
 }
 
+// This is only a milestone-002 flat mapping.
+// The original InksOrange data includes camera fields, so this will later be replaced with a source-aware projection pass.
 function worldToScreen(x, z) {
   const ext = worldExtents();
   const nx = (x - ext.minX) / (ext.maxX - ext.minX);
@@ -369,9 +374,11 @@ function draw() {
   if (!state.room) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawFloor();
-  drawBoundary();
-  drawNoGoAreas();
-  drawObjectPlaceholders();
+  if (state.debug) {
+    drawBoundary();
+    drawNoGoAreas();
+    drawObjectPlaceholders();
+  }
   drawWeevil();
 }
 
@@ -432,7 +439,7 @@ function handleCommand(text) {
       break;
     case 'debug':
       state.debug = !state.debug;
-      addNotice(`debug ${state.debug ? 'on' : 'off'}`);
+      addNotice(`debug overlays ${state.debug ? 'on' : 'off'}`);
       break;
     default:
       addNotice(`unknown command: /${command}`);
@@ -442,6 +449,7 @@ function handleCommand(text) {
 loadRoom()
   .then(() => {
     addNotice('Loaded source-derived Orange Peel room definition');
+    if (!state.debug) addNotice('Type /debug to show source coordinate overlays');
     requestAnimationFrame(frame);
   })
   .catch((error) => {
