@@ -30,12 +30,14 @@ if (Test-Path $swfSource) {
 # If you export the Nest Hall background from JPEXS into the source folder with one of these names,
 # the script will copy it into the browser-used path expected by room.json.
 $candidateExports = @(
-    Join-Path $sourceOut "nest-hall.png",
-    Join-Path $sourceOut "nestHall_06_05_21.png",
-    Join-Path $sourceOut "nest-hall.jpg",
-    Join-Path $sourceOut "nestHall_06_05_21.jpg",
-    Join-Path $sourceOut "nest-hall.svg",
-    Join-Path $sourceOut "nestHall_06_05_21.svg"
+    (Join-Path $sourceOut "nest-hall.png"),
+    (Join-Path $sourceOut "nestHall_06_05_21.png"),
+    (Join-Path $sourceOut "nest-hall.jpg"),
+    (Join-Path $sourceOut "nestHall_06_05_21.jpg"),
+    (Join-Path $sourceOut "nest-hall.jpeg"),
+    (Join-Path $sourceOut "nestHall_06_05_21.jpeg"),
+    (Join-Path $sourceOut "nest-hall.svg"),
+    (Join-Path $sourceOut "nestHall_06_05_21.svg")
 )
 
 $copiedExport = $false
