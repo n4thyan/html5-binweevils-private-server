@@ -1,5 +1,13 @@
 import { WeevilDef } from '../avatar/WeevilDef.js';
 import { SAMPLE_WEEVIL_DEF } from '../avatar/WeevilDefSamples.js';
+import {
+  getBodyAtlas,
+  getEyeAtlasSet,
+  getHeadAtlas,
+  getLowerLegFrame,
+  getMouthAtlas
+} from '../avatar/WeevilPartMap.js';
+import { listAtlasKeys } from '../avatar/WeevilAtlasManifest.js';
 
 export class BootScene {
   constructor({ stage }) {
@@ -30,10 +38,11 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 002: source-derived WeevilDef decode proof', 40, 105);
+    ctx.fillText('Milestone 002: WeevilDef + prototype atlas mapping proof', 40, 105);
     ctx.fillText('No room, chat, account, or multiplayer systems are active yet.', 40, 132);
 
     this.renderDefinitionPanel(ctx, 40, 180);
+    this.renderAtlasPanel(ctx, 640, 180);
   }
 
   renderDefinitionPanel(ctx, x, y) {
@@ -81,6 +90,39 @@ export class BootScene {
     ctx.fillStyle = '#d2c48b';
     ctx.font = '14px Arial, sans-serif';
     ctx.fillText(`runtime: ${Math.floor(this.elapsedMs)}ms`, x + 20, y + 315);
+  }
+
+  renderAtlasPanel(ctx, x, y) {
+    const decoded = this.sampleDef.toJSON();
+    const atlasKeys = listAtlasKeys();
+    const rows = [
+      ['atlas keys', atlasKeys.length],
+      ['body atlas', getBodyAtlas(decoded.bodyType)],
+      ['head atlas', getHeadAtlas(decoded.headType)],
+      ['eye set', getEyeAtlasSet(decoded.eyeType)],
+      ['mouth atlas ex0', getMouthAtlas(0)],
+      ['lower leg frame', getLowerLegFrame(decoded.legType)]
+    ];
+
+    ctx.strokeStyle = '#f4e9bd';
+    ctx.strokeRect(x, y, 340, 220);
+
+    ctx.fillStyle = '#f4e9bd';
+    ctx.font = '16px Arial, sans-serif';
+    ctx.fillText('Prototype atlas/part map', x + 20, y + 32);
+
+    ctx.fillStyle = '#d2c48b';
+    ctx.font = '13px Arial, sans-serif';
+    ctx.fillText('Reference only until OG provenance is verified.', x + 20, y + 58);
+
+    ctx.font = '13px Consolas, Monaco, monospace';
+    rows.forEach(([label, value], index) => {
+      const rowY = y + 92 + index * 20;
+      ctx.fillStyle = '#d2c48b';
+      ctx.fillText(`${label}:`, x + 20, rowY);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.fillText(String(value), x + 150, rowY);
+    });
   }
 
   renderColourSwatch(ctx, label, colour, x, y) {
