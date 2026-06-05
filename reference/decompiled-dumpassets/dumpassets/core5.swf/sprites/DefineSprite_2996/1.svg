@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:ffdec="https://www.free-decompiler.com/flash" xmlns:xlink="http://www.w3.org/1999/xlink" ffdec:objectType="frame" height="266.95px" width="282.35px" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.0, 0.0, 0.0, 1.0, 44.55, 78.5)">
+    <filter id="filter0">
+      <feConvolveMatrix divisor="25.0" in="SourceGraphic" kernelMatrix="1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1" order="5 5" result="filterResult0"/>
+    </filter>
+    <use ffdec:characterId="2990" filter="url(#filter0)" height="266.95" transform="matrix(1.0, 0.0, 0.0, 1.0, -44.55, -78.5)" width="282.35" xlink:href="#sprite0"/>
+    <use ffdec:characterId="2991" height="122.7" transform="matrix(1.0, 0.0, 0.0, 1.0, -36.85, -7.85)" width="269.6" xlink:href="#shape1"/>
+    <use ffdec:characterId="2994" height="30.0" id="ok_btn" transform="matrix(1.0, 0.0, 0.0, 1.0, 133.8, 79.6)" width="80.0" xlink:href="#button0"/>
+    <use ffdec:characterId="2995" height="59.5" id="message_txt" transform="matrix(1.0, 0.0, 0.0, 1.0, -11.25, 13.5)" width="216.7" xlink:href="#text1"/>
+  </g>
+  <defs>
+    <g id="sprite0" transform="matrix(1.0, 0.0, 0.0, 1.0, 4.05, 0.5)">
+      <use ffdec:characterId="2989" height="266.95" transform="matrix(1.0, 0.0, 0.0, 1.0, -4.05, -0.5)" width="282.35" xlink:href="#shape0"/>
+    </g>
+    <g id="shape0" transform="matrix(1.0, 0.0, 0.0, 1.0, 4.05, 0.5)">
+      <path d="M16.7 -0.5 L257.6 -0.5 Q278.3 -0.5 278.3 20.1 L278.3 245.85 Q278.3 266.45 257.6 266.45 L16.7 266.45 Q-4.05 266.45 -4.05 245.85 L-4.05 20.1 Q-4.05 -0.5 16.7 -0.5" fill="#000000" fill-opacity="0.6901961" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="shape1" transform="matrix(1.0, 0.0, 0.0, 1.0, 36.85, 7.85)">
+      <path d="M-12.4 -6.5 L208.35 -6.5 Q231.4 -6.5 231.4 14.15 L231.4 92.8 Q231.4 113.5 208.35 113.5 L-12.4 113.5 Q-35.5 113.5 -35.5 92.8 L-35.5 14.15 Q-35.5 -6.5 -12.4 -6.5" fill="url(#gradient0)" fill-rule="evenodd" stroke="none"/>
+      <path d="M-12.4 -6.5 Q-35.5 -6.5 -35.5 14.15 L-35.5 92.8 Q-35.5 113.5 -12.4 113.5 L208.35 113.5 Q231.4 113.5 231.4 92.8 L231.4 14.15 Q231.4 -6.5 208.35 -6.5 L-12.4 -6.5 Z" fill="none" stroke="#9e3016" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.75"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0823, -0.1684, 0.0, 137.35, 76.65)" gradientUnits="userSpaceOnUse" id="gradient0" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#ff4e24"/>
+      <stop offset="1.0" stop-color="#b5381a"/>
+    </linearGradient>
+    <g id="button0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.75, 0.75)">
+      <use ffdec:characterId="2955" height="26.5" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.75, -0.75)" width="80.0" xlink:href="#sprite1"/>
+      <use ffdec:characterId="2992" height="28.65" transform="matrix(1.0, 0.0, 0.0, 1.0, 10.4, 0.6)" width="57.2" xlink:href="#text0"/>
+    </g>
+    <g id="sprite1" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.75, 0.75)">
+      <use ffdec:characterId="2954" height="26.5" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.75, -0.75)" width="80.0" xlink:href="#shape2"/>
+    </g>
+    <g id="shape2" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.75, 0.75)">
+      <path d="M78.5 25.0 L0.0 25.0 0.0 0.0 78.5 0.0 78.5 25.0" fill="url(#gradient1)" fill-rule="evenodd" stroke="none"/>
+      <path d="M78.5 25.0 L0.0 25.0 0.0 0.0 78.5 0.0 78.5 25.0 Z" fill="none" stroke="#6e210f" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0138, -0.0479, 0.0, 39.25, 12.5)" gradientUnits="userSpaceOnUse" id="gradient1" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#ff4e24"/>
+      <stop offset="1.0" stop-color="#b5381a"/>
+    </linearGradient>
+    <g id="text0" transform="matrix(1.0, 0.0, 0.0, 1.0, 4.6, 2.0)">
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -4.6, -2.0)">
+        <use fill="#ffffff" height="28.65" transform="matrix(0.0156, 0.0, 0.0, 0.0156, 18.7, 17.35)" width="57.2" xlink:href="#font_GosmickSans_O0"/>
+        <use fill="#ffffff" height="28.65" transform="matrix(0.0156, 0.0, 0.0, 0.0156, 29.35, 17.35)" width="57.2" xlink:href="#font_GosmickSans_K0"/>
+      </g>
+    </g>
+    <g id="font_GosmickSans_O0">
+      <path d="M557.0 -381.0 Q555.0 -417.5 550.5 -451.0 546.0 -484.5 537.5 -506.0 523.5 -544.0 503.5 -569.0 483.5 -594.0 459.5 -609.5 435.0 -624.5 406.0 -631.0 377.0 -637.0 344.0 -637.0 296.0 -637.0 256.0 -615.5 216.0 -594.0 187.5 -556.0 158.5 -518.0 143.5 -465.0 128.0 -411.5 128.0 -349.0 128.0 -291.5 143.5 -241.5 158.5 -191.5 187.0 -154.5 215.0 -117.5 254.5 -96.0 294.0 -74.5 342.0 -74.5 391.0 -74.5 432.0 -98.0 473.0 -121.5 501.0 -162.5 529.5 -203.5 544.5 -260.0 559.0 -316.5 557.0 -381.0 M653.5 -368.5 Q651.5 -286.5 626.0 -216.5 600.0 -146.5 557.0 -94.5 514.0 -43.0 456.5 -13.0 398.5 16.5 332.0 16.5 268.5 16.5 214.5 -10.0 161.0 -37.0 121.0 -83.5 81.0 -130.0 58.5 -193.0 36.0 -256.0 36.0 -328.5 36.0 -411.5 61.0 -483.5 86.0 -555.0 129.0 -608.0 172.0 -660.5 230.0 -691.0 288.0 -721.0 353.5 -721.0 399.5 -721.0 442.0 -708.0 484.5 -695.5 520.0 -671.5 555.0 -647.0 582.5 -613.5 609.5 -579.5 625.0 -538.5 632.0 -518.0 638.0 -490.5 644.5 -463.0 648.0 -437.5 651.5 -411.5 653.0 -392.0 654.5 -372.5 653.5 -368.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSans_K0">
+      <path d="M557.0 -42.0 Q558.0 -33.5 554.5 -23.5 551.0 -13.0 544.5 -4.5 537.5 4.0 529.0 10.5 520.0 16.5 511.0 16.5 489.5 16.5 452.0 -10.0 414.5 -36.5 368.0 -81.0 321.5 -125.0 269.0 -180.0 216.0 -235.5 164.0 -293.5 154.5 -305.0 142.5 -313.0 140.5 -308.0 139.5 -300.5 138.0 -292.5 138.0 -277.5 L140.5 -179.5 Q141.5 -137.0 146.5 -93.0 L148.5 -75.0 Q149.5 -67.5 149.5 -60.5 149.5 -41.0 141.5 -26.0 133.0 -11.0 122.0 -1.5 110.5 8.5 98.5 12.5 86.0 16.5 78.0 14.5 66.5 12.5 59.5 3.5 52.0 -5.0 50.0 -16.5 44.0 -57.0 40.0 -129.0 36.0 -200.5 36.0 -283.5 36.0 -326.5 36.5 -374.0 37.0 -421.5 38.0 -468.5 L40.0 -558.0 Q41.0 -601.0 43.0 -633.5 43.0 -642.0 45.5 -655.0 48.0 -668.5 54.5 -681.0 60.5 -694.0 72.5 -703.5 85.0 -712.5 105.5 -711.5 126.0 -710.5 135.5 -704.5 145.5 -698.0 149.0 -691.5 152.5 -685.0 152.5 -677.5 152.5 -671.5 153.5 -668.5 154.5 -665.5 154.0 -663.5 L151.5 -653.0 Q149.5 -630.5 147.0 -595.0 144.5 -560.0 142.5 -524.5 140.5 -489.5 140.0 -459.0 139.5 -429.0 140.5 -415.5 148.5 -418.5 167.0 -433.5 185.5 -448.5 210.0 -471.5 234.5 -494.5 262.5 -522.5 291.0 -550.5 319.0 -581.0 L374.0 -640.0 422.0 -692.0 Q434.0 -707.5 447.5 -707.5 455.5 -707.5 465.0 -703.0 474.0 -698.5 482.0 -691.0 489.5 -684.0 494.5 -674.5 499.5 -665.5 499.5 -656.5 499.5 -646.0 481.5 -625.5 463.0 -605.0 430.0 -572.5 394.0 -536.5 359.5 -501.0 324.5 -466.0 296.0 -436.0 267.5 -406.5 248.5 -385.0 229.5 -363.5 225.5 -356.0 237.5 -342.0 260.5 -317.0 283.5 -291.5 314.5 -261.0 345.0 -230.5 381.0 -196.5 417.0 -162.5 453.5 -131.0 467.0 -118.5 484.5 -107.0 502.0 -95.0 517.0 -84.0 532.5 -72.5 543.5 -62.0 555.0 -51.0 557.0 -42.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+  </defs>
+</svg>

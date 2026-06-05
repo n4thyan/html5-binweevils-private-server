@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:ffdec="https://www.free-decompiler.com/flash" xmlns:xlink="http://www.w3.org/1999/xlink" ffdec:objectType="shape" height="34.75px" width="34.7px" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.0, 0.0, 0.0, 1.0, 4.25, 4.95)">
+    <path d="M26.0 13.0 Q26.0 18.4 22.2 22.2 18.4 26.0 13.0 26.0 7.6 26.0 3.8 22.2 0.0 18.4 0.0 13.0 0.0 7.6 3.8 3.8 7.6 0.0 13.0 0.0 18.4 0.0 22.2 3.8 26.0 7.6 26.0 13.0 M19.45 6.55 Q16.8 3.9 13.0 3.9 9.2 3.9 6.55 6.55 3.9 9.2 3.9 13.0 3.9 16.8 6.55 19.45 9.2 22.1 13.0 22.1 16.8 22.1 19.45 19.45 22.1 16.8 22.1 13.0 22.1 9.2 19.45 6.55" fill="url(#gradient0)" fill-rule="evenodd" stroke="none"/>
+    <path d="M19.45 6.55 Q22.1 9.2 22.1 13.0 22.1 16.8 19.45 19.45 16.8 22.1 13.0 22.1 9.2 22.1 6.55 19.45 3.9 16.8 3.9 13.0 3.9 9.2 6.55 6.55 9.2 3.9 13.0 3.9 16.8 3.9 19.45 6.55" fill="url(#gradient1)" fill-rule="evenodd" stroke="none"/>
+    <path d="M13.1 -2.15 Q19.15 -2.15 23.45 2.1 27.7 6.4 27.7 12.4 27.7 18.5 23.45 22.75 19.15 27.0 13.1 27.0 7.1 27.0 2.8 22.75 -1.45 18.5 -1.45 12.4 -1.45 6.4 2.8 2.1 L4.4 0.7 Q7.4 -1.55 11.15 -2.05 L13.1 -2.15" fill="url(#gradient2)" fill-rule="evenodd" stroke="none"/>
+    <path d="M4.6 24.35 Q0.45 20.2 0.45 14.35 0.45 8.55 4.6 4.4 L5.4 3.7 Q8.4 1.15 12.15 0.5 L14.7 0.3 Q20.65 0.3 24.85 4.4 26.95 6.5 28.0 9.05" fill="none" stroke="#fbf3d9" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5"/>
+    <path d="M13.1 -2.45 Q19.3 -2.45 23.65 1.9 27.95 6.25 27.95 12.4 27.95 18.6 23.65 22.95 19.3 27.3 13.1 27.3 6.95 27.3 2.6 22.95 -1.75 18.6 -1.75 12.4 -1.75 6.25 2.6 1.9 L4.4 0.35 Q7.4 -1.9 11.15 -2.35 L13.1 -2.45 Z" fill="none" stroke="#cd9618" stroke-linecap="round" stroke-linejoin="round" stroke-width="5.0"/>
+    <path d="M13.05 -1.05 Q18.65 -1.05 22.6 2.85 26.45 6.8 26.45 12.35 26.45 17.95 22.6 21.85 18.65 25.8 13.05 25.8 7.5 25.8 3.6 21.85 -0.35 17.95 -0.35 12.35 -0.35 6.8 3.6 2.85 4.35 2.1 5.2 1.45 7.95 -0.55 11.3 -0.95 L13.05 -1.05 Z" fill="none" stroke="#e8bd17" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.0"/>
+    <path d="M11.1 8.05 Q10.5 8.7 9.6 8.7 8.7 8.7 8.05 8.05 7.45 7.45 7.45 6.55 7.45 5.65 8.05 5.0 8.7 4.4 9.6 4.4 10.5 4.4 11.1 5.0 11.75 5.65 11.75 6.55 11.75 7.45 11.1 8.05 M6.6 9.15 Q7.95 9.15 8.9 10.1 9.85 11.05 9.85 12.4 9.85 13.75 8.9 14.7 7.95 15.65 6.6 15.65 5.25 15.65 4.3 14.7 3.35 13.75 3.35 12.4 3.35 11.05 4.3 10.1 5.25 9.15 6.6 9.15" fill="#ffffff" fill-rule="evenodd" stroke="none"/>
+  </g>
+  <defs>
+    <linearGradient gradientTransform="matrix(0.0112, 0.0112, -0.0112, 0.0112, 13.0, 13.0)" gradientUnits="userSpaceOnUse" id="gradient0" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#21c521"/>
+      <stop offset="1.0" stop-color="#1d5c01"/>
+    </linearGradient>
+    <radialGradient cx="0" cy="0" gradientTransform="matrix(0.0112, 0.0, 0.0, 0.0112, 13.0, 13.0)" gradientUnits="userSpaceOnUse" id="gradient1" r="819.2" spreadMethod="pad">
+      <stop offset="0.0784313725490196" stop-color="#01ba25"/>
+      <stop offset="0.792156862745098" stop-color="#018f2c"/>
+    </radialGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0265, 0.0178, 0.0, 13.8, 8.75)" gradientUnits="userSpaceOnUse" id="gradient2" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.23529411764705882" stop-color="#f7e7aa"/>
+      <stop offset="0.5647058823529412" stop-color="#e8bd17"/>
+    </linearGradient>
+  </defs>
+</svg>

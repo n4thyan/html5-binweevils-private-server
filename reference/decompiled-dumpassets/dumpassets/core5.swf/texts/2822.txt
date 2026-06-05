@@ -1,0 +1,5 @@
+You have already 
+--- RECORDSEPARATOR ---
+collected todays reward. 
+--- RECORDSEPARATOR ---
+Try again tomorrow.

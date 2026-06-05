@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:ffdec="https://www.free-decompiler.com/flash" xmlns:xlink="http://www.w3.org/1999/xlink" ffdec:objectType="frame" height="299.9px" width="111.0px" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+    <use ffdec:characterId="101" ffdec:characterName="fl.core.ComponentShim" height="0.0" transform="matrix(1.0, 0.0, 0.0, 1.0031, 10.0, 10.0)" width="0.0" xlink:href="#sprite0"/>
+    <clipPath id="clip1">
+      <path d="M 0,0 L 6.0,0 L 6.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip2">
+      <path d="M 0,16.0 L 6.0,16.0 L 6.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip3">
+      <path d="M 74.0,0 L 82.0,0 L 82.0,5.0 L 74.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip4">
+      <path d="M 74.0,16.0 L 82.0,16.0 L 82.0,22.0 L 74.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip5">
+      <path d="M 6.0,0 L 74.0,0 L 74.0,5.0 L 6.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip6">
+      <path d="M 0,5.0 L 6.0,5.0 L 6.0,16.0 L 0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip7">
+      <path d="M 6.0,16.0 L 74.0,16.0 L 74.0,22.0 L 6.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip8">
+      <path d="M 74.0,5.0 L 82.0,5.0 L 82.0,16.0 L 74.0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip9">
+      <path d="M 6.0,5.0 L 74.0,5.0 L 74.0,16.0 L 6.0,16.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="338" ffdec:characterName="Button_disabledSkin">
+      <use clip-path="url(#clip1)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 265.95)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip2)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 265.9426)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip3)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 265.95)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip4)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 265.9426)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip5)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 265.95)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip6)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.05, 265.9534)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip7)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 265.9426)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip8)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.05, 265.9534)" xlink:href="#sprite1"/>
+      <use clip-path="url(#clip9)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.05, 265.9534)" xlink:href="#sprite1"/>
+    </g>
+    <clipPath id="clip10">
+      <path d="M 0,0 L 4.0,0 L 4.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip11">
+      <path d="M 0,16.0 L 4.0,16.0 L 4.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip12">
+      <path d="M 76.0,0 L 82.0,0 L 82.0,5.0 L 76.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip13">
+      <path d="M 76.0,16.0 L 82.0,16.0 L 82.0,22.0 L 76.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip14">
+      <path d="M 4.0,0 L 76.0,0 L 76.0,5.0 L 4.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip15">
+      <path d="M 0,5.0 L 4.0,5.0 L 4.0,16.0 L 0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip16">
+      <path d="M 4.0,16.0 L 76.0,16.0 L 76.0,22.0 L 4.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip17">
+      <path d="M 76.0,5.0 L 82.0,5.0 L 82.0,16.0 L 76.0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip18">
+      <path d="M 4.0,5.0 L 76.0,5.0 L 76.0,16.0 L 4.0,16.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="340" ffdec:characterName="Button_downSkin">
+      <use clip-path="url(#clip10)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip11)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip12)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip13)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip14)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip15)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip16)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip17)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+      <use clip-path="url(#clip18)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 138.0)" xlink:href="#sprite2"/>
+    </g>
+    <clipPath id="clip19">
+      <path d="M 0,0 L 5.0,0 L 5.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip20">
+      <path d="M 0,17.0 L 5.0,17.0 L 5.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip21">
+      <path d="M 77.0,0 L 82.0,0 L 82.0,5.0 L 77.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip22">
+      <path d="M 77.0,17.0 L 82.0,17.0 L 82.0,22.0 L 77.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip23">
+      <path d="M 5.0,0 L 77.0,0 L 77.0,5.0 L 5.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip24">
+      <path d="M 0,5.0 L 5.0,5.0 L 5.0,17.0 L 0,17.0 Z"/>
+    </clipPath>
+    <clipPath id="clip25">
+      <path d="M 5.0,17.0 L 77.0,17.0 L 77.0,22.0 L 5.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip26">
+      <path d="M 77.0,5.0 L 82.0,5.0 L 82.0,17.0 L 77.0,17.0 Z"/>
+    </clipPath>
+    <clipPath id="clip27">
+      <path d="M 5.0,5.0 L 77.0,5.0 L 77.0,17.0 L 5.0,17.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="342" ffdec:characterName="Button_emphasizedSkin">
+      <use clip-path="url(#clip19)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 233.95)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip20)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 233.9426)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip21)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 233.95)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip22)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 233.9426)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip23)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 233.95)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip24)" transform="matrix(1.0, 0.0, 0.0, 0.9994, 29.05, 233.953)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip25)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.05, 233.9426)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip26)" transform="matrix(1.0, 0.0, 0.0, 0.9994, 29.05, 233.953)" xlink:href="#sprite3"/>
+      <use clip-path="url(#clip27)" transform="matrix(1.0, 0.0, 0.0, 0.9994, 29.05, 233.953)" xlink:href="#sprite3"/>
+    </g>
+    <clipPath id="clip28">
+      <path d="M 0,0 L 5.0,0 L 5.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip29">
+      <path d="M 0,16.0 L 5.0,16.0 L 5.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip30">
+      <path d="M 76.0,0 L 82.0,0 L 82.0,5.0 L 76.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip31">
+      <path d="M 76.0,16.0 L 82.0,16.0 L 82.0,22.0 L 76.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip32">
+      <path d="M 5.0,0 L 76.0,0 L 76.0,5.0 L 5.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip33">
+      <path d="M 0,5.0 L 5.0,5.0 L 5.0,16.0 L 0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip34">
+      <path d="M 5.0,16.0 L 76.0,16.0 L 76.0,22.0 L 5.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip35">
+      <path d="M 76.0,5.0 L 82.0,5.0 L 82.0,16.0 L 76.0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip36">
+      <path d="M 5.0,5.0 L 76.0,5.0 L 76.0,16.0 L 5.0,16.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="344" ffdec:characterName="Button_overSkin">
+      <use clip-path="url(#clip28)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 170.0)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip29)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 169.9926)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip30)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 170.0)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip31)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 169.9926)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip32)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 170.0)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip33)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.0, 170.0034)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip34)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 169.9926)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip35)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.0, 170.0034)" xlink:href="#sprite4"/>
+      <use clip-path="url(#clip36)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.0, 170.0034)" xlink:href="#sprite4"/>
+    </g>
+    <clipPath id="clip37">
+      <path d="M 0,0 L 7.0,0 L 7.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip38">
+      <path d="M 0,16.0 L 7.0,16.0 L 7.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip39">
+      <path d="M 58.0,0 L 64.0,0 L 64.0,5.0 L 58.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip40">
+      <path d="M 58.0,16.0 L 64.0,16.0 L 64.0,22.0 L 58.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip41">
+      <path d="M 7.0,0 L 58.0,0 L 58.0,5.0 L 7.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip42">
+      <path d="M 0,5.0 L 7.0,5.0 L 7.0,16.0 L 0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip43">
+      <path d="M 7.0,16.0 L 58.0,16.0 L 58.0,22.0 L 7.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip44">
+      <path d="M 58.0,5.0 L 64.0,5.0 L 64.0,16.0 L 58.0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip45">
+      <path d="M 7.0,5.0 L 58.0,5.0 L 58.0,16.0 L 7.0,16.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="346" ffdec:characterName="Button_selectedDisabledSkin">
+      <use clip-path="url(#clip37)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip38)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip39)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip40)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip41)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip42)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip43)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip44)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+      <use clip-path="url(#clip45)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.05, 71.7)" xlink:href="#sprite5"/>
+    </g>
+    <clipPath id="clip46">
+      <path d="M 0,0 L 5.0,0 L 5.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip47">
+      <path d="M 0,17.0 L 5.0,17.0 L 5.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip48">
+      <path d="M 59.0,0 L 64.0,0 L 64.0,5.0 L 59.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip49">
+      <path d="M 59.0,17.0 L 64.0,17.0 L 64.0,22.0 L 59.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip50">
+      <path d="M 5.0,0 L 59.0,0 L 59.0,5.0 L 5.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip51">
+      <path d="M 0,5.0 L 5.0,5.0 L 5.0,17.0 L 0,17.0 Z"/>
+    </clipPath>
+    <clipPath id="clip52">
+      <path d="M 5.0,17.0 L 59.0,17.0 L 59.0,22.0 L 5.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip53">
+      <path d="M 59.0,5.0 L 64.0,5.0 L 64.0,17.0 L 59.0,17.0 Z"/>
+    </clipPath>
+    <clipPath id="clip54">
+      <path d="M 5.0,5.0 L 59.0,5.0 L 59.0,17.0 L 5.0,17.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="348" ffdec:characterName="Button_selectedDownSkin">
+      <use clip-path="url(#clip46)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip47)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip48)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip49)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip50)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip51)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip52)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip53)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+      <use clip-path="url(#clip54)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 103.7)" xlink:href="#sprite6"/>
+    </g>
+    <clipPath id="clip55">
+      <path d="M 0,0 L 5.0,0 L 5.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip56">
+      <path d="M 0,16.0 L 5.0,16.0 L 5.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip57">
+      <path d="M 58.0,0 L 64.0,0 L 64.0,5.0 L 58.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip58">
+      <path d="M 58.0,16.0 L 64.0,16.0 L 64.0,22.0 L 58.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip59">
+      <path d="M 5.0,0 L 59.0,0 L 59.0,5.0 L 5.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip60">
+      <path d="M 0,5.0 L 5.0,5.0 L 5.0,16.0 L 0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip61">
+      <path d="M 5.0,16.0 L 59.0,16.0 L 59.0,22.0 L 5.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip62">
+      <path d="M 59.0,5.0 L 64.0,5.0 L 64.0,16.0 L 59.0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip63">
+      <path d="M 5.0,5.0 L 59.0,5.0 L 59.0,16.0 L 5.0,16.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="350" ffdec:characterName="Button_selectedOverSkin">
+      <use clip-path="url(#clip55)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip56)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip57)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip58)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip59)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip60)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip61)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip62)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+      <use clip-path="url(#clip63)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 39.7)" xlink:href="#sprite7"/>
+    </g>
+    <clipPath id="clip64">
+      <path d="M 0,0 L 6.0,0 L 6.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip65">
+      <path d="M 0,16.0 L 6.0,16.0 L 6.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip66">
+      <path d="M 59.0,0 L 64.0,0 L 64.0,5.0 L 59.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip67">
+      <path d="M 59.0,16.0 L 64.0,16.0 L 64.0,22.0 L 59.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip68">
+      <path d="M 6.0,0 L 59.0,0 L 59.0,5.0 L 6.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip69">
+      <path d="M 0,5.0 L 6.0,5.0 L 6.0,16.0 L 0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip70">
+      <path d="M 6.0,16.0 L 59.0,16.0 L 59.0,22.0 L 6.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip71">
+      <path d="M 59.0,5.0 L 64.0,5.0 L 64.0,16.0 L 59.0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip72">
+      <path d="M 6.0,5.0 L 59.0,5.0 L 59.0,16.0 L 6.0,16.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="352" ffdec:characterName="Button_selectedUpSkin">
+      <use clip-path="url(#clip64)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip65)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip66)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip67)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip68)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip69)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip70)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip71)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+      <use clip-path="url(#clip72)" transform="matrix(1.0, 0.0, 0.0, 1.0, 47.1, 7.7)" xlink:href="#sprite8"/>
+    </g>
+    <clipPath id="clip73">
+      <path d="M 0,0 L 7.0,0 L 7.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip74">
+      <path d="M 0,16.0 L 7.0,16.0 L 7.0,22.0 L 0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip75">
+      <path d="M 75.0,0 L 82.0,0 L 82.0,5.0 L 75.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip76">
+      <path d="M 75.0,16.0 L 82.0,16.0 L 82.0,22.0 L 75.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip77">
+      <path d="M 7.0,0 L 75.0,0 L 75.0,5.0 L 7.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip78">
+      <path d="M 0,5.0 L 7.0,5.0 L 7.0,16.0 L 0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip79">
+      <path d="M 7.0,16.0 L 75.0,16.0 L 75.0,22.0 L 7.0,22.0 Z"/>
+    </clipPath>
+    <clipPath id="clip80">
+      <path d="M 75.0,5.0 L 82.0,5.0 L 82.0,16.0 L 75.0,16.0 Z"/>
+    </clipPath>
+    <clipPath id="clip81">
+      <path d="M 7.0,5.0 L 75.0,5.0 L 75.0,16.0 L 7.0,16.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="354" ffdec:characterName="Button_upSkin">
+      <use clip-path="url(#clip73)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 201.95)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip74)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 201.9426)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip75)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 201.95)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip76)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 201.9426)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip77)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 201.95)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip78)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.0, 201.9534)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip79)" transform="matrix(1.0, 0.0, 0.0, 1.0, 29.0, 201.9426)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip80)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.0, 201.9534)" xlink:href="#sprite9"/>
+      <use clip-path="url(#clip81)" transform="matrix(1.0, 0.0, 0.0, 0.9993, 29.0, 201.9534)" xlink:href="#sprite9"/>
+    </g>
+    <clipPath id="clip82">
+      <path d="M 0,0 L 5.0,0 L 5.0,5.0 L 0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip83">
+      <path d="M 0,17.0 L 5.0,17.0 L 5.0,0.0 L 0,0.0 Z"/>
+    </clipPath>
+    <clipPath id="clip84">
+      <path d="M 77.0,0 L 0.0,0 L 0.0,5.0 L 77.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip85">
+      <path d="M 77.0,17.0 L 0.0,17.0 L 0.0,0.0 L 77.0,0.0 Z"/>
+    </clipPath>
+    <clipPath id="clip86">
+      <path d="M 5.0,0 L 77.0,0 L 77.0,5.0 L 5.0,5.0 Z"/>
+    </clipPath>
+    <clipPath id="clip87">
+      <path d="M 0,5.0 L 5.0,5.0 L 5.0,17.0 L 0,17.0 Z"/>
+    </clipPath>
+    <clipPath id="clip88">
+      <path d="M 5.0,17.0 L 77.0,17.0 L 77.0,0.0 L 5.0,0.0 Z"/>
+    </clipPath>
+    <clipPath id="clip89">
+      <path d="M 77.0,5.0 L 0.0,5.0 L 0.0,17.0 L 77.0,17.0 Z"/>
+    </clipPath>
+    <clipPath id="clip90">
+      <path d="M 5.0,5.0 L 77.0,5.0 L 77.0,17.0 L 5.0,17.0 Z"/>
+    </clipPath>
+    <g ffdec:characterId="104" ffdec:characterName="focusRectSkin">
+      <use clip-path="url(#clip82)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip83)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip84)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip85)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip86)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip87)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip88)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip89)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+      <use clip-path="url(#clip90)" transform="matrix(1.0, 0.0, 0.0, 1.0, 28.95, 299.9)" xlink:href="#sprite10"/>
+    </g>
+  </g>
+  <defs>
+    <g id="sprite1" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <use ffdec:characterId="337" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.05, 0.0)" width="82.0" xlink:href="#shape0"/>
+    </g>
+    <g id="shape0" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <path d="M41.0 0.0 L74.05 0.0 78.05 0.0 Q82.05 0.0 82.05 4.0 L82.05 4.95 82.05 16.05 82.05 18.0 Q82.05 22.0 78.05 22.0 L74.05 22.0 41.0 22.0 41.0 21.0 74.05 21.0 78.15 21.0 Q81.05 20.95 81.05 18.0 L81.05 16.05 81.05 4.95 81.05 4.0 Q81.05 1.05 78.15 1.0 L74.05 1.0 41.0 1.0 41.0 0.0" fill="url(#gradient0)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 22.0 L5.95 22.0 4.05 22.0 Q0.0 22.0 0.05 18.0 L0.05 16.05 0.05 4.95 0.05 4.0 Q0.0 0.0 4.05 0.0 L5.95 0.0 41.0 0.0 41.0 1.0 5.95 1.0 3.9 1.0 Q1.0 1.05 1.05 4.0 L1.05 4.95 1.05 16.05 1.05 18.0 Q1.0 20.95 3.9 21.0 L5.95 21.0 41.0 21.0 41.0 22.0" fill="url(#gradient1)" fill-rule="evenodd" stroke="none"/>
+      <path d="M81.05 18.0 Q81.05 20.95 78.15 21.0 L74.05 21.0 5.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 16.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L5.95 1.0 74.05 1.0 78.15 1.0 Q81.05 1.05 81.05 4.0 L81.05 4.95 81.05 16.05 81.05 18.0" fill="url(#gradient2)" fill-rule="evenodd" stroke="none"/>
+      <path d="M81.05 12.0 L74.05 12.0 5.95 12.0 1.05 12.0 1.0 4.95 1.0 4.0 Q1.0 1.0 4.0 1.0 L5.95 1.0 74.05 1.0 78.0 1.0 Q81.0 1.0 81.0 4.0 L81.0 4.95 81.05 12.0" fill="url(#gradient3)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient0" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63" stop-opacity="0.3019608"/>
+      <stop offset="1.0" stop-color="#b7babc" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient1" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63" stop-opacity="0.3019608"/>
+      <stop offset="1.0" stop-color="#b7babc" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient2" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.2"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.004, 0.0183, 0.0, 80.5, 4.75)" gradientUnits="userSpaceOnUse" id="gradient3" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.0"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.15294118"/>
+    </linearGradient>
+    <g id="sprite2" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <use ffdec:characterId="339" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)" width="82.0" xlink:href="#shape1"/>
+    </g>
+    <g id="shape1" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <path d="M41.0 21.0 L76.05 21.0 78.15 21.0 Q81.0 20.95 81.0 18.0 L81.0 16.05 81.0 4.95 81.0 4.0 Q81.0 1.05 78.15 1.0 L76.05 1.0 41.0 1.0 41.0 0.0 76.05 0.0 78.0 0.0 Q82.0 0.0 82.0 4.0 L82.0 4.95 82.0 16.05 82.0 18.0 Q82.0 22.0 78.0 22.0 L76.05 22.0 41.0 22.0 41.0 21.0" fill="url(#gradient4)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 1.0 L3.95 1.0 3.9 1.0 Q1.0 1.05 1.0 4.0 L1.0 4.95 1.0 16.05 1.0 18.0 Q1.0 20.95 3.9 21.0 L3.95 21.0 41.0 21.0 41.0 22.0 4.05 22.0 Q0.0 22.0 0.0 18.0 L0.0 16.05 0.0 4.95 0.0 4.0 Q0.0 0.0 4.05 0.0 L41.0 0.0 41.0 1.0" fill="url(#gradient5)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 1.0 L76.05 1.0 78.15 1.0 Q81.05 1.05 81.05 4.0 L81.05 4.95 81.05 16.05 81.05 18.0 Q81.05 20.95 78.15 21.0 L76.05 21.0 41.05 21.0 41.05 16.05 41.05 4.95 41.05 1.0" fill="url(#gradient6)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L3.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 16.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L3.95 1.0 41.05 1.0 41.05 4.95 41.05 16.05 41.05 21.0" fill="url(#gradient7)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 1.0 L76.05 1.0 78.0 1.0 Q80.95 1.0 81.0 4.0 L81.0 4.95 81.0 12.0 76.05 12.0 41.0 12.0 41.0 4.95 41.0 1.0" fill="url(#gradient8)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 12.0 L3.95 12.0 1.0 12.0 1.0 4.95 1.0 4.0 Q1.0 1.0 4.0 1.0 L41.0 1.0 41.0 4.95 41.0 12.0" fill="url(#gradient9)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient4" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="0.9921568627450981" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient5" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="0.9921568627450981" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient6" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#99d7fe"/>
+      <stop offset="1.0" stop-color="#d9f0fe"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient7" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#99d7fe"/>
+      <stop offset="1.0" stop-color="#d9f0fe"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.004, 0.0183, 0.0, 80.5, 4.75)" gradientUnits="userSpaceOnUse" id="gradient8" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.0"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0064, 0.0183, 0.0, 61.55, 6.75)" gradientUnits="userSpaceOnUse" id="gradient9" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.0"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <g id="sprite3" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <use ffdec:characterId="341" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.05, 0.0)" width="82.0" xlink:href="#shape2"/>
+    </g>
+    <g id="shape2" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <path d="M81.05 18.0 L81.05 17.1 81.05 4.85 81.05 4.0 Q81.05 1.05 78.15 1.0 L76.95 1.0 4.85 1.0 3.9 1.0 Q1.0 1.05 1.05 4.0 L1.05 4.85 1.05 17.1 1.05 18.0 Q1.0 20.95 3.9 21.0 L4.85 21.0 76.95 21.0 78.15 21.0 Q81.05 20.95 81.05 18.0 M82.05 4.0 L82.05 4.85 82.05 17.1 82.05 18.0 Q82.05 22.0 78.05 22.0 L76.95 22.0 4.85 22.0 4.05 22.0 Q0.0 22.0 0.05 18.0 L0.05 17.1 0.05 4.85 0.05 4.0 Q0.0 0.0 4.05 0.0 L4.85 0.0 76.95 0.0 78.05 0.0 Q82.05 0.0 82.05 4.0" fill="url(#gradient10)" fill-rule="evenodd" stroke="none"/>
+      <path d="M4.0 1.0 L4.85 1.0 76.95 1.0 78.05 1.0 Q81.05 1.0 81.05 4.0 L81.05 4.85 81.05 17.1 81.05 18.0 Q81.05 21.0 78.05 21.0 L76.95 21.0 4.85 21.0 4.0 21.0 Q1.0 21.0 1.0 18.0 L1.0 17.1 1.0 4.85 1.0 4.0 Q1.0 1.0 4.0 1.0" fill="#ffffff" fill-opacity="0.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0132, -0.0134, 0.0, 41.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient10" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#2c92f5"/>
+      <stop offset="1.0" stop-color="#3d00cc"/>
+    </linearGradient>
+    <g id="sprite4" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <use ffdec:characterId="343" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)" width="82.0" xlink:href="#shape3"/>
+    </g>
+    <g id="shape3" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <path d="M41.0 0.0 L76.05 0.0 78.0 0.0 Q82.0 0.0 82.0 4.0 L82.0 4.95 82.0 16.05 82.0 18.0 Q82.0 22.0 78.0 22.0 L76.05 22.0 41.0 22.0 41.0 21.0 76.05 21.0 78.15 21.0 Q81.0 20.95 81.0 18.0 L81.0 16.05 81.0 4.95 81.0 4.0 Q81.0 1.05 78.15 1.0 L76.05 1.0 41.0 1.0 41.0 0.0" fill="url(#gradient11)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 22.0 L4.95 22.0 4.05 22.0 Q0.0 22.0 0.0 18.0 L0.0 16.05 0.0 4.95 0.0 4.0 Q0.0 0.0 4.05 0.0 L4.95 0.0 41.0 0.0 41.0 1.0 4.95 1.0 3.9 1.0 Q1.0 1.05 1.0 4.0 L1.0 4.95 1.0 16.05 1.0 18.0 Q1.0 20.95 3.9 21.0 L4.95 21.0 41.0 21.0 41.0 22.0" fill="url(#gradient12)" fill-rule="evenodd" stroke="none"/>
+      <path d="M81.05 18.0 Q81.05 20.95 78.15 21.0 L76.05 21.0 4.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 16.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L4.95 1.0 76.05 1.0 78.15 1.0 Q81.05 1.05 81.05 4.0 L81.05 4.95 81.05 16.05 81.05 18.0" fill="url(#gradient13)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 1.0 L76.05 1.0 78.0 1.0 Q80.95 1.0 81.0 4.0 L81.0 4.95 81.0 12.0 76.05 12.0 41.0 12.0 41.0 4.95 41.0 1.0" fill="url(#gradient14)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 12.0 L4.95 12.0 1.0 12.0 1.0 4.95 1.0 4.0 Q1.0 1.0 4.0 1.0 L4.95 1.0 41.0 1.0 41.0 4.95 41.0 12.0" fill="url(#gradient15)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient11" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="0.9921568627450981" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient12" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="0.9921568627450981" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient13" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.004, 0.0183, 0.0, 80.5, 4.75)" gradientUnits="userSpaceOnUse" id="gradient14" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.0"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0064, 0.0183, 0.0, 61.55, 6.75)" gradientUnits="userSpaceOnUse" id="gradient15" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.0"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <g id="sprite5" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <use ffdec:characterId="345" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.05, 0.0)" width="63.95" xlink:href="#shape4"/>
+    </g>
+    <g id="shape4" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <path d="M41.0 22.0 L41.0 21.0 57.8 21.0 60.1 21.0 Q63.0 20.95 63.0 18.0 L63.0 16.05 63.0 4.95 63.0 4.0 Q63.0 1.1 60.1 1.0 L57.8 1.0 41.0 1.0 41.0 0.0 57.8 0.0 60.0 0.0 Q64.0 0.0 64.0 4.0 L64.0 4.95 64.0 16.05 64.0 18.0 Q64.0 22.0 60.0 22.0 L57.8 22.0 41.0 22.0" fill="url(#gradient16)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 22.0 L6.95 22.0 4.05 22.0 Q0.0 22.0 0.05 18.0 L0.05 16.05 0.05 4.95 0.05 4.0 Q0.0 0.0 4.05 0.0 L6.95 0.0 41.0 0.0 41.0 1.0 6.95 1.0 3.9 1.0 Q1.0 1.05 1.05 4.0 L1.05 4.95 1.05 16.05 1.05 18.0 Q1.0 20.95 3.9 21.0 L6.95 21.0 41.0 21.0 41.0 22.0" fill="url(#gradient17)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L41.05 16.05 41.05 4.95 41.05 1.0 57.8 1.0 60.1 1.0 Q63.0 1.1 63.0 4.0 L63.0 4.95 63.0 16.05 63.0 18.0 Q63.0 20.95 60.1 21.0 L57.8 21.0 41.05 21.0" fill="url(#gradient18)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L6.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 16.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L6.95 1.0 41.05 1.0 41.05 4.95 41.05 16.05 41.05 21.0" fill="url(#gradient19)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient16" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63" stop-opacity="0.3019608"/>
+      <stop offset="1.0" stop-color="#b7babc" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient17" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63" stop-opacity="0.3019608"/>
+      <stop offset="1.0" stop-color="#b7babc" stop-opacity="0.2"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient18" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.2"/>
+      <stop offset="1.0" stop-color="#cccccc" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient19" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.2"/>
+      <stop offset="1.0" stop-color="#cccccc" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <g id="sprite6" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <use ffdec:characterId="347" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.05, 0.0)" width="63.95" xlink:href="#shape5"/>
+    </g>
+    <g id="shape5" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <path d="M41.0 22.0 L41.0 21.0 58.9 21.0 60.1 21.0 Q63.0 20.95 63.0 18.0 L63.0 17.05 63.0 4.95 63.0 4.0 Q63.0 1.1 60.1 1.0 L58.9 1.0 41.0 1.0 41.0 0.0 58.9 0.0 60.0 0.0 Q64.0 0.0 64.0 4.0 L64.0 4.95 64.0 17.05 64.0 18.0 Q64.0 22.0 60.0 22.0 L58.9 22.0 41.0 22.0" fill="url(#gradient20)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 22.0 L4.95 22.0 4.05 22.0 Q0.0 22.0 0.05 18.0 L0.05 17.05 0.05 4.95 0.05 4.0 Q0.0 0.0 4.05 0.0 L4.95 0.0 41.0 0.0 41.0 1.0 4.95 1.0 3.9 1.0 Q1.0 1.05 1.05 4.0 L1.05 4.95 1.05 17.05 1.05 18.0 Q1.0 20.95 3.9 21.0 L4.95 21.0 41.0 21.0 41.0 22.0" fill="url(#gradient21)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 1.0 L58.9 1.0 60.1 1.0 Q63.0 1.1 63.0 4.0 L63.0 4.95 63.0 17.05 63.0 18.0 Q63.0 20.95 60.1 21.0 L58.9 21.0 41.05 21.0 41.05 17.05 41.05 4.95 41.05 1.0" fill="url(#gradient22)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L4.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 17.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L4.95 1.0 41.05 1.0 41.05 4.95 41.05 17.05 41.05 21.0" fill="url(#gradient23)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient20" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="1.0" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient21" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="1.0" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, 0.0134, -0.0134, 0.0, 33.1, 11.0)" gradientUnits="userSpaceOnUse" id="gradient22" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#94d2fc"/>
+      <stop offset="1.0" stop-color="#ade4fc"/>
+      <stop offset="1.0" stop-color="#beeafc"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, 0.0134, 0.0134, 0.0, 31.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient23" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#94d2fc"/>
+      <stop offset="1.0" stop-color="#ade4fc"/>
+      <stop offset="1.0" stop-color="#beeafc"/>
+    </linearGradient>
+    <g id="sprite7" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <use ffdec:characterId="349" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.05, 0.0)" width="63.95" xlink:href="#shape6"/>
+    </g>
+    <g id="shape6" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <path d="M41.0 22.0 L41.0 21.0 58.6 21.0 60.1 21.0 Q63.0 20.95 63.0 18.0 L63.0 16.05 63.0 4.95 63.0 4.0 Q63.0 1.1 60.1 1.0 L58.6 1.0 41.0 1.0 41.0 0.0 58.6 0.0 60.0 0.0 Q64.0 0.0 64.0 4.0 L64.0 4.95 64.0 16.05 64.0 18.0 Q64.0 22.0 60.0 22.0 L58.6 22.0 41.0 22.0" fill="url(#gradient24)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 22.0 L4.95 22.0 4.05 22.0 Q0.0 22.0 0.05 18.0 L0.05 16.05 0.05 4.95 0.05 4.0 Q0.0 0.0 4.05 0.0 L4.95 0.0 41.0 0.0 41.0 1.0 4.95 1.0 3.9 1.0 Q1.0 1.05 1.05 4.0 L1.05 4.95 1.05 16.05 1.05 18.0 Q1.0 20.95 3.9 21.0 L4.95 21.0 41.0 21.0 41.0 22.0" fill="url(#gradient25)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L41.05 16.05 41.05 4.95 41.05 1.0 58.6 1.0 60.1 1.0 Q63.0 1.1 63.0 4.0 L63.0 4.95 63.0 16.05 63.0 18.0 Q63.0 20.95 60.1 21.0 L58.6 21.0 41.05 21.0" fill="url(#gradient26)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L4.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 16.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L4.95 1.0 41.05 1.0 41.05 4.95 41.05 16.05 41.05 21.0" fill="url(#gradient27)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient24" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="1.0" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient25" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#0075bf"/>
+      <stop offset="1.0" stop-color="#009dff"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient26" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="1.0" stop-color="#cccccc" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient27" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="1.0" stop-color="#cccccc" stop-opacity="0.6"/>
+    </linearGradient>
+    <g id="sprite8" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <use ffdec:characterId="351" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.05, 0.0)" width="63.95" xlink:href="#shape7"/>
+    </g>
+    <g id="shape7" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.05, 0.0)">
+      <path d="M41.0 22.0 L41.0 21.0 59.25 21.0 60.1 21.0 Q63.0 20.95 63.0 18.0 L63.0 16.05 63.0 4.95 63.0 4.0 Q63.0 1.1 60.1 1.0 L59.25 1.0 41.0 1.0 41.0 0.0 59.25 0.0 60.0 0.0 Q64.0 0.0 64.0 4.0 L64.0 4.95 64.0 16.05 64.0 18.0 Q64.0 22.0 60.0 22.0 L59.25 22.0 41.0 22.0" fill="url(#gradient28)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 22.0 L5.95 22.0 4.05 22.0 Q0.0 22.0 0.05 18.0 L0.05 16.05 0.05 4.95 0.05 4.0 Q0.0 0.0 4.05 0.0 L5.95 0.0 41.0 0.0 41.0 1.0 5.95 1.0 3.9 1.0 Q1.0 1.05 1.05 4.0 L1.05 4.95 1.05 16.05 1.05 18.0 Q1.0 20.95 3.9 21.0 L5.95 21.0 41.0 21.0 41.0 22.0" fill="url(#gradient29)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 1.0 L59.25 1.0 60.1 1.0 Q63.0 1.1 63.0 4.0 L63.0 4.95 63.0 16.05 63.0 18.0 Q63.0 20.95 60.1 21.0 L59.25 21.0 41.05 21.0 41.05 16.05 41.05 4.95 41.05 1.0" fill="url(#gradient30)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L5.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 16.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L5.95 1.0 41.05 1.0 41.05 4.95 41.05 16.05 41.05 21.0" fill="url(#gradient31)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient28" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63"/>
+      <stop offset="1.0" stop-color="#b7babc"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient29" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63"/>
+      <stop offset="1.0" stop-color="#b7babc"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient30" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="1.0" stop-color="#cccccc" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient31" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="1.0" stop-color="#cccccc" stop-opacity="0.6"/>
+    </linearGradient>
+    <g id="sprite9" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <use ffdec:characterId="353" height="22.0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)" width="82.0" xlink:href="#shape8"/>
+    </g>
+    <g id="shape8" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <path d="M41.0 0.0 L75.05 0.0 78.0 0.0 Q82.0 0.0 82.0 4.0 L82.0 4.95 82.0 16.05 82.0 18.0 Q82.0 22.0 78.0 22.0 L75.05 22.0 41.0 22.0 41.0 21.0 75.05 21.0 78.15 21.0 Q81.0 20.95 81.0 18.0 L81.0 16.05 81.0 4.95 81.0 4.0 Q81.0 1.05 78.15 1.0 L75.05 1.0 41.0 1.0 41.0 0.0" fill="url(#gradient32)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 22.0 L6.95 22.0 4.05 22.0 Q0.0 22.0 0.0 18.0 L0.0 16.05 0.0 4.95 0.0 4.0 Q0.0 0.0 4.05 0.0 L6.95 0.0 41.0 0.0 41.0 1.0 6.95 1.0 3.9 1.0 Q1.0 1.05 1.0 4.0 L1.0 4.95 1.0 16.05 1.0 18.0 Q1.0 20.95 3.9 21.0 L6.95 21.0 41.0 21.0 41.0 22.0" fill="url(#gradient33)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 1.0 L75.05 1.0 78.15 1.0 Q81.05 1.05 81.05 4.0 L81.05 4.95 81.05 16.05 81.05 18.0 Q81.05 20.95 78.15 21.0 L75.05 21.0 41.05 21.0 41.05 16.05 41.05 4.95 41.05 1.0" fill="url(#gradient34)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.05 21.0 L6.95 21.0 3.9 21.0 Q1.0 20.95 1.05 18.0 L1.05 16.05 1.05 4.95 1.05 4.0 Q1.0 1.05 3.9 1.0 L6.95 1.0 41.05 1.0 41.05 4.95 41.05 16.05 41.05 21.0" fill="url(#gradient35)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 1.0 L75.05 1.0 78.0 1.0 Q81.0 1.0 81.0 4.0 L81.0 4.95 81.05 12.0 75.05 12.0 41.0 12.0 41.0 4.95 41.0 1.0" fill="url(#gradient36)" fill-rule="evenodd" stroke="none"/>
+      <path d="M41.0 12.0 L6.95 12.0 1.05 12.0 1.0 4.95 1.0 4.0 Q1.0 1.0 4.0 1.0 L6.95 1.0 41.0 1.0 41.0 4.95 41.0 12.0" fill="url(#gradient37)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient32" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63"/>
+      <stop offset="1.0" stop-color="#b7babc"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient33" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#585f63"/>
+      <stop offset="1.0" stop-color="#b7babc"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, 0.0134, 0.0, 71.0, 11.0)" gradientUnits="userSpaceOnUse" id="gradient34" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0134, -0.0134, 0.0, 11.05, 11.0)" gradientUnits="userSpaceOnUse" id="gradient35" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.4"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.004, 0.0183, 0.0, 80.5, 4.75)" gradientUnits="userSpaceOnUse" id="gradient36" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.0"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.3019608"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, -0.0064, 0.0183, 0.0, 61.55, 6.75)" gradientUnits="userSpaceOnUse" id="gradient37" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.0" stop-color="#cccccc" stop-opacity="0.0"/>
+      <stop offset="1.0" stop-color="#ffffff" stop-opacity="0.3019608"/>
+    </linearGradient>
+  </defs>
+</svg>

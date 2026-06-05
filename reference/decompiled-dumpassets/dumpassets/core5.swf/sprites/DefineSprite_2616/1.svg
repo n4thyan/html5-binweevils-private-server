@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:ffdec="https://www.free-decompiler.com/flash" xmlns:xlink="http://www.w3.org/1999/xlink" ffdec:objectType="frame" height="381.8px" width="261.75px" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(1.0, 0.0, 0.0, 1.0, 13.0, 4.15)">
+    <use ffdec:characterId="2585" height="52.35" id="sendReply_btn" transform="matrix(1.0, 0.0, 0.0, 1.0, 143.55, 309.75)" width="61.7" xlink:href="#button0"/>
+    <filter id="filter2">
+      <feColorMatrix in="SourceGraphic" result="filterResult10" type="matrix" values="0.28610292 1.5432959 -0.8293989 0.0 0.0 0.10915956 0.5276371 0.36320326 0.0 0.0 1.0250307 0.13502091 -0.16005167 0.0 0.0 0.0 0.0 0.0 1.0 0.0"/>
+    </filter>
+    <use ffdec:characterId="2593" filter="url(#filter2)" height="46.15" id="closeMessage_btn" transform="matrix(1.0, 0.0, 0.0, 1.0, 39.95, 317.15)" width="46.05" xlink:href="#button1"/>
+    <filter id="filter3">
+      <feOffset dx="-2.4072595914843915" dy="3.19454241781298" in="SourceGraphic" result="filterResult11"/>
+      <feColorMatrix in="filterResult11" result="filterResult12" type="matrix" values="0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 1 0"/>
+      <feConvolveMatrix divisor="4.0" in="filterResult12" kernelMatrix="1 1 1 1" order="2 2" result="filterResult13"/>
+      <feColorMatrix in="filterResult13" result="filterResult14" type="matrix" values="1 0 0 0 0,0 1 0 0 0,0 0 1 0 0,0 0 0 0.296875 0"/>
+      <feComposite in="SourceGraphic" in2="filterResult14" operator="over" result="filterResult15"/>
+    </filter>
+    <use ffdec:characterId="2595" filter="url(#filter3)" height="215.2" transform="matrix(1.0, 0.0, 0.0, 1.0, 3.8, 76.25)" width="228.05" xlink:href="#sprite6"/>
+    <use ffdec:characterId="2596" height="126.15" id="msg_txt" transform="matrix(1.0, 0.0, 0.0, 1.0, 12.5, 151.85)" width="210.0" xlink:href="#text0"/>
+    <filter id="filter183">
+      <feColorMatrix in="SourceGraphic" result="filterResult16" type="matrix" values="0 0 0 0 0.06666667,0 0 0 0 0.36078432,0 0 0 0 0.27058825,0 0 0 1 0"/>
+      <feConvolveMatrix divisor="9.0" in="filterResult16" kernelMatrix="1 1 1 1 1 1 1 1 1" order="3 3" result="filterResult17"/>
+      <feComposite in="SourceGraphic" in2="filterResult17" operator="over" result="filterResult18"/>
+      <feOffset dx="-0.813463150409148" dy="1.8270954279748017" in="filterResult18" result="filterResult19"/>
+      <feColorMatrix in="filterResult19" result="filterResult20" type="matrix" values="0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 1 0"/>
+      <feConvolveMatrix divisor="4.0" in="filterResult20" kernelMatrix="1 1 1 1" order="2 2" result="filterResult21"/>
+      <feColorMatrix in="filterResult21" result="filterResult22" type="matrix" values="1 0 0 0 0,0 1 0 0 0,0 0 1 0 0,0 0 0 0.296875 0"/>
+      <feComposite in="filterResult18" in2="filterResult22" operator="over" result="filterResult23"/>
+    </filter>
+    <use ffdec:characterId="2597" filter="url(#filter183)" height="13.7" transform="matrix(1.0, 0.0, 0.0, 1.0, 25.3, 0.8)" width="17.9" xlink:href="#text1"/>
+    <use ffdec:characterId="2598" height="18.45" id="to_txt" transform="matrix(1.0, 0.0, 0.0, 1.0, 45.6, 0.75)" width="169.95" xlink:href="#text2"/>
+    <use ffdec:characterId="2615" height="381.8" id="messages_mc" transform="matrix(1.0, 0.0, 0.0, 1.0, -13.0, -4.15)" width="261.75" xlink:href="#sprite7"/>
+  </g>
+  <defs>
+    <g id="button0" transform="matrix(1.0, 0.0, 0.0, 1.0, 3.0, 7.1)">
+      <filter id="filter0">
+        <feOffset dx="-0.813463150409148" dy="1.8270954279748017" in="SourceGraphic" result="filterResult0"/>
+        <feColorMatrix in="filterResult0" result="filterResult1" type="matrix" values="0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 1 0"/>
+        <feConvolveMatrix divisor="4.0" in="filterResult1" kernelMatrix="1 1 1 1" order="2 2" result="filterResult2"/>
+        <feColorMatrix in="filterResult2" result="filterResult3" type="matrix" values="1 0 0 0 0,0 1 0 0 0,0 0 1 0 0,0 0 0 0.296875 0"/>
+        <feComposite in="SourceGraphic" in2="filterResult3" operator="over" result="filterResult4"/>
+      </filter>
+      <use ffdec:characterId="2580" filter="url(#filter0)" height="38.25" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.7, 5.25)" width="57.15" xlink:href="#sprite0"/>
+      <use ffdec:characterId="2581" height="42.6" transform="matrix(1.0, 0.0, 0.0, 1.0, 7.85, -1.8)" width="39.65" xlink:href="#shape1"/>
+      <use ffdec:characterId="2583" height="42.6" transform="matrix(1.0, 0.0, 0.0, 1.0, 9.2, -3.45)" width="39.65" xlink:href="#sprite2"/>
+    </g>
+    <g id="sprite0" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.7, 1.6)">
+      <use ffdec:characterId="2579" height="38.25" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.7, -1.6)" width="57.15" xlink:href="#sprite1"/>
+    </g>
+    <g id="sprite1" transform="matrix(1.0, 0.0, 0.0, 1.0, -10.5, -8.8)">
+      <use ffdec:characterId="2578" height="38.25" transform="matrix(1.0, 0.0, 0.0, 1.0, 10.5, 8.8)" width="57.15" xlink:href="#shape0"/>
+    </g>
+    <g id="shape0" transform="matrix(1.0, 0.0, 0.0, 1.0, -10.5, -8.8)">
+      <path d="M66.9 41.3 Q66.9 46.3 61.9 46.3 L16.25 46.3 Q11.25 46.3 11.25 41.3 L11.25 14.55 Q11.25 9.55 16.25 9.55 L61.9 9.55 Q66.9 9.55 66.9 14.55 L66.9 41.3" fill="url(#gradient0)" fill-rule="evenodd" stroke="none"/>
+      <path d="M66.9 41.3 L66.9 14.55 Q66.9 9.55 61.9 9.55 L16.25 9.55 Q11.25 9.55 11.25 14.55 L11.25 41.3 Q11.25 46.3 16.25 46.3 L61.9 46.3 Q66.9 46.3 66.9 41.3 Z" fill="none" stroke="#676767" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path d="M56.4 10.4 Q66.4 10.4 66.4 20.4 L66.4 35.45 Q66.4 45.45 56.4 45.45 L21.9 45.45 Q11.9 45.45 11.9 35.45 L11.9 20.4 Q11.9 10.4 21.9 10.4 L56.4 10.4" fill="url(#gradient1)" fill-rule="evenodd" stroke="none"/>
+      <path d="M66.25 18.0 L47.85 29.3 49.1 30.05 65.6 40.3 65.6 40.35 67.15 41.3 66.65 43.0 47.6 31.0 46.4 30.25 46.35 30.25 39.15 34.65 32.0 30.25 30.8 31.0 11.7 42.85 11.25 41.15 12.7 40.3 12.7 40.25 29.3 30.05 30.5 29.3 12.1 18.0 11.2 17.45 11.7 15.95 39.15 32.9 66.7 15.9 67.05 17.5 66.25 18.0" fill="#666666" fill-opacity="0.9882353" fill-rule="evenodd" stroke="none"/>
+      <path d="M49.1 30.05 L47.85 29.3 66.25 18.0 66.4 19.5 49.1 30.05 M12.1 18.0 L30.5 29.3 29.3 30.05 11.95 19.5 Q11.95 18.7 12.1 18.0 M30.8 31.0 L32.0 30.25 39.15 34.65 46.35 30.25 46.4 30.25 47.6 31.0 46.4 31.75 46.35 31.75 39.15 36.15 30.8 31.0" fill="#000000" fill-opacity="0.2" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0221, -0.0214, 0.0, 39.15, 27.9)" gradientUnits="userSpaceOnUse" id="gradient0" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.027450980392156862" stop-color="#ffffff"/>
+      <stop offset="0.6039215686274509" stop-color="#eeeeee"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, 0.0221, -0.0214, 0.0, 39.15, 27.9)" gradientUnits="userSpaceOnUse" id="gradient1" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.027450980392156862" stop-color="#ffffff"/>
+      <stop offset="0.6039215686274509" stop-color="#eeeeee"/>
+    </linearGradient>
+    <g id="shape1" transform="matrix(1.0, 0.0, 0.0, 1.0, -7.85, 1.8)">
+      <path d="M36.25 -1.7 L37.05 -0.95 47.35 19.25 Q47.6 19.75 47.45 20.3 L46.85 21.15 45.8 21.4 37.45 20.15 Q36.05 29.5 37.4 37.85 L37.3 38.65 36.8 39.3 36.0 39.55 17.55 40.8 16.75 40.65 16.15 40.05 15.95 39.25 Q16.45 25.75 19.4 17.55 L9.15 16.15 Q8.55 16.05 8.2 15.6 7.8 15.1 7.85 14.5 7.95 13.85 8.45 13.5 19.8 4.45 35.15 -1.7 35.7 -1.9 36.25 -1.7" fill="#000000" fill-opacity="0.29803923" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="sprite2" transform="matrix(1.0, 0.0, 0.0, 1.0, 39.75, 21.3)">
+      <use ffdec:characterId="2582" height="42.6" transform="matrix(1.0, 0.0, 0.0, 1.0, -39.75, -21.3)" width="39.65" xlink:href="#shape2"/>
+    </g>
+    <g id="shape2" transform="matrix(1.0, 0.0, 0.0, 1.0, 39.75, 21.3)">
+      <path d="M-11.9 -19.8 L-1.6 0.4 -11.4 -1.05 Q-13.15 9.35 -11.7 18.55 L-30.15 19.8 Q-29.6 5.1 -26.15 -3.2 L-38.25 -4.85 Q-27.05 -13.75 -11.9 -19.8 Z" fill="none" stroke="url(#gradient2)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.0"/>
+      <path d="M-11.9 -19.8 L-1.6 0.4 -11.4 -1.05 Q-13.15 9.35 -11.7 18.55 L-30.15 19.8 Q-29.6 5.1 -26.15 -3.2 L-38.25 -4.85 Q-27.05 -13.75 -11.9 -19.8" fill="url(#gradient3)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0168, -0.0258, 0.0, 0.85, -7.5)" gradientUnits="userSpaceOnUse" id="gradient2" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.027450980392156862" stop-color="#39de39"/>
+      <stop offset="0.6039215686274509" stop-color="#006000"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, 0.0201, -0.0242, 0.0, -18.35, -6.5)" gradientUnits="userSpaceOnUse" id="gradient3" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.13725490196078433" stop-color="#cbffd2"/>
+      <stop offset="0.7803921568627451" stop-color="#00cc33"/>
+    </linearGradient>
+    <g id="button1" transform="matrix(1.0, 0.0, 0.0, 1.0, -5.05, -1.55)">
+      <filter id="filter1">
+        <feOffset dx="-0.813463150409148" dy="1.8270954279748017" in="SourceGraphic" result="filterResult5"/>
+        <feColorMatrix in="filterResult5" result="filterResult6" type="matrix" values="0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 1 0"/>
+        <feConvolveMatrix divisor="4.0" in="filterResult6" kernelMatrix="1 1 1 1" order="2 2" result="filterResult7"/>
+        <feColorMatrix in="filterResult7" result="filterResult8" type="matrix" values="1 0 0 0 0,0 1 0 0 0,0 0 1 0 0,0 0 0 0.296875 0"/>
+        <feComposite in="SourceGraphic" in2="filterResult8" operator="over" result="filterResult9"/>
+      </filter>
+      <use ffdec:characterId="2588" filter="url(#filter1)" height="42.6" transform="matrix(1.0, 0.0, 0.0, 1.0, 6.8, 3.15)" width="42.6" xlink:href="#sprite3"/>
+      <use ffdec:characterId="2589" height="30.5" transform="matrix(1.0, 0.0, 0.0, 1.0, 12.8, 10.85)" width="31.1" xlink:href="#shape4"/>
+      <use ffdec:characterId="2591" height="30.45" transform="matrix(0.0, 1.0249, -1.0249, 0.0, 43.899, 8.9611)" width="29.85" xlink:href="#sprite5"/>
+    </g>
+    <g id="sprite3" transform="matrix(1.0, 0.0, 0.0, 1.0, -6.8, 3.7)">
+      <use ffdec:characterId="2587" height="42.6" transform="matrix(1.0, 0.0, 0.0, 1.0, 6.8, -3.7)" width="42.6" xlink:href="#sprite4"/>
+    </g>
+    <g id="sprite4" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.75, 0.75)">
+      <use ffdec:characterId="2586" height="42.6" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.75, -0.75)" width="42.6" xlink:href="#shape3"/>
+    </g>
+    <g id="shape3" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.75, 0.75)">
+      <path d="M0.0 20.55 Q0.0 12.05 6.0 6.0 12.05 0.0 20.55 0.0 29.05 0.0 35.05 6.0 41.1 12.05 41.1 20.55 41.1 29.05 35.05 35.05 29.05 41.1 20.55 41.1 12.05 41.1 6.0 35.05 0.0 29.05 0.0 20.55" fill="url(#gradient4)" fill-rule="evenodd" stroke="none"/>
+      <path d="M0.0 20.55 Q0.0 12.05 6.0 6.0 12.05 0.0 20.55 0.0 29.05 0.0 35.05 6.0 41.1 12.05 41.1 20.55 41.1 29.05 35.05 35.05 29.05 41.1 20.55 41.1 12.05 41.1 6.0 35.05 0.0 29.05 0.0 20.55 Z" fill="none" stroke="#676767" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0251, -0.0251, 0.0, 20.55, 20.55)" gradientUnits="userSpaceOnUse" id="gradient4" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.027450980392156862" stop-color="#ffffff"/>
+      <stop offset="0.6039215686274509" stop-color="#eeeeee"/>
+    </linearGradient>
+    <g id="shape4" transform="matrix(1.0, 0.0, 0.0, 1.0, -12.8, -10.85)">
+      <path d="M43.8 32.15 L43.9 32.95 43.5 33.7 Q40.5 36.8 38.75 40.5 L38.1 41.2 37.15 41.35 Q36.65 41.25 36.35 40.9 L28.35 33.2 Q24.3 36.85 20.45 40.9 L19.6 41.35 18.7 41.2 18.0 40.5 Q16.2 36.8 13.25 33.7 L12.85 32.95 12.9 32.15 13.4 31.5 20.2 26.0 13.4 20.4 12.9 19.7 12.85 18.8 Q12.95 18.35 13.3 18.1 16.4 15.3 18.3 11.7 L18.95 11.0 19.85 10.9 Q20.35 10.95 20.7 11.3 L28.35 18.8 36.05 11.3 Q36.4 10.95 36.9 10.9 L37.8 11.05 38.45 11.7 Q40.25 15.3 43.4 18.1 L43.85 18.8 43.85 19.7 43.35 20.4 36.5 26.0 43.35 31.5 43.8 32.15" fill="#000000" fill-opacity="0.29803923" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="sprite5" transform="matrix(1.0, 0.0, 0.0, 1.0, -2.45, -4.05)">
+      <use ffdec:characterId="2590" height="30.45" transform="matrix(1.0, 0.0, 0.0, 1.0, 2.45, 4.05)" width="29.85" xlink:href="#shape5"/>
+    </g>
+    <g id="shape5" transform="matrix(1.0, 0.0, 0.0, 1.0, -2.45, -4.05)">
+      <path d="M30.8 10.45 Q27.0 8.65 23.75 5.55 L17.25 13.6 10.65 5.55 Q7.75 8.85 3.95 10.75 L12.2 19.25 3.95 27.8 Q7.75 29.75 10.65 33.0 L17.25 25.0 23.75 33.0 Q27.0 29.9 30.8 28.05 26.3 23.75 22.3 19.25 26.3 14.8 30.8 10.45 Z" fill="none" stroke="url(#gradient5)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.0"/>
+      <path d="M30.8 10.45 Q26.3 14.8 22.3 19.25 26.3 23.75 30.8 28.05 27.0 29.9 23.75 33.0 L17.25 25.0 10.65 33.0 Q7.75 29.75 3.95 27.8 L12.2 19.25 3.95 10.75 Q7.75 8.85 10.65 5.55 L17.25 13.6 23.75 5.55 Q27.0 8.65 30.8 10.45" fill="url(#gradient6)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0188, 0.0012, -0.0018, 0.0288, 19.6, -15.85)" gradientUnits="userSpaceOnUse" id="gradient5" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.027450980392156862" stop-color="#39de39"/>
+      <stop offset="0.6039215686274509" stop-color="#006000"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0092, 0.0, 0.0, 0.0092, 10.35, -24.65)" gradientUnits="userSpaceOnUse" id="gradient6" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.13725490196078433" stop-color="#cbffd2"/>
+      <stop offset="0.7803921568627451" stop-color="#00cc33"/>
+    </linearGradient>
+    <g id="sprite6" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <use ffdec:characterId="2594" height="215.2" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)" width="228.05" xlink:href="#shape6"/>
+    </g>
+    <g id="shape6" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <path d="M216.05 59.7 Q228.05 59.7 228.05 71.7 L228.05 203.2 Q228.05 215.2 216.05 215.2 L12.0 215.2 Q0.0 215.2 0.0 203.2 L0.0 71.7 Q0.0 59.7 12.0 59.7 L110.1 59.7 Q126.5 49.0 124.8 29.25 123.35 10.1 90.1 0.0 130.5 2.6 143.9 21.2 157.3 39.8 153.4 59.7 L216.05 59.7" fill="#ffffff" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="text0" transform="matrix(1.0, 0.0, 0.0, 1.0, 2.0, 2.0)">
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 0.0, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_L0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 6.35, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_o0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 12.8, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 17.05, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 23.7, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 37.7, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 40.05, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_p0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 46.55, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 52.4, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 58.55, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 72.55, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 79.35, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_o0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 86.35, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 88.6, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_o0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 95.05, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 103.4, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 109.25, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 111.6, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 120.0, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 126.15, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 136.55, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 142.7, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 147.5, 14.3)" width="210.0" xlink:href="#font_GosmickSansBold__1"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 0.0, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_c0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 6.0, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_o0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 12.45, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 18.95, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 24.8, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 31.45, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_c0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 37.45, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 42.25, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 48.4, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 53.2, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 60.35, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 68.7, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 74.85, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 81.65, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 84.0, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_p0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 90.5, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 92.85, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 98.7, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_c0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 104.7, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 107.05, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 113.55, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_g0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 123.65, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 130.3, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 133.65, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 136.0, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 140.8, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_.0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 146.9, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_V0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 154.7, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 160.25, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 166.1, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 170.9, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 173.25, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_b0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 180.0, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 186.15, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 188.4, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 194.55, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 208.55, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 210.9, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 221.3, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 223.55, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 230.2, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_c0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 236.2, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 241.0, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 247.15, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 256.6, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 262.75, 31.9)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 0.0, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 6.15, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 12.65, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 17.45, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 27.7, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_o0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 34.15, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 38.9, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 45.4, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 51.55, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 55.8, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 66.05, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_b0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 72.8, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 75.05, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 81.2, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 87.7, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 94.5, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 96.85, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 101.65, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_.0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 107.75, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_I0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 111.3, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 121.4, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 127.55, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_c0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 137.15, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 143.95, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 146.3, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 152.45, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 166.45, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 169.8, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 172.15, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_b0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 178.9, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 185.55, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 190.3, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_o0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 196.75, 49.5)" width="210.0" xlink:href="#font_GosmickSansBold_.0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 0.0, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_V0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 7.8, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 10.15, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_v0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 14.6, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 20.75, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 31.15, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 37.3, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 46.75, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 53.25, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 59.9, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_c0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 69.5, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 79.9, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 86.05, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 91.9, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 97.75, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_a0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 107.5, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_v0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 112.35, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 119.0, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 124.85, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 131.65, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 137.8, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 143.75, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 154.15, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_o0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 161.15, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 163.4, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 168.95, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 174.8, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 179.6, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 181.95, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 192.2, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 198.85, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_l0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 201.1, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 207.75, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 210.1, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_f0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 213.35, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 220.0, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 226.5, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 233.3, 67.1)" width="210.0" xlink:href="#font_GosmickSansBold_.0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 0.0, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_I0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 3.55, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 10.05, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 14.85, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 21.5, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_g0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 28.0, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 34.65, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 43.0, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 47.8, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 53.95, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_y0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 64.0, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 66.35, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_p0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 72.85, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 78.7, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 84.85, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_m0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 98.85, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_n0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 105.35, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 107.7, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_b0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 114.45, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_h0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 121.0, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold__1"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 127.2, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 132.0, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_r0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 136.75, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 139.1, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 144.95, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_t0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 149.75, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_i0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 152.1, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_q0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 158.6, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_u0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 164.75, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_e0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 171.4, 84.7)" width="210.0" xlink:href="#font_GosmickSansBold_.0"/>
+      </g>
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -2.0, -2.0)">
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 0.0, 102.3)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 6.8, 102.3)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 12.65, 102.3)" width="210.0" xlink:href="#font_GosmickSansBold_f0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 18.0, 102.3)" width="210.0" xlink:href="#font_GosmickSansBold_s0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 23.85, 102.3)" width="210.0" xlink:href="#font_GosmickSansBold_d0"/>
+        <use fill="#073c2c" height="126.15" transform="matrix(0.0127, 0.0, 0.0, 0.0127, 30.65, 102.3)" width="210.0" xlink:href="#font_GosmickSansBold_f0"/>
+      </g>
+    </g>
+    <g id="font_GosmickSansBold_L0">
+      <path d="M479.0 -78.0 L479.0 -81.0 Q485.5 -54.5 470.0 -38.0 454.5 -21.5 422.5 -12.5 390.0 -3.5 343.5 1.5 297.0 6.0 242.5 8.0 L225.0 8.5 208.0 9.0 170.5 7.5 139.5 4.0 Q103.5 -2.0 81.5 -16.5 59.5 -31.0 47.5 -54.0 36.0 -77.0 32.5 -108.5 28.5 -140.5 28.5 -181.5 28.5 -195.0 29.0 -209.0 29.5 -223.5 29.5 -240.0 29.5 -251.0 30.0 -262.5 30.5 -273.5 30.5 -286.0 30.5 -316.5 31.5 -358.5 33.0 -400.5 34.0 -446.0 35.0 -491.5 36.5 -536.5 L39.0 -617.5 Q39.0 -626.0 39.5 -633.5 40.0 -641.0 40.0 -649.5 40.0 -661.5 45.0 -671.5 50.0 -681.0 57.5 -688.5 64.5 -695.5 72.0 -700.0 80.0 -704.5 85.0 -708.0 104.5 -713.0 123.5 -708.0 142.5 -702.5 156.5 -693.5 171.0 -684.0 179.0 -673.0 187.5 -661.5 187.5 -654.5 L188.5 -656.5 Q188.5 -651.5 188.0 -647.0 187.5 -642.0 186.5 -637.0 184.5 -627.0 184.5 -619.5 180.0 -582.0 177.5 -539.0 175.0 -496.0 173.0 -450.0 171.0 -404.5 170.0 -359.0 169.0 -313.5 169.0 -270.5 L169.0 -222.5 Q169.0 -191.5 169.5 -168.5 170.0 -145.5 172.0 -124.0 196.5 -112.0 239.5 -115.0 L257.0 -115.5 274.5 -116.0 332.5 -118.0 Q363.5 -119.0 410.5 -125.0 L408.5 -125.0 Q414.5 -127.0 419.0 -126.5 423.0 -126.0 428.0 -124.0 L429.0 -124.0 Q449.5 -124.0 463.5 -111.0 477.0 -97.5 479.0 -78.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_o0">
+      <path d="M361.5 -252.0 Q361.5 -284.5 354.5 -313.0 347.0 -341.0 334.5 -361.5 321.5 -382.0 302.5 -393.5 283.5 -405.5 260.0 -405.5 235.5 -405.5 215.5 -393.5 195.5 -382.0 181.0 -361.5 167.0 -341.0 159.0 -314.0 151.5 -286.5 151.5 -256.0 151.5 -226.5 158.0 -199.0 165.0 -172.0 178.0 -151.5 191.5 -131.0 210.0 -119.0 228.5 -106.5 253.0 -106.5 277.5 -106.5 297.5 -118.0 317.5 -129.0 332.0 -148.5 346.0 -168.0 354.0 -194.5 361.5 -221.0 361.5 -252.0 M486.5 -240.5 Q482.5 -186.0 462.5 -140.0 442.5 -94.0 410.5 -59.0 379.0 -24.5 336.5 -5.0 294.0 14.5 245.5 14.5 196.5 14.5 156.5 -5.5 116.5 -25.5 88.0 -59.5 59.0 -94.0 44.0 -140.5 28.5 -187.0 28.5 -240.5 28.5 -299.0 47.0 -349.5 65.5 -400.0 97.5 -437.5 130.0 -475.0 174.5 -496.5 219.0 -518.0 271.5 -518.0 322.5 -518.0 364.0 -496.0 405.5 -474.0 434.0 -436.5 463.0 -399.0 477.0 -348.5 490.5 -298.0 486.5 -240.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_r0">
+      <path d="M376.0 -437.0 L376.0 -431.0 Q371.5 -401.5 364.0 -382.0 356.5 -362.5 347.0 -350.5 338.0 -339.0 327.5 -334.5 317.5 -329.5 308.0 -329.5 289.0 -329.5 276.0 -344.5 263.0 -359.5 266.0 -374.5 264.0 -383.0 257.0 -386.0 250.0 -389.0 244.5 -390.0 215.0 -388.0 197.5 -370.5 180.0 -353.0 171.0 -325.0 162.0 -297.0 159.0 -260.5 156.5 -224.5 156.5 -186.5 156.5 -154.5 157.5 -123.5 158.5 -92.5 161.0 -62.5 158.5 -15.5 111.5 -1.0 102.5 6.0 97.0 8.0 91.0 10.0 82.0 10.0 50.0 8.0 37.0 -18.0 23.5 -44.0 25.5 -114.0 L25.5 -209.0 Q25.5 -251.0 26.0 -295.5 26.5 -340.0 28.5 -378.5 30.5 -416.5 34.5 -446.0 38.0 -475.0 45.0 -486.0 72.5 -520.0 106.5 -520.0 131.0 -520.0 145.0 -504.5 158.5 -489.5 161.0 -464.5 190.5 -490.5 220.5 -506.0 251.0 -522.0 284.5 -522.0 327.5 -522.0 349.0 -497.5 370.5 -473.0 376.0 -437.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_e0">
+      <path d="M294.0 -311.5 Q311.5 -325.5 320.5 -340.0 329.5 -354.5 328.5 -368.5 326.5 -369.5 326.5 -370.5 326.5 -371.5 325.5 -372.5 323.5 -375.0 322.0 -378.0 320.5 -381.0 321.5 -380.0 313.5 -394.0 296.5 -402.0 279.5 -409.5 259.0 -409.5 237.5 -409.5 219.5 -399.5 201.5 -389.0 188.0 -372.0 174.0 -355.5 165.5 -333.5 156.5 -311.5 153.5 -289.0 159.5 -287.5 165.0 -288.5 L177.0 -290.0 Q210.0 -293.0 239.0 -298.0 268.5 -303.0 294.0 -311.5 M454.5 -187.0 Q470.0 -187.0 485.5 -175.5 500.5 -163.5 503.0 -147.0 L503.0 -148.0 Q509.0 -120.5 489.5 -92.0 470.0 -63.0 436.0 -40.0 402.5 -17.0 358.5 -2.5 314.5 12.5 270.5 12.5 215.0 12.5 170.5 -5.5 126.0 -23.5 94.0 -56.5 62.5 -90.0 45.5 -136.0 28.5 -182.0 28.5 -239.5 28.5 -297.0 47.0 -347.5 65.5 -398.0 98.0 -435.5 130.0 -473.0 175.5 -495.0 221.0 -517.0 275.5 -517.0 313.5 -517.0 346.5 -505.0 380.0 -493.5 404.0 -472.0 428.0 -450.5 442.0 -421.5 455.5 -393.0 455.5 -359.0 455.5 -301.0 419.5 -265.0 383.0 -229.0 322.5 -210.5 295.0 -202.5 275.0 -197.5 255.0 -192.0 239.0 -190.0 L211.0 -187.0 186.5 -186.0 Q178.0 -185.0 176.0 -186.0 174.0 -187.0 164.0 -185.0 165.0 -177.0 173.0 -160.5 187.5 -132.0 216.0 -115.5 244.5 -99.0 281.5 -99.0 331.0 -99.0 361.5 -119.5 392.0 -140.0 417.0 -166.5 434.0 -184.0 454.5 -187.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_m0">
+      <path d="M179.0 -471.0 L179.0 -455.0 Q208.0 -482.5 243.0 -501.0 278.5 -519.5 321.5 -518.5 360.5 -517.5 395.0 -496.0 430.0 -474.0 449.5 -439.5 L449.5 -437.5 Q485.0 -473.0 532.5 -496.5 580.5 -519.5 632.5 -517.5 672.5 -512.0 702.5 -490.0 733.0 -468.0 752.5 -434.5 763.5 -413.0 769.5 -381.0 776.0 -349.0 779.0 -313.0 782.0 -276.5 783.0 -240.5 L785.0 -176.0 Q785.0 -169.0 785.5 -162.0 786.0 -155.5 786.0 -150.5 787.0 -138.0 787.0 -123.0 787.0 -107.5 786.0 -94.0 785.0 -84.0 784.5 -73.5 784.0 -63.5 786.0 -55.0 L786.0 -49.0 788.0 -43.0 Q789.0 -40.0 789.0 -34.5 789.0 -22.5 781.0 -13.5 773.0 -5.0 761.5 1.0 750.5 7.5 738.5 10.5 726.5 13.5 718.5 13.5 696.0 13.5 682.0 1.5 668.5 -10.0 661.0 -30.0 654.0 -50.0 651.5 -77.5 649.0 -105.5 649.0 -136.0 649.0 -148.5 649.5 -161.5 650.0 -175.0 650.0 -188.0 651.0 -202.5 651.0 -217.0 L651.0 -246.5 Q651.0 -278.5 649.0 -307.0 647.0 -335.5 639.5 -357.0 632.5 -378.5 620.0 -391.5 608.0 -404.5 586.5 -404.5 571.0 -404.5 555.5 -396.5 540.5 -389.0 527.5 -377.0 515.0 -365.5 504.5 -350.5 494.5 -335.5 489.0 -320.5 482.0 -298.0 479.5 -268.0 477.0 -238.5 477.0 -207.5 477.0 -181.0 478.0 -154.5 479.0 -128.0 481.0 -103.0 482.0 -92.0 482.0 -81.5 482.0 -71.5 483.0 -61.0 483.0 -47.0 477.5 -33.0 471.5 -19.5 462.0 -8.0 452.5 3.5 439.0 10.5 425.5 17.5 410.0 17.5 378.5 17.5 363.0 -5.5 357.0 -14.5 353.0 -32.0 348.5 -49.5 346.0 -71.0 343.5 -92.5 343.0 -116.5 342.5 -140.5 342.5 -163.0 342.5 -177.5 343.5 -190.5 344.0 -204.0 344.0 -215.5 L344.0 -259.5 Q344.0 -267.5 344.5 -275.5 345.0 -284.0 345.0 -294.0 345.0 -312.5 343.5 -331.5 342.0 -350.5 337.0 -366.5 331.5 -382.0 322.0 -392.0 312.5 -401.5 297.0 -401.5 276.5 -401.5 256.5 -392.0 236.5 -382.0 220.5 -367.0 204.5 -351.5 194.5 -331.5 184.5 -311.5 182.0 -291.0 181.0 -280.0 180.5 -267.5 180.0 -255.0 178.0 -244.0 L178.0 -245.0 Q175.0 -219.5 173.0 -194.5 171.0 -169.0 171.0 -145.5 171.0 -134.5 172.0 -125.0 L174.0 -104.5 Q175.0 -97.5 175.5 -89.0 176.0 -80.0 176.0 -72.0 177.0 -57.5 171.0 -43.0 165.0 -29.0 154.0 -17.0 143.5 -5.5 129.5 2.0 115.5 9.0 101.5 9.0 78.0 9.0 64.5 -5.5 51.0 -19.5 45.0 -39.5 39.0 -59.5 38.0 -82.0 37.0 -104.5 37.0 -122.0 L37.0 -134.5 Q36.0 -158.0 37.5 -184.5 39.0 -211.0 41.0 -233.5 44.0 -270.5 44.0 -306.5 L44.0 -443.5 Q44.0 -476.5 65.0 -501.5 86.0 -526.5 121.0 -526.5 145.5 -526.5 161.0 -510.0 177.0 -493.5 179.0 -471.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_i0">
+      <path d="M173.0 -642.0 Q171.0 -628.5 162.5 -614.5 153.5 -600.0 140.5 -588.0 127.0 -576.5 110.5 -570.5 94.0 -564.0 76.0 -567.0 48.0 -571.5 37.5 -596.0 26.5 -620.5 28.5 -650.0 31.5 -683.0 54.0 -706.5 76.0 -730.0 109.5 -730.0 128.0 -730.0 141.5 -722.0 154.5 -713.5 162.5 -700.5 170.0 -687.0 172.5 -671.5 175.0 -656.5 173.0 -642.0 M164.0 -442.5 L162.0 -399.5 Q161.0 -378.0 159.5 -357.5 157.5 -318.5 156.5 -282.5 155.5 -247.0 155.5 -210.0 155.5 -171.0 156.5 -134.5 157.5 -98.5 159.5 -71.5 159.5 -57.5 151.0 -44.0 142.5 -31.0 130.5 -20.0 119.0 -9.5 106.5 -2.5 94.0 4.0 86.0 4.0 63.5 4.0 50.0 -5.5 37.0 -15.5 30.0 -35.5 23.5 -55.5 21.5 -85.5 19.5 -116.0 19.5 -155.5 L19.5 -173.0 19.5 -198.5 Q19.5 -212.0 20.5 -224.5 22.5 -248.0 23.0 -273.0 23.5 -298.0 24.5 -324.5 L26.5 -388.5 Q27.5 -423.0 30.5 -451.5 33.0 -472.0 42.5 -485.0 52.0 -497.5 64.5 -504.5 77.0 -512.0 88.5 -514.5 100.5 -517.0 106.5 -517.0 136.0 -517.0 151.0 -498.5 166.0 -480.0 164.0 -442.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_p0">
+      <path d="M363.5 -262.0 Q362.5 -292.0 355.5 -318.5 348.5 -345.0 335.5 -364.0 323.0 -383.0 305.0 -394.0 287.0 -405.5 264.5 -404.5 214.0 -402.5 188.0 -359.5 162.0 -316.5 162.0 -248.0 162.0 -221.0 165.5 -197.5 169.0 -174.0 175.5 -153.5 194.0 -134.0 213.0 -121.5 232.5 -108.5 259.5 -108.5 286.0 -108.5 306.5 -120.5 327.0 -132.0 339.5 -152.5 352.5 -173.0 358.5 -201.0 365.0 -229.5 363.5 -262.0 M491.5 -268.5 Q491.5 -207.0 472.0 -156.5 452.0 -105.5 419.0 -69.5 386.5 -33.0 344.5 -13.0 302.5 7.0 257.0 7.0 243.0 7.0 231.0 5.0 219.5 3.0 208.5 -0.5 198.0 -4.5 186.5 -9.5 175.5 -14.5 162.0 -21.5 L162.0 -20.5 162.0 45.0 162.0 90.0 Q162.0 109.5 163.0 127.0 163.0 133.0 163.5 138.0 164.0 143.5 164.0 150.5 167.0 171.0 159.5 187.5 152.0 203.5 140.0 214.5 128.0 225.0 115.5 231.0 102.5 236.5 93.5 236.5 72.0 236.5 59.0 227.0 46.5 217.0 39.5 199.5 33.0 182.0 31.0 158.5 29.0 135.0 29.0 106.5 L29.0 -8.5 Q29.0 -59.5 29.5 -114.5 30.0 -169.0 32.0 -209.0 L32.0 -208.0 Q33.0 -246.0 33.0 -280.5 L33.0 -350.5 Q33.0 -374.0 33.5 -397.0 34.0 -420.0 34.0 -443.5 34.0 -484.5 58.0 -505.0 82.0 -525.5 112.0 -525.5 141.5 -525.5 152.0 -511.0 162.0 -497.0 164.0 -476.5 187.5 -492.5 215.5 -504.0 243.0 -515.5 271.5 -518.5 318.5 -521.5 359.0 -502.0 399.5 -482.5 429.5 -447.5 459.0 -413.0 475.5 -366.5 491.5 -319.5 491.5 -268.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_s0">
+      <path d="M440.5 -147.5 Q437.5 -109.5 417.5 -79.5 397.5 -50.0 366.5 -29.0 336.0 -8.0 297.5 2.5 259.0 13.5 219.0 13.5 154.5 13.5 102.5 -7.5 50.0 -28.5 31.5 -65.0 23.5 -81.5 30.0 -98.5 37.0 -115.5 49.5 -128.5 62.5 -142.0 78.0 -149.5 93.0 -157.5 102.5 -155.5 104.5 -153.0 108.5 -151.0 L111.5 -147.5 Q113.5 -145.0 115.5 -143.0 127.0 -129.5 156.0 -115.5 185.5 -101.0 226.5 -101.0 262.0 -101.0 287.5 -112.0 313.5 -122.5 314.5 -141.0 316.5 -180.0 243.5 -196.5 L221.0 -202.5 Q168.0 -216.0 132.5 -230.0 97.5 -244.5 76.5 -262.5 55.5 -280.5 48.5 -304.0 42.0 -327.5 45.0 -360.5 49.0 -397.5 71.5 -426.5 94.0 -455.5 128.0 -477.0 162.0 -499.0 203.5 -512.0 244.5 -525.5 286.5 -528.5 L323.0 -527.0 Q342.0 -525.5 360.0 -519.5 378.0 -513.0 393.0 -501.0 408.5 -488.5 419.0 -467.0 424.0 -449.5 423.5 -437.0 423.0 -424.0 421.0 -416.0 421.0 -417.0 421.5 -417.5 L422.0 -418.0 Q413.5 -391.0 406.0 -376.5 398.5 -361.5 376.0 -359.5 357.5 -357.5 346.0 -361.0 335.0 -364.5 327.0 -371.0 319.5 -378.0 316.0 -386.5 312.5 -395.5 309.5 -404.5 L309.5 -405.5 295.5 -409.5 Q287.5 -411.5 279.5 -411.5 L260.5 -410.5 242.5 -408.5 Q211.0 -404.5 189.5 -389.5 168.0 -375.0 167.0 -358.5 175.0 -346.0 206.0 -337.0 272.5 -318.5 319.0 -300.0 365.5 -281.5 393.5 -260.0 422.0 -238.5 432.5 -211.5 443.5 -184.0 440.5 -147.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_u0">
+      <path d="M466.0 -443.5 Q461.0 -380.0 459.5 -318.5 457.5 -257.0 457.5 -192.5 L457.5 -165.0 Q457.5 -146.5 458.0 -133.5 L460.0 -108.5 Q462.0 -102.5 463.0 -93.5 464.0 -84.0 464.0 -75.0 L464.0 -58.5 464.0 -48.5 Q466.0 -23.5 452.5 -8.5 439.5 7.0 406.5 7.0 L395.5 6.5 Q387.0 6.0 377.5 3.0 367.5 0.0 359.5 -7.5 351.0 -14.5 348.0 -27.0 332.0 -13.5 311.0 -6.5 290.0 1.0 269.0 4.5 248.0 8.0 229.5 8.0 L200.5 8.0 Q139.5 4.0 101.0 -30.0 62.5 -63.5 43.0 -117.0 33.0 -146.5 30.0 -182.5 27.5 -218.0 27.5 -251.0 L27.5 -288.0 Q27.5 -294.0 28.0 -299.5 28.5 -305.0 28.5 -311.5 29.5 -328.5 29.5 -347.0 29.5 -365.5 31.5 -385.0 L31.5 -412.5 Q31.5 -429.0 32.5 -445.5 33.0 -462.0 39.0 -475.5 45.0 -489.5 59.0 -499.5 72.5 -510.0 99.5 -514.0 111.5 -516.0 124.5 -512.5 137.0 -509.0 147.5 -501.0 157.5 -493.5 164.5 -481.5 171.0 -470.0 171.0 -455.5 171.0 -423.0 169.5 -390.5 168.0 -358.5 166.0 -329.5 164.0 -306.0 162.5 -285.5 161.0 -265.5 161.0 -249.0 161.0 -181.5 172.5 -149.0 184.5 -117.0 216.0 -115.0 235.5 -111.5 254.0 -117.0 272.5 -122.0 287.0 -134.0 302.0 -145.5 311.0 -164.0 319.5 -182.5 319.5 -206.0 323.5 -239.5 325.0 -278.0 326.5 -316.5 327.5 -355.5 327.5 -378.0 328.0 -400.5 328.5 -423.0 329.5 -443.5 329.5 -455.5 338.0 -468.5 346.0 -481.0 358.5 -491.5 370.5 -501.5 385.0 -508.5 399.5 -515.0 410.5 -515.0 435.0 -515.0 451.5 -498.5 468.0 -482.0 466.0 -443.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_d0">
+      <path d="M370.5 -263.0 Q370.5 -327.5 345.5 -367.0 320.5 -406.5 268.0 -406.5 211.0 -406.5 180.0 -363.0 149.5 -319.5 149.5 -242.5 149.5 -215.0 157.5 -190.5 166.0 -166.0 179.5 -148.0 193.5 -130.0 213.0 -120.0 232.5 -109.5 254.0 -109.5 312.0 -109.5 341.5 -151.5 370.5 -193.5 370.5 -263.0 M515.0 -54.5 L514.0 -57.5 Q514.0 -51.5 507.0 -40.5 500.5 -30.0 490.5 -20.0 480.0 -10.5 467.5 -2.5 454.5 5.0 442.0 5.0 L434.0 4.0 Q427.0 3.0 417.0 -1.5 407.5 -6.5 396.0 -14.0 385.0 -21.5 375.5 -36.0 352.0 -18.5 323.0 -5.5 293.5 7.0 264.0 9.0 216.0 12.0 173.0 -4.0 130.0 -20.5 98.0 -53.5 66.5 -86.0 48.0 -133.0 29.5 -180.0 29.5 -237.5 29.5 -295.0 47.5 -345.5 65.5 -396.0 97.5 -434.5 130.0 -473.0 175.0 -495.5 220.0 -518.0 274.0 -518.0 305.0 -518.0 329.5 -510.5 354.0 -502.5 375.5 -490.5 L377.0 -589.0 Q377.5 -635.0 379.5 -675.0 380.5 -686.0 385.5 -696.0 390.0 -705.5 399.0 -710.5 406.5 -721.0 417.0 -723.0 428.0 -725.0 438.0 -726.0 446.5 -726.0 450.5 -727.0 486.0 -729.0 499.5 -703.5 513.0 -678.0 511.0 -635.0 L506.0 -540.5 Q503.5 -491.5 502.0 -441.0 500.5 -390.0 499.5 -340.0 498.5 -290.0 498.5 -243.0 498.5 -203.0 500.5 -171.0 502.5 -139.5 506.5 -116.0 L505.5 -117.0 Q506.5 -115.0 507.5 -110.5 L510.0 -101.5 Q512.0 -90.0 513.5 -76.5 515.0 -62.5 515.0 -54.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_l0">
+      <path d="M162.5 -687.0 L160.5 -690.5 Q164.5 -681.0 163.5 -653.5 162.5 -626.0 160.5 -595.0 158.5 -569.5 157.0 -543.5 155.5 -517.5 155.5 -497.0 L155.5 -486.5 155.5 -437.5 Q155.5 -413.0 154.5 -388.0 L154.5 -366.5 Q154.5 -354.5 154.0 -341.0 153.5 -328.0 153.5 -315.5 L153.5 -294.0 153.5 -142.5 153.5 -107.5 Q153.5 -92.5 154.5 -75.0 153.5 -53.5 146.0 -38.0 138.0 -22.5 121.0 -14.5 111.5 -5.5 102.0 0.5 92.0 6.0 84.0 6.0 59.5 6.0 46.0 -4.5 33.0 -15.5 27.0 -37.0 21.5 -58.5 20.5 -92.0 19.5 -125.0 19.5 -170.0 L19.5 -202.0 Q19.5 -262.5 20.5 -322.0 21.5 -382.0 23.5 -443.5 L25.5 -524.0 27.5 -604.5 Q28.5 -615.5 28.5 -625.0 28.5 -635.0 29.5 -643.0 31.0 -664.5 33.5 -680.0 36.0 -695.5 42.5 -706.0 49.0 -717.0 63.0 -723.0 77.0 -729.0 100.5 -731.5 124.0 -733.5 140.0 -722.5 156.5 -712.0 162.5 -687.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_t0">
+      <path d="M374.5 -462.0 L374.5 -459.5 Q372.5 -449.5 362.5 -435.0 352.0 -421.0 342.0 -410.5 339.0 -409.5 327.5 -408.0 L301.0 -404.5 269.5 -401.0 242.5 -399.5 Q239.5 -384.0 239.5 -342.0 L239.5 -243.0 Q239.5 -232.5 239.0 -221.0 238.5 -209.0 237.5 -197.5 236.5 -180.5 236.0 -163.0 235.5 -145.5 237.5 -134.5 236.5 -120.0 242.0 -112.0 247.5 -103.5 255.0 -103.5 266.0 -103.5 282.5 -120.0 295.0 -125.0 309.5 -127.0 324.5 -129.0 337.0 -124.0 349.0 -119.0 357.0 -105.0 364.5 -91.5 362.5 -64.5 352.0 -40.0 343.0 -26.0 333.5 -11.5 319.0 -4.5 304.0 3.0 281.0 5.5 258.0 8.0 220.0 9.0 207.0 9.0 197.5 7.0 188.5 5.0 180.5 1.5 173.0 -2.5 166.0 -8.0 L149.5 -20.5 143.5 -36.0 Q143.5 -32.0 142.5 -32.0 141.5 -32.0 140.0 -34.0 135.0 -39.0 129.5 -46.0 124.0 -52.5 122.0 -59.5 113.5 -80.0 110.5 -102.0 107.5 -124.0 107.5 -147.5 107.5 -155.0 108.0 -162.0 108.5 -169.0 108.5 -176.5 L108.5 -204.0 Q108.5 -250.0 110.0 -297.0 111.5 -344.0 113.5 -390.0 L113.0 -392.5 Q112.5 -393.5 112.5 -394.5 L99.5 -395.5 84.0 -395.5 Q73.5 -395.5 63.5 -396.0 L46.0 -397.5 Q30.5 -398.5 22.0 -405.5 13.5 -412.5 9.0 -422.0 5.0 -431.0 5.0 -440.5 5.0 -450.5 8.0 -458.0 13.5 -485.5 32.5 -498.0 52.0 -511.0 72.5 -511.0 L83.0 -510.5 92.0 -510.0 Q97.0 -509.0 101.5 -509.0 L110.5 -509.0 Q113.5 -509.0 114.5 -508.0 L115.5 -509.0 117.5 -560.5 Q118.5 -589.0 121.0 -606.0 125.0 -642.0 146.5 -656.0 168.0 -669.5 190.5 -670.5 220.0 -671.5 238.0 -655.0 256.0 -638.0 256.0 -599.0 256.0 -589.0 255.0 -578.0 L253.0 -558.0 Q252.0 -548.0 252.0 -538.5 L252.0 -521.0 252.0 -514.0 Q252.0 -513.0 256.0 -513.0 L273.5 -513.5 288.5 -515.0 309.0 -515.0 Q352.0 -515.0 364.5 -501.5 376.5 -488.5 374.5 -462.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_a0">
+      <path d="M330.5 -196.5 Q330.5 -206.0 329.5 -213.5 328.5 -221.0 326.5 -226.5 312.0 -237.5 294.0 -246.0 276.0 -254.0 254.5 -254.0 203.5 -254.0 171.5 -228.0 140.0 -201.5 140.0 -167.0 140.0 -133.0 161.0 -113.0 182.0 -93.0 219.0 -93.0 247.5 -93.0 269.5 -102.5 291.5 -111.5 309.0 -125.0 322.5 -142.5 326.5 -161.5 330.5 -180.0 330.5 -196.5 M461.5 -54.0 L462.5 -52.0 Q463.5 -41.0 458.0 -29.0 452.5 -17.5 442.0 -7.0 432.0 3.0 420.0 9.5 408.5 15.5 398.0 15.5 377.5 15.5 363.5 2.0 349.0 -11.0 339.0 -32.5 310.0 -10.0 281.5 0.0 253.0 10.5 220.0 13.5 181.0 16.5 146.5 9.0 111.5 1.0 85.0 -20.0 58.0 -41.0 43.0 -76.0 27.5 -111.5 27.5 -163.5 27.5 -231.5 52.5 -270.5 77.5 -310.0 112.0 -330.0 146.5 -350.0 183.0 -355.5 220.0 -361.5 243.5 -360.5 273.5 -358.5 293.0 -354.5 313.0 -351.0 327.5 -346.0 327.5 -358.5 324.0 -371.5 320.5 -385.0 310.5 -395.5 301.0 -406.5 283.0 -412.5 265.0 -418.5 236.5 -417.5 190.5 -414.5 169.5 -402.5 148.5 -390.0 136.0 -380.0 L128.0 -373.0 Q124.0 -369.5 119.5 -367.5 112.5 -363.5 101.0 -363.0 L84.0 -363.5 83.0 -363.5 Q70.5 -363.5 63.5 -376.5 56.0 -390.0 51.0 -401.5 49.0 -403.5 48.5 -410.5 L48.0 -417.5 Q53.0 -442.0 70.5 -462.0 88.0 -482.0 113.5 -497.0 139.0 -512.0 171.0 -520.5 202.5 -529.5 238.5 -531.5 290.5 -534.5 327.0 -523.5 363.5 -513.0 387.0 -494.5 410.5 -476.0 423.5 -452.5 436.0 -429.0 442.0 -404.5 448.5 -380.0 449.0 -356.5 L449.5 -318.5 449.5 -310.0 449.5 -285.5 Q449.5 -273.5 448.5 -260.0 447.5 -239.5 447.5 -216.0 L447.5 -174.0 Q447.5 -143.0 450.5 -117.0 453.5 -91.0 461.5 -54.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold__1">
+      <path d="M102.5 -164.0 Q119.0 -164.0 134.5 -157.5 150.5 -150.5 163.5 -139.0 176.0 -127.0 184.0 -112.0 191.5 -96.5 191.5 -80.0 192.5 -70.0 189.0 -53.0 185.5 -36.0 179.0 -16.5 173.0 3.0 165.5 23.5 157.5 44.0 151.5 61.5 144.5 82.0 129.0 100.0 113.5 118.5 85.0 124.0 58.5 126.0 41.0 117.0 23.5 108.5 20.5 85.0 18.5 76.5 24.0 58.0 29.5 40.0 37.0 19.5 L44.0 -3.0 Q47.0 -13.5 50.0 -26.0 30.5 -48.5 25.5 -80.0 24.5 -115.0 47.0 -139.5 69.5 -164.0 102.5 -164.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_c0">
+      <path d="M449.5 -133.0 Q455.5 -107.5 443.5 -82.5 431.0 -57.5 406.5 -37.0 382.0 -16.5 349.5 -2.5 317.5 11.5 283.5 14.5 229.5 19.5 184.0 2.5 138.0 -14.5 104.5 -47.0 70.5 -80.0 50.5 -126.0 30.5 -172.0 27.5 -227.5 24.5 -282.5 40.5 -333.5 56.5 -384.0 86.5 -424.5 116.5 -465.0 158.0 -490.5 199.5 -516.0 248.0 -520.0 283.5 -523.5 317.0 -514.5 350.0 -506.0 376.0 -489.5 401.5 -473.0 415.5 -451.0 430.0 -429.0 428.0 -406.5 427.0 -393.0 419.0 -382.0 410.5 -370.5 400.0 -362.0 389.0 -353.5 379.0 -348.0 368.5 -343.0 364.5 -343.0 352.5 -343.0 338.0 -349.0 323.5 -355.5 320.5 -369.5 306.0 -387.0 290.5 -399.5 274.5 -411.5 254.0 -411.5 231.5 -411.5 213.0 -397.5 194.5 -383.0 180.5 -360.5 167.0 -338.0 159.0 -308.5 151.5 -279.5 151.5 -251.0 151.5 -217.0 161.5 -189.5 171.0 -162.0 188.5 -142.5 206.0 -123.0 229.5 -112.5 253.0 -102.5 281.5 -103.5 303.0 -105.5 327.5 -120.5 352.5 -135.0 371.5 -152.5 383.0 -163.0 389.5 -166.5 396.5 -170.0 405.5 -170.0 423.0 -170.0 434.5 -158.5 446.5 -147.5 449.5 -133.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_n0">
+      <path d="M170.0 -439.5 Q170.0 -440.5 171.0 -441.5 L170.0 -440.5 170.0 -439.5 M489.5 -64.5 Q490.5 -40.0 481.5 -18.5 472.5 3.0 451.0 8.0 439.5 15.0 430.0 14.0 420.0 13.0 413.0 11.0 408.0 9.0 406.0 9.0 386.5 7.0 375.0 -11.0 364.0 -29.0 357.5 -55.0 351.5 -81.0 349.5 -112.5 347.5 -143.5 347.5 -172.0 L347.5 -224.5 Q347.5 -239.0 348.0 -254.5 348.5 -270.5 349.5 -285.0 350.5 -296.0 350.5 -305.5 L350.5 -322.0 Q350.5 -366.0 333.5 -385.0 316.5 -404.5 291.0 -403.5 255.5 -403.5 231.0 -380.5 207.0 -357.5 192.0 -320.5 176.5 -284.0 170.0 -237.0 163.0 -189.5 163.0 -140.5 L163.0 -119.0 Q163.0 -109.0 165.0 -97.5 168.0 -72.0 162.0 -52.5 156.0 -33.0 144.5 -19.0 133.5 -5.5 119.0 2.0 104.5 9.0 92.5 9.0 71.0 9.0 58.0 -1.0 45.5 -11.5 39.0 -30.0 33.0 -48.5 31.0 -75.5 29.0 -102.5 29.0 -136.5 L29.0 -194.0 Q29.0 -227.5 30.0 -264.0 31.0 -300.0 33.0 -336.0 35.0 -372.0 38.0 -402.5 L38.0 -421.0 Q38.0 -425.0 37.5 -428.0 37.0 -431.5 37.0 -436.5 36.0 -442.5 36.0 -452.0 36.0 -461.0 37.0 -466.0 39.0 -479.5 51.5 -489.5 64.0 -500.0 78.5 -505.5 93.5 -511.0 109.0 -513.0 124.0 -515.5 132.5 -513.0 153.0 -512.0 160.5 -496.5 168.0 -480.5 170.5 -458.0 169.5 -456.0 169.5 -453.0 169.5 -451.0 168.0 -451.0 L168.0 -448.5 168.0 -446.5 Q171.0 -449.0 173.5 -452.0 189.5 -468.0 209.0 -481.0 228.5 -494.0 249.0 -503.0 269.5 -512.0 289.5 -517.0 309.5 -521.5 328.0 -520.5 398.5 -516.5 440.5 -462.5 482.5 -409.0 482.5 -316.5 L482.5 -186.5 Q482.5 -159.0 484.5 -131.5 486.5 -103.5 488.5 -81.0 488.5 -77.0 489.0 -72.5 489.5 -68.0 489.5 -64.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_g0">
+      <path d="M355.5 -279.5 Q355.5 -301.0 354.0 -321.0 352.5 -341.0 346.0 -357.5 340.0 -373.5 328.5 -385.0 317.5 -396.5 298.0 -400.5 285.5 -406.5 271.5 -404.5 257.0 -402.5 242.5 -399.5 220.0 -393.0 203.5 -376.5 186.5 -359.5 175.0 -336.5 164.0 -313.5 158.0 -285.0 152.5 -257.0 154.5 -227.5 157.5 -172.0 186.0 -140.0 214.0 -107.5 260.0 -107.5 290.0 -107.5 308.0 -124.0 326.5 -140.5 337.5 -166.0 348.0 -191.5 351.5 -221.5 355.5 -252.0 355.5 -279.5 M489.5 -449.5 L489.5 -451.5 Q487.5 -426.0 486.0 -402.0 484.5 -378.0 482.5 -354.5 476.0 -284.5 471.0 -215.0 466.0 -145.5 466.0 -59.5 L466.0 -32.0 Q466.0 4.0 465.5 32.0 465.0 60.5 461.0 85.0 456.5 109.5 449.0 131.5 441.5 153.5 428.0 176.0 415.5 194.5 395.5 206.5 375.0 219.0 351.5 226.5 328.5 234.5 304.0 237.5 279.5 240.5 260.0 240.5 229.5 240.5 193.0 228.5 156.5 217.0 125.5 196.0 94.0 175.0 71.0 145.0 48.0 115.5 44.0 79.5 39.0 63.5 42.0 50.5 45.0 37.5 54.0 28.5 62.5 19.0 75.5 14.5 88.0 10.0 102.5 10.0 116.5 10.0 131.0 16.0 145.5 22.5 156.5 35.5 161.0 50.0 170.0 65.0 179.0 79.5 191.5 92.0 204.0 104.0 219.0 112.0 234.5 119.5 253.0 119.5 L254.0 119.0 Q255.0 118.5 255.0 120.5 271.5 118.5 287.0 113.5 303.0 108.5 314.5 96.5 325.5 85.0 333.0 64.5 340.0 44.0 340.0 11.0 L340.0 5.0 340.0 3.0 340.0 0.0 340.0 -7.5 Q323.5 -2.0 301.5 1.5 279.5 5.0 256.0 7.0 210.0 10.0 170.0 -5.5 130.0 -21.5 99.5 -52.0 68.5 -82.0 49.5 -126.0 30.5 -170.0 28.5 -224.5 26.5 -279.5 43.5 -332.0 60.5 -384.0 92.5 -424.5 125.0 -465.0 170.5 -490.0 216.0 -515.0 270.5 -518.0 302.0 -520.0 329.5 -515.0 357.5 -510.0 381.0 -490.5 398.5 -506.0 409.0 -510.0 420.0 -514.0 433.0 -514.0 445.5 -514.0 456.5 -508.5 468.0 -502.5 476.0 -494.0 484.5 -485.5 488.5 -473.5 492.5 -462.0 489.5 -449.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_.0">
+      <path d="M185.5 -66.5 Q185.5 -30.5 162.0 -8.5 138.0 13.5 106.5 13.5 70.5 13.5 47.5 -11.5 24.5 -36.5 20.5 -69.5 19.5 -105.5 41.5 -129.5 63.5 -153.5 96.5 -153.5 113.5 -153.5 129.5 -147.0 145.5 -140.0 157.5 -128.5 170.0 -116.5 177.5 -100.5 185.5 -85.0 185.5 -66.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_V0">
+      <path d="M557.0 -720.0 Q572.5 -718.0 585.0 -704.5 598.0 -691.5 601.0 -676.0 603.0 -664.5 595.5 -645.5 588.0 -626.0 577.5 -601.0 569.5 -585.0 562.0 -567.0 555.0 -549.0 550.0 -534.5 L550.0 -535.5 Q535.5 -492.5 519.0 -442.5 L486.5 -341.0 464.0 -271.0 442.5 -206.0 Q432.0 -175.5 423.5 -149.5 414.5 -124.0 407.5 -107.5 399.5 -87.0 388.5 -66.5 378.0 -45.5 364.5 -28.5 351.0 -11.5 335.5 -1.0 319.5 9.0 300.0 9.0 258.0 9.0 235.5 -34.0 L236.5 -34.0 Q222.0 -59.5 205.0 -101.5 187.5 -143.5 168.0 -196.0 148.5 -249.0 127.5 -311.0 106.5 -373.0 85.0 -439.5 L85.0 -438.5 Q80.0 -453.5 73.0 -471.0 66.5 -488.5 60.5 -506.0 46.0 -540.5 32.5 -577.5 18.5 -614.5 13.5 -647.0 10.0 -665.5 22.5 -678.5 35.0 -691.0 52.0 -699.0 69.5 -706.5 86.5 -709.0 103.5 -711.5 108.5 -709.5 L107.5 -709.5 Q129.0 -703.5 137.0 -683.5 145.5 -663.5 153.5 -639.0 154.5 -633.5 156.0 -628.5 157.5 -623.5 159.5 -618.5 166.0 -601.0 172.0 -583.5 L214.0 -456.0 Q235.5 -391.0 254.0 -336.5 272.5 -281.5 286.5 -242.5 301.0 -203.5 307.0 -194.5 308.0 -195.5 307.5 -196.0 307.0 -196.5 308.0 -197.5 324.5 -240.5 337.0 -278.5 349.0 -316.5 360.5 -355.0 L372.5 -395.5 Q379.0 -415.5 386.0 -436.0 L391.5 -458.5 Q394.0 -470.0 398.5 -483.0 406.5 -517.0 420.0 -561.5 433.0 -606.0 459.0 -661.5 465.0 -680.0 478.0 -691.0 491.5 -702.5 506.5 -708.5 521.0 -714.5 535.5 -717.5 550.0 -720.0 557.0 -720.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_b0">
+      <path d="M387.0 -245.0 L387.0 -267.5 Q387.0 -280.0 385.5 -291.0 384.0 -301.5 381.5 -309.5 379.0 -318.0 375.5 -321.0 368.5 -364.0 340.5 -382.5 312.5 -401.0 279.5 -401.0 250.0 -401.0 224.5 -384.0 199.5 -367.0 177.0 -340.5 172.0 -320.0 169.0 -299.5 166.0 -279.0 166.0 -255.5 L166.0 -249.5 Q166.0 -197.0 177.0 -155.0 L178.0 -154.0 Q197.5 -137.5 218.5 -123.0 239.5 -108.0 266.0 -108.0 318.5 -108.0 351.5 -146.5 385.0 -185.0 387.0 -245.0 M511.0 -252.0 Q511.0 -198.0 492.0 -149.5 473.0 -101.5 440.0 -66.5 406.5 -31.0 361.5 -10.5 316.5 10.0 264.0 10.0 223.5 10.0 193.0 3.5 163.0 -3.5 138.5 -24.0 136.0 -14.5 129.5 -6.5 123.0 2.0 114.5 7.0 106.5 12.0 97.5 13.5 88.0 15.0 80.0 11.0 L63.5 10.5 Q54.5 9.0 46.5 3.0 39.0 -3.5 34.5 -16.0 29.5 -29.0 30.5 -51.5 29.5 -59.5 29.0 -68.5 28.5 -77.0 28.5 -89.5 28.5 -116.0 30.0 -151.5 L34.0 -222.5 Q36.0 -254.0 37.0 -283.5 38.0 -312.5 38.0 -333.0 38.0 -382.0 38.5 -433.5 39.0 -484.5 40.0 -529.0 41.0 -573.5 42.5 -607.5 44.0 -641.0 46.0 -654.5 48.0 -679.0 61.0 -693.5 74.0 -707.5 90.0 -714.0 106.5 -720.0 123.0 -720.0 139.5 -720.0 150.5 -716.0 157.5 -714.0 166.5 -706.5 175.0 -699.5 177.0 -691.5 L176.0 -686.0 Q175.0 -681.0 174.0 -673.0 172.0 -658.5 170.5 -635.5 169.0 -612.5 169.0 -594.0 L169.0 -524.5 169.0 -499.0 Q169.0 -486.5 170.0 -474.5 187.5 -486.5 215.0 -499.5 242.5 -512.0 275.5 -515.0 322.5 -519.5 365.5 -503.5 408.5 -487.5 441.0 -456.0 473.0 -424.0 492.0 -379.0 511.0 -334.0 511.0 -278.5 L511.0 -252.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_I0">
+      <path d="M224.5 -91.0 Q238.5 -79.5 250.0 -68.5 261.0 -57.0 263.5 -41.0 L263.5 -42.0 Q267.5 -23.5 258.5 -12.5 250.0 -2.0 234.5 3.0 219.0 8.5 201.0 11.0 182.5 13.5 167.0 14.5 L162.5 15.0 156.0 15.5 137.0 17.0 Q125.0 17.5 114.0 17.5 86.0 17.5 60.5 10.5 35.0 3.0 31.0 -15.0 28.0 -33.5 36.5 -47.5 45.0 -61.5 55.5 -73.5 66.5 -85.0 66.5 -96.0 59.5 -128.0 57.5 -174.0 55.5 -220.0 55.5 -302.0 55.5 -358.0 57.5 -416.5 59.5 -475.0 62.5 -531.5 L62.5 -536.5 Q62.5 -540.5 61.5 -544.5 60.5 -549.5 60.5 -554.0 60.5 -559.0 59.5 -564.0 L60.5 -563.0 Q58.5 -571.0 54.5 -576.0 L46.0 -585.5 Q39.0 -594.0 32.0 -606.5 24.5 -619.5 22.5 -639.0 20.5 -675.5 49.5 -689.0 78.0 -702.5 144.5 -707.5 158.5 -708.5 177.0 -707.5 195.5 -706.5 213.0 -701.0 230.5 -695.0 243.5 -684.0 257.0 -672.5 260.0 -654.0 260.0 -644.0 251.0 -628.0 241.5 -612.0 228.5 -595.0 L214.5 -577.0 200.5 -557.0 Q196.5 -509.0 194.5 -458.5 192.5 -408.5 192.5 -359.5 L192.5 -329.5 192.5 -267.0 Q192.5 -236.5 193.5 -208.5 L195.0 -159.0 Q195.5 -137.0 197.5 -123.5 197.5 -115.5 206.5 -107.0 215.0 -98.0 224.5 -91.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_v0">
+      <path d="M466.0 -467.0 L462.0 -451.5 459.5 -447.5 457.5 -444.5 Q456.5 -443.5 456.5 -441.0 439.5 -398.0 415.5 -344.5 L366.5 -232.5 Q359.5 -218.0 354.0 -203.5 348.0 -188.5 341.0 -174.0 337.0 -166.0 334.0 -158.5 L327.5 -143.5 Q314.5 -111.5 301.5 -83.0 289.0 -54.5 275.0 -34.0 261.0 -13.5 245.0 -2.5 229.5 8.0 210.0 5.0 L211.0 5.0 Q195.5 2.0 185.5 -2.5 175.0 -7.5 168.5 -16.0 162.0 -24.5 155.5 -38.0 149.5 -51.5 141.5 -70.5 120.0 -127.0 96.5 -193.5 72.5 -260.0 49.0 -334.0 33.0 -392.0 20.5 -419.5 13.5 -438.0 11.0 -449.0 8.0 -459.5 13.5 -470.0 17.5 -489.5 35.0 -500.5 52.0 -512.0 67.5 -515.0 90.0 -519.0 109.0 -509.5 128.0 -499.5 138.0 -475.0 L140.5 -462.5 Q142.5 -450.5 153.5 -416.5 163.0 -386.0 173.0 -356.0 L193.5 -296.0 Q201.5 -271.5 210.5 -245.5 219.0 -220.0 228.5 -195.5 242.5 -228.5 262.5 -276.5 282.5 -324.5 300.0 -379.0 L300.0 -378.0 Q302.0 -386.0 306.5 -396.5 311.5 -407.5 313.5 -415.5 315.5 -419.5 315.0 -420.5 314.5 -422.0 316.5 -426.0 L316.5 -425.0 Q322.5 -444.5 329.0 -461.5 336.0 -479.0 346.0 -492.0 356.5 -504.5 371.5 -512.0 387.0 -519.0 411.5 -519.0 435.0 -519.0 450.5 -504.5 466.0 -490.5 466.0 -467.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_f0">
+      <path d="M435.0 -676.0 L436.0 -668.0 434.5 -650.5 Q434.0 -643.5 434.0 -636.0 433.0 -605.5 426.5 -590.0 420.0 -574.5 395.5 -572.5 372.5 -569.5 363.5 -580.5 354.5 -591.0 349.0 -605.5 347.0 -612.5 342.0 -618.5 337.0 -625.0 319.5 -623.0 292.0 -623.0 274.5 -591.0 257.0 -559.5 258.0 -503.0 L280.5 -503.0 285.0 -503.5 290.0 -504.0 323.5 -504.0 Q359.5 -504.0 376.0 -490.5 392.0 -477.0 392.0 -449.5 391.0 -434.0 386.0 -423.0 381.0 -411.5 368.0 -404.5 355.5 -397.0 332.5 -392.5 309.5 -388.0 273.5 -386.0 262.0 -383.0 259.0 -373.0 256.0 -363.5 256.0 -346.0 L256.0 -320.5 Q255.0 -306.0 255.0 -289.5 L255.0 -257.0 255.0 -153.5 Q255.0 -139.0 256.0 -125.5 L258.0 -97.0 258.0 -68.5 Q258.0 -1.0 205.0 16.5 172.0 28.0 155.5 18.5 139.5 9.5 131.5 -11.5 124.0 -32.5 123.5 -60.5 123.0 -88.0 123.0 -115.5 L123.0 -364.5 Q123.0 -374.5 121.0 -376.5 119.0 -379.0 112.5 -377.5 L80.0 -377.5 Q52.0 -377.5 41.0 -390.5 29.5 -403.5 27.5 -419.5 L29.5 -413.5 Q27.5 -425.0 33.5 -444.0 39.0 -462.5 45.0 -471.0 L45.0 -470.0 Q56.5 -484.0 73.5 -488.5 91.0 -492.5 108.5 -494.5 L120.0 -495.5 Q127.0 -495.5 129.0 -494.5 130.0 -543.5 141.5 -586.0 152.5 -629.0 174.0 -661.0 195.5 -693.5 228.0 -713.5 260.0 -733.5 304.0 -737.5 333.0 -737.5 356.0 -730.0 379.0 -722.0 396.0 -712.0 412.5 -701.5 423.0 -692.0 433.0 -682.0 435.0 -676.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_y0">
+      <path d="M495.5 -451.5 L491.5 -440.5 Q482.5 -429.0 475.5 -412.5 L462.0 -379.0 Q460.0 -375.0 460.0 -370.5 460.0 -367.5 457.5 -365.5 440.5 -320.5 422.5 -276.0 404.5 -231.5 390.0 -194.5 L337.5 -61.0 Q311.5 5.0 280.5 87.0 265.0 126.0 260.5 150.5 256.0 175.0 254.0 190.5 L250.5 214.5 Q249.0 224.5 244.0 231.5 239.5 238.5 230.0 243.0 220.0 248.0 201.5 252.0 192.5 254.0 182.0 252.5 171.0 251.0 161.5 245.5 151.5 239.5 144.5 231.5 137.0 223.0 135.0 213.0 128.0 195.5 128.0 172.0 128.0 148.5 133.5 125.0 139.5 101.5 147.5 81.0 150.5 65.5 157.5 48.0 165.0 30.5 173.0 14.5 L185.0 -11.0 Q190.5 -23.5 192.5 -34.0 187.5 -47.0 181.0 -60.0 175.0 -72.5 169.0 -86.0 165.0 -94.0 159.5 -106.5 154.5 -119.0 150.5 -126.0 L150.5 -125.0 Q128.0 -171.0 106.5 -217.5 85.0 -264.0 65.5 -311.5 61.5 -319.5 57.5 -328.5 53.5 -338.0 50.0 -345.0 L27.0 -396.0 Q15.5 -422.0 12.5 -439.5 10.0 -452.5 17.0 -466.0 23.5 -479.0 35.0 -489.5 46.0 -499.5 60.0 -506.0 73.5 -512.0 85.0 -512.0 100.5 -512.0 115.5 -494.5 131.0 -477.0 146.0 -449.0 161.0 -421.0 174.5 -386.0 188.5 -351.0 201.5 -316.5 217.0 -277.5 230.0 -242.5 242.5 -208.0 255.0 -186.5 273.5 -229.5 291.5 -277.5 309.5 -325.5 323.5 -367.5 L323.5 -368.5 Q325.5 -372.5 326.5 -376.5 327.5 -380.0 329.5 -385.0 L344.0 -427.5 Q352.5 -450.5 364.5 -469.5 377.0 -488.5 395.0 -501.0 412.5 -514.0 438.5 -514.0 447.5 -514.0 458.0 -508.0 469.0 -502.0 477.5 -492.5 486.5 -483.5 491.5 -472.0 496.5 -461.0 495.5 -451.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_h0">
+      <path d="M492.0 -99.5 Q494.0 -91.5 495.0 -83.5 496.0 -76.0 496.0 -66.5 498.5 -36.0 483.5 -22.5 468.5 -9.5 448.0 -7.5 427.5 8.0 413.5 8.0 393.0 6.0 381.0 -11.0 369.0 -28.0 363.0 -53.0 357.0 -78.0 355.0 -109.0 353.0 -140.5 353.0 -171.0 L353.0 -310.5 Q353.0 -360.5 338.0 -380.0 323.0 -399.5 293.5 -399.5 273.0 -399.5 248.0 -386.5 223.0 -374.0 204.5 -344.0 191.0 -327.0 184.5 -300.0 177.5 -273.5 171.5 -244.0 170.5 -241.0 170.0 -238.0 L168.5 -230.5 Q167.5 -217.0 167.5 -202.0 167.5 -186.5 166.5 -175.0 165.5 -131.0 163.5 -98.0 161.5 -64.5 153.5 -41.5 146.0 -18.5 131.5 -7.0 117.0 5.0 92.5 5.0 59.0 5.0 44.0 -19.5 29.0 -44.0 29.0 -101.5 29.0 -108.5 29.5 -116.5 30.0 -124.0 30.0 -132.0 31.0 -141.5 31.0 -150.5 L31.0 -171.0 31.0 -228.5 Q31.0 -262.5 31.5 -301.5 32.0 -341.0 33.0 -382.5 L35.0 -467.0 37.0 -550.0 Q37.0 -558.0 37.5 -569.0 L38.0 -586.0 38.0 -620.5 Q38.0 -627.0 37.5 -632.5 37.0 -638.0 37.0 -644.0 37.0 -683.0 50.0 -694.5 62.5 -705.5 83.0 -706.5 91.5 -716.0 101.5 -718.5 112.0 -721.0 123.5 -721.0 151.0 -724.0 161.5 -706.5 171.5 -689.0 173.5 -666.5 171.5 -647.0 170.5 -622.5 L168.5 -572.5 Q168.5 -561.0 168.0 -549.0 167.5 -536.5 167.5 -525.0 L165.5 -484.0 Q165.0 -464.0 165.0 -443.5 197.0 -474.0 233.5 -494.5 270.0 -515.0 309.0 -515.0 390.5 -515.0 438.5 -469.5 486.0 -424.0 486.0 -321.5 L486.0 -300.0 Q486.0 -272.5 486.5 -246.0 487.0 -219.0 487.0 -192.5 487.0 -178.5 487.5 -165.0 488.0 -151.5 488.0 -137.5 488.0 -129.0 489.0 -119.5 490.0 -109.5 492.0 -98.5 L492.0 -99.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_GosmickSansBold_q0">
+      <path d="M355.5 -279.5 Q355.5 -301.0 351.0 -321.5 347.0 -342.0 339.5 -359.0 332.0 -376.0 320.0 -386.5 308.0 -397.5 292.0 -398.5 279.5 -404.5 268.0 -403.5 256.0 -402.5 242.5 -399.5 220.0 -393.0 203.5 -376.5 186.5 -359.5 175.0 -336.5 164.0 -313.5 158.0 -285.0 152.5 -257.0 154.5 -227.5 157.5 -172.0 186.0 -140.0 214.0 -107.5 260.0 -107.5 290.0 -107.5 308.0 -124.0 326.5 -140.5 337.5 -166.0 348.0 -191.5 351.5 -221.5 355.5 -252.0 355.5 -279.5 M489.5 -449.5 L489.5 -452.5 482.5 -339.0 Q478.0 -274.5 474.5 -205.0 471.0 -135.0 468.5 -66.0 466.0 3.0 466.0 62.5 L466.0 115.5 Q466.0 141.5 468.0 162.0 469.0 178.0 459.0 191.5 448.5 205.0 433.5 214.0 419.0 223.0 403.5 226.5 388.0 229.5 379.0 225.5 349.0 214.0 341.5 177.5 334.0 141.5 334.0 80.0 L334.0 33.0 Q334.0 10.0 336.0 -13.5 L325.5 -8.5 Q319.5 -6.0 309.5 0.0 L306.0 0.0 Q303.0 0.0 300.0 1.0 291.0 3.0 277.5 4.5 L257.0 7.0 Q211.0 11.5 170.5 -4.0 130.0 -19.5 99.5 -50.0 68.5 -81.0 49.5 -125.5 30.5 -170.0 28.5 -224.0 26.5 -279.5 43.5 -331.5 60.5 -384.0 92.5 -424.5 125.0 -465.0 170.5 -490.0 216.0 -515.0 270.5 -518.0 302.0 -520.0 329.5 -515.0 357.5 -510.0 381.0 -490.5 398.5 -506.0 409.0 -510.0 420.0 -514.0 433.0 -514.0 445.5 -514.0 456.5 -508.5 468.0 -502.5 476.0 -494.0 484.5 -485.5 488.5 -473.5 492.5 -462.0 489.5 -449.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="text1" transform="matrix(1.0, 0.0, 0.0, 1.0, -63.45, 1.2)">
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, 63.25, 0.0)">
+        <use fill="#ffffff" height="13.7" transform="matrix(0.0146, 0.0, 0.0, 0.0146, 0.0, 11.0)" width="17.9" xlink:href="#font_Burbank_Big_Regular_Bold_T0"/>
+        <use fill="#ffffff" height="13.7" transform="matrix(0.0146, 0.0, 0.0, 0.0146, 6.05, 11.0)" width="17.9" xlink:href="#font_Burbank_Big_Regular_Bold_o0"/>
+        <use fill="#ffffff" height="13.7" transform="matrix(0.0146, 0.0, 0.0, 0.0146, 13.9, 11.0)" width="17.9" xlink:href="#font_Burbank_Big_Regular_Bold_:0"/>
+      </g>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_T0">
+      <path d="M9.0 -560.0 L9.0 -600.0 Q9.0 -639.0 8.0 -711.5 L48.0 -711.5 Q87.0 -712.0 153.0 -712.0 L301.5 -713.0 Q383.5 -713.5 471.0 -715.0 L470.5 -694.0 Q470.0 -673.5 470.0 -638.5 469.5 -603.5 470.0 -560.0 L450.5 -560.0 Q431.5 -560.0 398.0 -560.5 365.0 -560.5 322.5 -561.0 322.5 -472.5 324.0 -330.0 L327.5 5.0 281.0 5.0 Q235.0 4.5 158.5 6.0 159.0 5.0 159.0 -64.0 L158.5 -260.5 Q158.0 -387.5 156.5 -561.0 L9.0 -560.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_o0">
+      <path d="M270.5 -97.5 Q306.0 -96.5 326.5 -135.0 347.0 -173.5 347.0 -261.0 347.5 -337.0 329.0 -377.0 310.5 -417.5 271.5 -418.0 234.0 -418.0 214.0 -379.5 194.0 -341.5 193.5 -265.0 193.5 -176.0 212.0 -136.5 230.5 -96.5 270.5 -97.5 M268.5 13.5 Q147.5 12.5 85.0 -59.5 23.0 -131.5 22.5 -265.0 23.0 -346.0 52.5 -405.0 82.5 -464.0 137.5 -496.0 192.5 -528.0 269.5 -528.5 349.5 -528.0 405.0 -495.0 460.0 -462.0 489.0 -402.0 517.5 -342.0 517.0 -260.0 516.5 -164.5 484.5 -104.0 453.0 -43.5 397.0 -15.0 341.0 13.5 268.5 13.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_:0">
+      <path d="M114.5 -269.5 Q71.5 -270.0 47.0 -296.5 23.0 -323.5 22.5 -368.5 23.5 -413.0 49.0 -437.5 74.5 -462.5 115.5 -463.0 160.5 -462.0 184.0 -436.5 207.5 -411.0 208.0 -368.5 207.0 -316.0 181.0 -292.5 155.0 -269.0 114.5 -269.5 M116.5 15.5 Q74.0 14.5 49.5 -12.0 25.0 -38.0 24.5 -82.0 25.0 -126.5 50.5 -152.5 76.0 -178.5 119.0 -179.0 162.0 -178.5 186.5 -153.0 210.5 -127.0 211.0 -82.0 210.5 -33.0 185.0 -8.5 159.5 15.5 116.5 15.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="text2" transform="matrix(1.0, 0.0, 0.0, 1.0, 12.95, 2.0)">
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -12.95, -2.0)">
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 0.0, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 11.05, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 22.1, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 33.15, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 44.2, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 55.25, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 66.3, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 77.35, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 88.4, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 99.45, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 110.5, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 121.55, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 132.6, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 143.65, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+        <use fill="#105b44" height="18.45" transform="matrix(0.0117, 0.0, 0.0, 0.0117, 154.7, 13.35)" width="169.95" xlink:href="#font_GosmickSansBold_W0"/>
+      </g>
+    </g>
+    <g id="font_GosmickSansBold_W0">
+      <path d="M919.5 -672.0 L918.5 -673.0 Q921.5 -660.5 915.0 -635.5 908.5 -610.5 900.0 -585.0 L900.0 -586.0 896.0 -572.0 892.0 -557.0 Q890.0 -550.0 888.5 -546.5 887.0 -543.0 887.0 -545.0 876.5 -502.0 865.5 -459.5 854.0 -416.5 843.0 -373.5 832.5 -336.0 823.0 -298.5 813.0 -261.0 804.0 -223.0 801.0 -211.5 797.5 -199.5 788.5 -163.5 777.0 -126.5 766.0 -89.0 750.0 -58.0 734.0 -27.5 713.0 -8.0 692.0 11.5 664.5 11.5 640.0 11.5 623.5 0.5 607.0 -10.5 594.0 -34.0 580.5 -57.5 568.0 -96.0 555.0 -134.5 538.5 -188.5 L526.0 -236.5 512.0 -287.0 Q504.0 -314.5 498.5 -335.0 493.5 -355.5 488.5 -374.0 483.5 -392.5 477.0 -412.5 471.0 -432.5 462.0 -460.0 452.5 -429.0 440.5 -371.0 424.0 -301.0 405.0 -236.0 386.0 -171.0 369.5 -118.0 365.5 -106.5 363.0 -98.5 360.5 -90.5 358.5 -79.0 359.5 -77.0 359.0 -75.5 358.5 -74.0 358.5 -72.0 347.0 -36.0 321.0 -14.0 295.0 8.0 264.0 8.0 208.0 8.0 185.5 -53.5 161.0 -121.0 137.0 -212.0 113.5 -303.0 89.0 -396.5 80.0 -434.0 69.0 -476.0 L49.0 -555.0 Q47.0 -561.0 45.5 -567.0 L42.0 -580.5 43.0 -579.5 Q37.0 -608.0 24.5 -633.5 L24.5 -651.0 Q25.5 -653.0 24.5 -653.0 L25.5 -655.0 25.5 -661.5 Q29.5 -666.0 34.0 -670.5 41.0 -679.0 56.5 -693.5 71.5 -708.5 88.0 -710.5 L87.0 -710.5 Q101.5 -712.5 122.5 -704.0 143.5 -695.0 156.5 -671.5 164.0 -657.5 171.0 -635.0 178.0 -612.0 185.5 -584.5 192.5 -557.0 199.5 -525.0 207.0 -493.5 214.0 -461.5 L226.0 -408.5 236.5 -357.5 Q242.5 -331.5 248.5 -307.0 254.0 -282.5 259.5 -262.5 265.0 -242.5 269.5 -229.0 273.5 -215.0 275.5 -212.0 285.5 -241.5 296.5 -282.0 307.0 -322.5 317.5 -368.0 L337.5 -460.0 Q347.0 -507.0 354.5 -547.5 367.5 -580.5 383.0 -609.5 398.5 -639.0 414.0 -661.0 430.0 -683.0 446.5 -695.5 463.0 -708.5 479.0 -708.5 495.5 -708.5 509.0 -695.5 522.0 -683.0 533.0 -662.5 543.5 -642.0 552.0 -616.0 560.0 -589.5 567.5 -563.0 569.5 -556.0 571.5 -546.0 573.5 -536.5 577.5 -522.0 L597.0 -447.5 620.5 -357.5 Q633.0 -311.0 645.0 -267.5 657.5 -224.0 668.5 -193.5 673.0 -204.5 676.5 -220.0 680.0 -235.5 685.0 -255.0 701.5 -319.5 713.0 -371.0 L735.0 -467.0 Q749.5 -528.5 761.5 -578.5 773.0 -628.5 785.5 -671.5 806.0 -692.0 829.0 -706.0 852.0 -720.0 869.5 -720.0 890.0 -720.0 902.5 -706.5 915.5 -693.5 919.5 -672.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="sprite7" transform="matrix(1.0, 0.0, 0.0, 1.0, 23.3, 99.25)">
+      <use ffdec:characterId="2600" height="381.8" transform="matrix(1.0, 0.0, 0.0, 1.0, -23.3, -99.25)" width="261.75" xlink:href="#sprite8"/>
+      <filter id="filter199">
+        <feConvolveMatrix divisor="16.0" in="SourceGraphic" kernelMatrix="1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1" order="4 4" result="filterResult24"/>
+      </filter>
+      <use ffdec:characterId="2602" filter="url(#filter199)" height="140.95" transform="matrix(1.0, 0.0, 0.0, 1.0, 3.75, 16.9)" width="209.4" xlink:href="#sprite9"/>
+      <use ffdec:characterId="2603" height="136.15" transform="matrix(1.0, 0.0, 0.0, 1.0, 8.15, 14.4)" width="205.3" xlink:href="#shape9"/>
+      <filter id="filter201">
+        <feColorMatrix in="SourceGraphic" result="filterResult26" type="matrix" values="0.061368063 -0.5629069 1.5015388 0.0 0.0 0.31520858 1.0852532 -0.40046194 0.0 0.0 -1.1454526 1.6830559 0.46239653 0.0 0.0 0.0 0.0 0.0 1.0 0.0"/>
+      </filter>
+      <use ffdec:characterId="2607" filter="url(#filter201)" height="189.5" transform="matrix(0.9003, 0.0, 0.0, 0.9003, -8.4354, -2.3758)" width="270.4" xlink:href="#sprite10"/>
+      <filter id="filter217">
+        <feColorMatrix in="SourceGraphic" result="filterResult27" type="matrix" values="0 0 0 0 0.06666667,0 0 0 0 0.36078432,0 0 0 0 0.27058825,0 0 0 1 0"/>
+        <feConvolveMatrix divisor="9.0" in="filterResult27" kernelMatrix="1 1 1 1 1 1 1 1 1" order="3 3" result="filterResult28"/>
+        <feComposite in="SourceGraphic" in2="filterResult28" operator="over" result="filterResult29"/>
+        <feOffset dx="-0.813463150409148" dy="1.8270954279748017" in="filterResult29" result="filterResult30"/>
+        <feColorMatrix in="filterResult30" result="filterResult31" type="matrix" values="0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 1 0"/>
+        <feConvolveMatrix divisor="4.0" in="filterResult31" kernelMatrix="1 1 1 1" order="2 2" result="filterResult32"/>
+        <feColorMatrix in="filterResult32" result="filterResult33" type="matrix" values="1 0 0 0 0,0 1 0 0 0,0 0 1 0 0,0 0 0 0.296875 0"/>
+        <feComposite in="filterResult29" in2="filterResult33" operator="over" result="filterResult34"/>
+      </filter>
+      <use ffdec:characterId="2608" filter="url(#filter217)" height="22.85" transform="matrix(1.0, 0.0, 0.0, 1.0, 33.1, 41.0)" width="155.05" xlink:href="#text3"/>
+      <filter id="filter218">
+        <feOffset dx="-0.813463150409148" dy="1.8270954279748017" in="SourceGraphic" result="filterResult35"/>
+        <feColorMatrix in="filterResult35" result="filterResult36" type="matrix" values="0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 0 0.0,0 0 0 1 0"/>
+        <feConvolveMatrix divisor="4.0" in="filterResult36" kernelMatrix="1 1 1 1" order="2 2" result="filterResult37"/>
+        <feColorMatrix in="filterResult37" result="filterResult38" type="matrix" values="1 0 0 0 0,0 1 0 0 0,0 0 1 0 0,0 0 0 0.296875 0"/>
+        <feComposite in="SourceGraphic" in2="filterResult38" operator="over" result="filterResult39"/>
+      </filter>
+      <use ffdec:characterId="2613" filter="url(#filter218)" height="45.85" id="ok_btn" transform="matrix(1.0, 0.0, 0.0, 1.0, 77.05, 82.55)" width="65.05" xlink:href="#button2"/>
+    </g>
+    <g id="sprite8" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <use ffdec:characterId="2599" height="381.8" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)" width="261.75" xlink:href="#shape7"/>
+    </g>
+    <g id="shape7" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <path d="M251.05 10.25 Q261.2 20.5 261.75 35.0 L261.75 341.65 Q261.75 356.15 251.5 366.4 241.25 376.65 225.35 378.05 131.75 385.65 35.25 377.85 20.5 376.65 10.25 366.4 0.0 356.15 0.0 341.65 L0.0 35.0 Q1.25 20.5 11.15 10.25 21.05 0.0 35.0 0.0 L226.75 0.0 Q240.9 0.0 251.05 10.25" fill="#000000" fill-opacity="0.29803923" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="sprite9" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <use ffdec:characterId="2601" height="140.95" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)" width="209.4" xlink:href="#shape8"/>
+    </g>
+    <g id="shape8" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)">
+      <path d="M199.85 0.0 Q209.4 0.0 209.4 9.55 L209.4 131.4 Q209.4 134.85 208.2 137.05 207.5 138.2 206.45 139.05 204.1 140.95 199.85 140.95 L9.55 140.95 Q0.0 140.95 0.0 131.4 L0.0 9.55 Q0.0 5.3 1.9 3.0 L2.35 2.45 Q4.7 0.0 9.55 0.0 L199.85 0.0" fill="#000000" fill-opacity="0.28627452" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="shape9" transform="matrix(1.0, 0.0, 0.0, 1.0, -8.15, -14.4)">
+      <path d="M201.8 16.4 Q210.8 16.4 210.8 25.4 L210.8 140.6 Q210.8 149.6 201.8 149.6 L18.15 149.6 Q9.15 149.6 9.15 140.6 L9.15 25.4 Q9.15 16.4 18.15 16.4 L201.8 16.4" fill="#daf2fb" fill-rule="evenodd" stroke="none"/>
+      <path d="M203.95 14.4 Q213.45 14.4 213.45 23.9 L213.45 145.35 Q213.45 148.45 212.45 150.55 L8.15 150.55 8.15 15.95 Q10.4 14.4 14.25 14.4 L203.95 14.4 M199.55 19.75 L18.85 19.75 Q14.5 19.75 12.3 22.0 L11.8 22.55 Q10.1 24.75 10.1 28.55 L10.1 140.8 Q10.1 149.55 18.85 149.55 L199.55 149.55 Q203.4 149.55 205.55 147.9 206.55 147.1 207.2 145.95 208.3 143.95 208.3 140.8 L208.3 28.55 Q208.3 19.75 199.55 19.75" fill="#000000" fill-opacity="0.29803923" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="sprite10" transform="matrix(1.0, 0.0, 0.0, 1.0, 15.7, 16.8)">
+      <clipPath id="clipPath0">
+        <path d="M 216.35 5.95 L 216.95 5.96 L 217.53 5.99 L 218.09 6.04 L 218.64 6.1 L 219.16 6.19 L 219.66 6.29 L 220.15 6.42 L 220.62 6.56 L 221.06 6.72 L 221.49 6.9 L 221.9 7.1 L 222.29 7.32 L 222.66 7.56 L 223.02 7.82 L 223.35 8.09 L 223.66 8.39 L 223.96 8.7 L 224.23 9.03 L 224.49 9.39 L 224.73 9.76 L 224.95 10.15 L 225.15 10.56 L 225.33 10.99 L 225.49 11.43 L 225.63 11.9 L 225.76 12.39 L 225.86 12.89 L 225.95 13.41 L 226.01 13.96 L 226.06 14.52 L 226.09 15.1 L 226.1 15.7 L 226.1 140.35 L 226.08 141.21 L 226.06 141.62 L 226.02 142.02 L 225.98 142.42 L 225.92 142.8 L 225.86 143.17 L 225.79 143.54 L 225.7 143.89 L 225.61 144.24 L 225.51 144.57 L 225.4 144.9 L 225.27 145.21 L 225.14 145.52 L 225 145.81 L 224.85 146.1 L 224.67 146.41 L 224.48 146.7 L 224.27 146.99 L 224.05 147.26 L 223.82 147.53 L 223.57 147.78 L 223.32 148.02 L 223.05 148.25 L 222.74 148.47 L 222.42 148.68 L 222.08 148.88 L 221.73 149.06 L 221.36 149.23 L 220.98 149.38 L 220.59 149.51 L 220.18 149.64 L 219.75 149.75 L 219.31 149.84 L 218.85 149.92 L 218.38 149.98 L 217.9 150.03 L 217.4 150.07 L 216.88 150.09 L 216.35 150.1 L 15.7 150.1 L 15.1 150.09 L 14.52 150.06 L 13.96 150.01 L 13.41 149.95 L 12.89 149.86 L 12.39 149.76 L 11.9 149.63 L 11.43 149.49 L 10.99 149.33 L 10.56 149.15 L 10.15 148.95 L 9.76 148.73 L 9.39 148.49 L 9.03 148.23 L 8.7 147.96 L 8.39 147.66 L 8.09 147.35 L 7.82 147.02 L 7.56 146.66 L 7.32 146.29 L 7.1 145.9 L 6.9 145.49 L 6.72 145.06 L 6.56 144.62 L 6.42 144.15 L 6.29 143.66 L 6.19 143.16 L 6.1 142.64 L 6.04 142.09 L 5.99 141.53 L 5.96 140.95 L 5.95 140.35 L 5.95 15.7 L 5.96 15.18 L 5.98 14.67 L 6.02 14.17 L 6.07 13.69 L 6.14 13.22 L 6.22 12.77 L 6.31 12.34 L 6.43 11.91 L 6.55 11.5 L 6.69 11.11 L 6.85 10.73 L 7.02 10.37 L 7.2 10.02 L 7.4 9.68 L 7.62 9.36 L 7.85 9.05 L 8.4 8.4 L 8.72 8.1 L 9.05 7.83 L 9.4 7.57 L 9.77 7.33 L 10.17 7.11 L 10.57 6.91 L 11 6.73 L 11.45 6.56 L 11.92 6.42 L 12.4 6.29 L 12.9 6.19 L 13.43 6.1 L 13.97 6.04 L 14.52 5.99 L 15.1 5.96 L 15.7 5.95 Z M 10.55 0 L 9.89 0.01 L 9.26 0.04 L 8.64 0.09 L 8.05 0.17 L 7.47 0.26 L 6.92 0.38 L 6.4 0.52 L 5.89 0.68 L 5.4 0.85 L 4.94 1.05 L 4.49 1.28 L 4.07 1.52 L 3.67 1.78 L 3.29 2.07 L 2.94 2.37 L 2.6 2.7 L 2.1 3.3 L 1.85 3.63 L 1.61 3.97 L 1.39 4.33 L 1.18 4.71 L 0.99 5.1 L 0.82 5.51 L 0.66 5.94 L 0.52 6.39 L 0.4 6.85 L 0.3 7.33 L 0.21 7.82 L 0.13 8.33 L 0.07 8.86 L 0.03 9.41 L 0.01 9.97 L 0 10.55 L 0 145.45 L 0.01 146.1 L 0.04 146.73 L 0.09 147.34 L 0.16 147.92 L 0.26 148.49 L 0.37 149.04 L 0.5 149.56 L 0.66 150.07 L 0.83 150.55 L 1.03 151.01 L 1.25 151.46 L 1.48 151.88 L 1.74 152.28 L 2.02 152.66 L 2.32 153.02 L 2.64 153.36 L 2.98 153.68 L 3.34 153.98 L 3.72 154.26 L 4.12 154.52 L 4.54 154.75 L 4.99 154.97 L 5.45 155.17 L 5.93 155.34 L 6.44 155.5 L 6.96 155.63 L 7.51 155.74 L 8.08 155.84 L 8.66 155.91 L 9.27 155.96 L 9.9 155.99 L 10.55 156 L 221.25 156 L 221.83 155.99 L 222.39 155.97 L 222.94 155.93 L 223.47 155.87 L 223.98 155.8 L 224.48 155.71 L 224.96 155.61 L 225.43 155.49 L 225.87 155.35 L 226.3 155.2 L 226.72 155.03 L 227.12 154.85 L 227.5 154.65 L 227.87 154.43 L 228.22 154.2 L 228.55 153.95 L 228.83 153.71 L 229.1 153.45 L 229.36 153.19 L 229.6 152.91 L 229.83 152.63 L 230.05 152.33 L 230.26 152.02 L 230.45 151.7 L 230.61 151.39 L 230.77 151.07 L 230.91 150.73 L 231.04 150.39 L 231.16 150.04 L 231.27 149.67 L 231.37 149.3 L 231.46 148.91 L 231.54 148.52 L 231.61 148.11 L 231.67 147.69 L 231.72 147.27 L 231.75 146.83 L 231.78 146.38 L 231.79 145.92 L 231.8 145.45 L 231.8 10.55 L 231.79 9.9 L 231.76 9.27 L 231.71 8.66 L 231.64 8.08 L 231.54 7.51 L 231.43 6.96 L 231.3 6.44 L 231.14 5.93 L 230.97 5.45 L 230.77 4.99 L 230.55 4.54 L 230.32 4.12 L 230.06 3.72 L 229.78 3.34 L 229.48 2.98 L 229.16 2.64 L 228.82 2.32 L 228.46 2.02 L 228.08 1.74 L 227.68 1.48 L 227.26 1.25 L 226.81 1.03 L 226.35 0.83 L 225.87 0.66 L 225.36 0.5 L 224.84 0.37 L 224.29 0.26 L 223.72 0.16 L 223.14 0.09 L 222.53 0.04 L 221.9 0.01 L 221.25 0 Z"/>
+      </clipPath>
+      <g clip-path="url(#clipPath0)">
+        <filter id="filter200">
+          <feConvolveMatrix divisor="9.0" in="SourceGraphic" kernelMatrix="1 1 1 1 1 1 1 1 1" order="3 3" result="filterResult25"/>
+        </filter>
+        <use ffdec:characterId="2606" filter="url(#filter200)" height="189.5" transform="matrix(1.0, 0.0, 0.0, 1.0, -15.7, -16.8)" width="270.4" xlink:href="#sprite11"/>
+      </g>
+    </g>
+    <g id="sprite11" transform="matrix(1.0, 0.0, 0.0, 1.0, 15.7, -134.95)">
+      <use ffdec:characterId="2605" height="189.5" transform="matrix(1.0, 0.0, 0.0, 1.0, -15.7, 134.95)" width="270.4" xlink:href="#shape10"/>
+    </g>
+    <g id="shape10" transform="matrix(1.0, 0.0, 0.0, 1.0, 15.7, -134.95)">
+      <path d="M244.7 134.95 Q254.7 134.95 254.7 144.95 L254.7 314.45 Q254.7 324.45 244.7 324.45 L-5.7 324.45 Q-15.7 324.45 -15.7 314.45 L-15.7 144.95 Q-15.7 134.95 -5.7 134.95 L244.7 134.95" fill="#bd3400" fill-rule="evenodd" stroke="none"/>
+      <path d="M223.05 300.0 Q220.6 303.05 215.15 303.05 L14.5 303.05 Q4.75 303.05 4.75 293.3 L4.75 168.65 Q4.75 163.15 7.85 160.8 5.95 163.2 5.95 167.45 L5.95 292.1 Q5.95 301.85 15.7 301.85 L216.35 301.85 Q220.65 301.85 223.05 300.0 M229.4 304.35 Q230.6 301.95 230.6 298.4 L230.6 163.5 Q230.6 152.95 220.05 152.95 L9.35 152.95 Q4.95 152.95 2.4 154.8 L2.6 154.45 Q5.2 151.75 10.55 151.75 L221.25 151.75 Q231.8 151.75 231.8 162.3 L231.8 297.2 Q231.8 301.0 230.45 303.45 L229.4 304.35" fill="#ffcb66" fill-rule="evenodd" stroke="none"/>
+      <path d="M8.4 160.15 Q10.65 156.1 16.9 156.1 L217.55 156.1 Q227.3 156.1 227.3 165.85 L227.3 290.5 Q227.3 295.4 224.85 297.85 226.1 295.6 226.1 292.1 L226.1 167.45 Q226.1 157.7 216.35 157.7 L15.7 157.7 Q10.85 157.7 8.4 160.15 M2.4 154.8 Q1.2 157.15 1.2 160.7 L1.2 295.6 Q1.2 306.15 11.75 306.15 L222.45 306.15 Q226.85 306.15 229.4 304.35 L228.55 305.7 Q225.95 307.75 221.25 307.75 L10.55 307.75 Q0.0 307.75 0.0 297.2 L0.0 162.3 Q0.0 157.6 2.1 155.05 L2.4 154.8" fill="#ec5911" fill-rule="evenodd" stroke="none"/>
+      <path d="M224.85 297.85 Q227.3 295.4 227.3 290.5 L227.3 165.85 Q227.3 156.1 217.55 156.1 L16.9 156.1 Q10.65 156.1 8.4 160.15 L7.85 160.8 Q4.75 163.15 4.75 168.65 L4.75 293.3 Q4.75 303.05 14.5 303.05 L215.15 303.05 Q220.6 303.05 223.05 300.0 224.15 299.1 224.85 297.85 M2.4 154.8 Q4.95 152.95 9.35 152.95 L220.05 152.95 Q230.6 152.95 230.6 163.5 L230.6 298.4 Q230.6 301.95 229.4 304.35 226.85 306.15 222.45 306.15 L11.75 306.15 Q1.2 306.15 1.2 295.6 L1.2 160.7 Q1.2 157.15 2.4 154.8" fill="#ff8f39" fill-rule="evenodd" stroke="none"/>
+      <path d="M229.4 304.35 L230.45 303.45 Q229.7 304.75 228.55 305.7 L229.4 304.35 M2.6 154.45 L2.4 154.8 2.1 155.05 2.6 154.45" fill="#0ec800" fill-rule="evenodd" stroke="none"/>
+      <path d="M230.55 169.7 Q230.65 164.5 229.75 160.65 228.8 156.75 226.85 155.45 224.85 154.15 221.35 153.5 217.85 152.85 200.95 152.95 L218.0 152.5 Q222.55 152.4 225.55 153.45 228.6 154.55 230.0 157.8 231.3 162.05 230.55 169.7 M5.45 295.45 Q6.4 299.35 8.35 300.65 10.35 301.95 13.85 302.6 17.35 303.25 34.25 303.15 L17.2 303.6 Q12.65 303.7 9.65 302.65 6.6 301.55 5.2 298.3 3.9 294.05 4.65 286.4 4.55 291.6 5.45 295.45" fill="#ffffff" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="text3" transform="matrix(1.0, 0.0, 0.0, 1.0, 4.95, 1.4)">
+      <g transform="matrix(1.0, 0.0, 0.0, 1.0, -5.6, 0.0)">
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 0.0, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_M0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 14.75, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_e0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 25.15, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_s0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 34.45, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_s0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 43.75, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_a0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 53.55, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_g0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 63.15, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_e0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 77.9, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_i0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 82.7, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_s0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 96.25, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_e0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 106.65, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_m0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 122.15, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_p0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 132.6, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_t0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 140.3, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold_y0"/>
+        <use fill="#ffffff" height="22.85" transform="matrix(0.0195, 0.0, 0.0, 0.0195, 150.0, 15.0)" width="155.05" xlink:href="#font_Burbank_Big_Regular_Bold__1"/>
+      </g>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_M0">
+      <path d="M27.5 -16.5 L30.0 -67.0 36.5 -207.5 Q40.5 -298.5 45.0 -422.0 49.5 -545.5 53.0 -693.0 L87.5 -693.0 Q120.5 -693.0 174.5 -693.5 228.0 -694.5 290.0 -696.5 290.0 -695.5 295.5 -663.0 301.0 -630.5 312.0 -573.0 322.5 -515.5 337.5 -440.0 353.0 -365.0 371.5 -279.5 382.5 -328.5 397.0 -399.0 411.5 -469.0 428.0 -554.0 444.5 -638.5 461.0 -731.0 L696.5 -723.0 698.0 -669.5 Q699.5 -617.0 703.0 -519.5 706.5 -422.0 712.5 -286.5 718.0 -151.5 727.0 14.5 L701.5 15.0 637.5 17.0 556.0 19.5 556.5 -25.5 Q557.0 -70.0 557.0 -150.5 556.5 -231.0 555.0 -339.0 553.5 -447.5 550.0 -575.5 538.0 -522.0 522.0 -448.0 506.5 -374.5 489.5 -290.0 472.5 -206.0 456.5 -122.0 L432.0 -121.5 Q408.0 -121.5 370.0 -122.0 331.5 -122.5 287.5 -124.0 287.5 -125.0 276.5 -179.0 L245.5 -329.5 Q225.5 -426.0 197.5 -554.0 197.0 -497.0 197.0 -411.0 196.5 -325.0 197.0 -222.0 197.0 -119.5 198.5 -12.5 L172.0 -13.0 Q146.0 -13.5 107.0 -14.5 L27.5 -16.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_e0">
+      <path d="M269.5 -423.0 Q234.0 -423.0 215.0 -390.0 196.5 -357.5 192.5 -293.0 222.5 -293.5 259.0 -294.5 L341.0 -298.0 Q340.0 -358.0 322.0 -390.5 304.0 -422.5 269.5 -423.0 M273.5 16.5 Q181.0 15.5 126.0 -20.0 70.5 -55.5 46.5 -117.5 22.0 -179.5 22.5 -260.0 22.5 -339.5 51.0 -399.5 79.0 -460.0 133.5 -494.0 187.5 -528.0 266.0 -528.5 360.5 -527.0 415.5 -488.0 470.5 -448.5 492.5 -379.0 514.5 -309.5 510.0 -217.0 L428.5 -216.0 Q347.5 -215.0 192.5 -212.0 197.0 -150.5 216.5 -121.5 236.0 -92.0 271.5 -92.0 299.0 -92.0 317.0 -112.5 334.5 -133.0 341.0 -175.0 L386.0 -173.5 Q430.5 -172.5 511.0 -170.0 488.0 -77.5 426.0 -30.5 364.0 16.5 273.5 16.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_s0">
+      <path d="M246.0 21.5 Q138.5 22.0 77.5 -28.0 16.0 -78.0 14.5 -182.5 92.0 -180.5 170.0 -179.0 171.0 -134.0 190.0 -112.5 209.0 -91.0 246.0 -91.0 271.0 -91.0 286.0 -103.0 301.5 -115.0 302.0 -138.0 302.5 -153.0 293.5 -165.0 285.0 -176.5 259.5 -187.0 234.5 -198.0 186.5 -209.0 100.5 -228.5 60.5 -269.5 20.0 -310.5 20.5 -378.0 21.0 -447.5 75.5 -490.5 130.0 -533.5 231.5 -534.5 304.5 -534.0 353.5 -508.5 402.5 -483.0 427.5 -437.5 452.5 -392.5 453.5 -334.0 L414.0 -334.0 Q375.0 -334.0 303.0 -332.0 302.5 -372.0 285.0 -396.0 267.5 -419.5 234.5 -420.0 205.5 -419.0 191.5 -406.0 178.0 -393.0 178.0 -375.0 178.0 -358.5 187.0 -346.0 196.5 -333.0 220.5 -322.5 244.0 -311.5 286.5 -301.0 354.5 -284.5 393.0 -262.0 431.0 -240.0 446.0 -210.5 461.5 -181.0 461.0 -142.5 460.0 -85.5 432.0 -49.5 404.0 -13.0 355.5 4.5 307.5 21.5 246.0 21.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_a0">
+      <path d="M314.5 -210.0 L314.5 -229.5 Q239.5 -230.5 207.5 -207.0 176.0 -184.0 177.0 -147.5 177.0 -120.5 192.0 -105.5 207.0 -90.5 235.5 -90.0 267.5 -89.0 290.5 -115.0 313.5 -141.5 314.5 -210.0 M184.5 15.5 Q106.5 14.5 60.5 -24.0 14.5 -63.0 13.5 -131.0 13.0 -218.0 85.0 -265.5 157.0 -312.5 307.0 -308.0 L307.0 -316.0 Q307.0 -323.5 306.0 -332.0 304.0 -374.5 290.0 -396.0 276.0 -417.0 248.0 -417.0 218.0 -416.5 203.0 -394.5 187.5 -372.5 185.5 -333.0 L144.0 -333.5 33.0 -337.0 Q35.0 -394.0 61.5 -437.0 88.0 -480.0 136.0 -504.0 184.0 -528.0 251.0 -528.5 365.0 -528.0 418.0 -472.0 470.5 -416.5 472.0 -311.5 473.5 -247.0 474.0 -188.5 474.5 -130.5 474.0 -84.5 474.0 -39.0 473.5 -12.5 L473.0 14.5 438.0 14.5 Q403.5 14.5 340.0 15.5 L341.5 -6.5 Q343.0 -28.0 344.0 -65.5 320.0 -23.0 277.0 -3.5 234.5 15.5 184.5 15.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_g0">
+      <path d="M349.0 132.0 Q349.5 117.0 337.5 105.5 325.5 94.5 296.0 88.0 266.5 81.0 214.0 78.0 192.5 89.5 182.0 103.5 171.0 117.5 171.0 133.0 171.5 158.0 195.0 170.5 218.5 183.0 258.0 182.5 300.0 182.0 324.5 168.5 348.5 155.5 349.0 132.0 M247.0 -197.5 Q276.5 -197.5 294.5 -225.0 313.0 -252.5 313.5 -312.5 313.5 -364.5 296.5 -394.5 280.0 -424.5 247.0 -425.0 213.5 -424.5 196.5 -395.0 179.5 -365.5 179.0 -312.5 179.5 -254.0 197.0 -226.0 215.0 -197.5 247.0 -197.5 M239.5 278.5 Q170.0 278.5 118.5 264.5 67.0 250.0 38.0 222.5 9.5 194.5 9.0 153.5 9.5 115.0 36.5 86.5 64.0 58.0 115.5 45.0 83.5 32.5 66.0 10.5 48.5 -11.0 48.0 -37.0 48.5 -65.5 67.5 -88.0 87.0 -111.0 122.0 -127.0 73.0 -151.5 46.0 -199.0 19.0 -246.5 18.5 -318.5 19.0 -385.5 47.0 -434.0 75.5 -482.5 126.5 -509.0 178.0 -535.0 247.0 -535.5 258.5 -535.5 269.0 -535.0 L291.0 -532.5 306.0 -603.5 Q315.5 -649.0 327.5 -713.5 328.5 -713.5 370.0 -698.0 411.5 -682.5 486.5 -657.5 485.5 -656.5 459.0 -614.5 432.0 -572.0 389.0 -497.5 431.0 -470.0 453.5 -424.0 476.0 -378.0 476.0 -316.5 475.5 -241.0 445.0 -193.0 414.5 -145.0 364.5 -122.5 314.5 -100.0 255.0 -100.5 227.5 -100.5 203.0 -103.5 197.5 -99.0 195.0 -93.5 192.5 -88.5 192.5 -83.0 192.0 -75.5 200.0 -69.0 208.0 -62.5 229.0 -57.5 250.5 -52.5 290.0 -49.0 405.0 -38.5 456.0 -1.5 507.0 35.5 506.0 101.5 504.5 161.0 467.0 200.5 429.0 240.0 368.5 259.0 308.5 278.5 239.5 278.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_i0">
+      <path d="M124.0 -562.0 Q72.5 -562.5 47.0 -585.0 21.5 -607.5 21.5 -651.5 21.5 -691.5 47.5 -714.0 73.0 -737.0 124.0 -737.5 174.5 -736.5 199.0 -713.0 223.5 -689.5 223.0 -651.5 223.5 -612.0 199.5 -587.5 175.0 -563.0 124.0 -562.0 M43.0 -1.0 L43.0 -50.5 42.5 -213.5 Q42.0 -326.0 40.0 -513.0 L83.0 -513.0 Q125.5 -512.5 204.0 -514.0 L203.5 -473.0 Q203.5 -433.0 204.0 -362.5 204.0 -292.0 204.5 -199.5 205.5 -107.0 207.0 -2.0 L185.5 -2.0 Q164.0 -2.5 127.5 -2.0 90.5 -2.0 43.0 -1.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_m0">
+      <path d="M37.0 -15.5 L37.0 -78.5 36.5 -250.5 Q36.0 -360.5 34.0 -505.0 35.0 -504.5 71.5 -504.0 108.0 -503.0 166.0 -504.0 L165.0 -479.5 Q164.0 -455.5 164.0 -419.0 187.5 -467.5 230.0 -497.0 272.5 -526.5 327.5 -527.5 385.5 -526.5 418.5 -497.5 451.0 -468.5 464.0 -421.0 487.5 -462.0 527.0 -486.0 567.0 -509.5 617.5 -510.0 671.0 -509.5 702.0 -486.0 733.0 -462.5 747.0 -423.5 760.5 -384.5 762.0 -337.0 763.5 -278.0 763.5 -216.5 764.0 -154.5 764.0 -102.0 763.5 -49.0 763.5 -16.0 L763.0 17.5 Q762.0 17.0 719.5 16.5 677.0 16.0 601.0 16.5 L601.5 -12.5 601.5 -86.5 Q601.5 -132.5 601.0 -187.0 600.5 -241.5 599.0 -295.0 598.0 -331.5 586.5 -351.5 575.0 -371.5 551.0 -371.5 518.0 -371.0 500.5 -341.5 483.0 -312.5 482.5 -266.0 481.5 -226.0 481.5 -185.0 L481.5 -108.5 482.0 -52.0 482.5 -29.5 459.5 -30.0 400.0 -30.0 316.5 -28.5 317.5 -55.0 319.0 -121.5 Q320.0 -163.0 320.0 -212.5 320.0 -261.5 318.5 -309.0 318.0 -345.0 306.5 -365.0 295.0 -384.5 270.5 -385.0 240.0 -384.0 220.5 -353.5 201.0 -322.5 199.5 -272.5 198.5 -230.0 198.5 -185.5 198.5 -141.0 199.0 -103.0 L200.0 -41.0 200.5 -16.5 178.5 -16.5 119.5 -16.5 Q82.5 -16.5 37.0 -15.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_p0">
+      <path d="M277.5 -92.0 Q314.5 -91.5 333.5 -130.5 352.0 -170.0 352.5 -256.0 352.0 -335.5 333.0 -377.5 313.5 -419.5 276.5 -420.0 238.0 -419.5 218.5 -378.0 198.5 -336.0 198.5 -256.0 198.5 -172.0 217.5 -132.0 237.0 -92.0 277.5 -92.0 M34.0 212.0 L35.0 0.5 35.0 -195.0 Q35.0 -286.5 34.5 -357.0 34.5 -427.0 34.0 -467.0 L34.0 -508.0 Q52.0 -507.5 76.0 -507.5 100.0 -507.5 122.5 -508.0 L160.5 -508.5 176.0 -509.0 Q175.5 -486.5 174.5 -471.5 174.0 -456.5 174.0 -442.5 198.0 -482.5 236.5 -505.5 275.5 -528.0 327.5 -528.5 391.5 -527.5 435.5 -491.5 479.5 -455.5 502.5 -393.5 525.0 -332.0 525.5 -255.0 525.0 -166.0 500.0 -106.5 474.5 -47.0 430.0 -17.5 385.5 12.5 326.5 12.5 285.5 12.5 251.0 -3.5 216.5 -19.0 194.5 -51.0 198.0 88.0 201.0 150.0 204.5 212.0 205.0 211.0 166.0 209.5 127.0 210.0 87.5 210.0 61.5 211.0 L34.0 212.0" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_t0">
+      <path d="M378.0 -16.5 Q342.5 -7.0 310.5 -2.0 278.5 3.0 250.0 3.0 170.5 4.0 124.0 -40.5 77.0 -85.0 75.0 -185.5 74.0 -237.0 74.0 -287.0 73.5 -337.5 73.5 -385.0 L7.0 -385.0 Q8.0 -460.0 7.0 -489.5 6.5 -519.5 6.0 -518.0 L41.0 -517.0 75.0 -517.0 76.0 -612.5 77.0 -649.0 Q151.5 -648.5 194.0 -649.0 L237.5 -649.0 236.5 -611.5 Q235.5 -575.0 234.5 -515.0 L368.5 -515.0 Q367.0 -462.5 367.0 -434.0 L367.0 -394.5 367.5 -384.0 299.5 -385.0 234.5 -385.0 Q234.5 -343.5 235.0 -301.5 235.0 -259.5 236.5 -218.0 237.0 -181.5 254.0 -164.0 271.5 -146.5 307.0 -146.5 319.5 -146.5 334.0 -148.5 349.0 -151.0 366.5 -155.5 L374.5 -54.0 Q377.5 -17.0 378.0 -16.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold_y0">
+      <path d="M294.0 236.5 Q231.5 227.0 195.0 222.0 159.0 216.5 144.0 215.0 L129.0 213.0 Q153.5 126.0 163.5 84.0 173.5 42.5 173.0 43.0 94.0 -217.0 48.5 -355.0 3.0 -493.5 2.0 -494.5 88.5 -496.5 133.0 -500.0 L178.0 -504.0 Q199.5 -393.5 216.0 -314.0 233.0 -235.0 243.0 -192.5 252.5 -150.0 253.0 -149.5 292.5 -341.5 309.0 -437.5 326.0 -533.5 325.5 -533.5 L452.0 -526.5 Q496.0 -525.0 496.5 -525.5 436.0 -300.5 396.5 -152.5 356.5 -4.0 334.0 81.5 L302.5 202.0 Q293.5 237.5 294.0 236.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="font_Burbank_Big_Regular_Bold__1">
+      <path d="M58.5 -228.5 L57.0 -265.5 Q56.0 -302.0 53.0 -368.0 50.5 -434.0 46.0 -523.0 41.5 -612.0 35.0 -718.0 L62.0 -717.0 130.5 -716.0 Q172.5 -716.0 220.0 -717.0 L217.5 -653.5 Q215.5 -591.5 211.5 -482.5 208.0 -373.0 204.0 -229.5 L184.5 -230.0 133.0 -230.0 Q100.0 -230.0 58.5 -228.5 M132.0 11.5 Q80.0 11.0 51.0 -16.0 22.0 -43.0 21.5 -90.0 21.5 -133.0 49.0 -160.5 76.0 -187.5 130.0 -188.5 183.0 -187.5 210.0 -158.5 236.5 -129.5 236.5 -87.0 235.5 -40.5 206.0 -15.0 176.5 11.0 132.0 11.5" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <g id="button2" transform="matrix(1.0, 0.0, 0.0, 1.0, 3.9, 4.35)">
+      <use ffdec:characterId="2609" height="39.5" transform="matrix(1.0, 0.0, 0.0, 1.0, -0.75, -0.75)" width="58.0" xlink:href="#shape11"/>
+      <use ffdec:characterId="2611" height="23.7" transform="matrix(1.0, 0.0, 0.0, 1.0, 9.7, 6.9)" width="37.35" xlink:href="#sprite12"/>
+    </g>
+    <g id="shape11" transform="matrix(1.0, 0.0, 0.0, 1.0, 0.75, 0.75)">
+      <path d="M56.5 33.0 Q56.5 38.0 51.5 38.0 L5.0 38.0 Q0.0 38.0 0.0 33.0 L0.0 5.0 Q0.0 0.0 5.0 0.0 L51.5 0.0 Q56.5 0.0 56.5 5.0 L56.5 33.0" fill="url(#gradient7)" fill-rule="evenodd" stroke="none"/>
+      <path d="M56.5 33.0 L56.5 5.0 Q56.5 0.0 51.5 0.0 L5.0 0.0 Q0.0 0.0 0.0 5.0 L0.0 33.0 Q0.0 38.0 5.0 38.0 L51.5 38.0 Q56.5 38.0 56.5 33.0 Z" fill="none" stroke="#676767" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path d="M18.7 16.65 L18.5 17.55 18.3 20.8 18.5 23.85 18.7 24.7 18.9 23.95 19.05 20.65 18.9 17.45 18.7 16.65 M45.5 9.4 L46.0 10.2 45.95 11.2 43.5 16.65 42.1 19.8 43.95 25.1 45.4 28.8 45.45 28.9 Q45.6 29.35 45.3 29.45 L45.55 29.65 Q46.0 30.05 46.0 30.7 46.0 31.3 45.6 31.75 L44.55 32.2 44.5 32.2 43.95 32.2 39.75 32.35 37.85 32.5 36.95 32.2 36.4 31.4 36.0 29.95 Q36.0 30.55 35.55 31.0 L34.5 31.45 29.95 31.45 28.4 31.5 Q27.8 31.5 27.35 31.05 26.9 30.6 26.9 30.0 L26.9 28.25 Q25.75 30.15 23.9 31.15 L23.95 31.15 Q21.7 32.35 18.7 32.35 13.7 32.3 11.25 29.2 L11.25 29.25 Q8.75 26.35 8.7 20.85 8.65 17.2 9.8 14.65 L9.8 14.7 Q10.95 11.85 13.2 10.45 15.45 8.95 18.65 8.9 L18.7 8.9 Q22.15 8.95 24.35 10.4 L24.4 10.4 Q25.9 11.4 26.9 12.95 L26.9 12.6 26.9 11.15 27.1 10.4 27.7 9.85 28.45 9.65 32.75 9.75 32.8 9.75 34.45 9.7 35.2 9.9 35.75 10.5 35.95 11.25 35.95 11.3 36.55 9.75 Q36.7 9.3 37.15 9.05 L38.05 8.8 42.9 9.0 44.55 9.05 Q45.05 9.05 45.5 9.4" fill="#000000" fill-opacity="0.29803923" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0219, -0.0232, 0.0, 28.25, 19.0)" gradientUnits="userSpaceOnUse" id="gradient7" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.027450980392156862" stop-color="#ffffff"/>
+      <stop offset="0.6039215686274509" stop-color="#eeeeee"/>
+    </linearGradient>
+    <g id="sprite12" transform="matrix(1.0, 0.0, 0.0, 1.0, -1.0, -1.5)">
+      <use ffdec:characterId="2610" height="23.7" transform="matrix(1.0, 0.0, 0.0, 1.0, 1.0, 1.5)" width="37.35" xlink:href="#shape12"/>
+    </g>
+    <g id="shape12" transform="matrix(1.0, 0.0, 0.0, 1.0, -1.0, -1.5)">
+      <path d="M36.85 3.25 L35.15 3.2 30.25 3.0 29.35 5.3 26.7 12.35 26.7 8.45 26.75 3.9 25.1 3.95 20.7 3.85 20.7 5.3 20.7 9.2 20.7 15.15 20.7 22.7 22.25 22.65 26.8 22.65 26.8 22.15 26.75 20.65 28.4 17.65 29.15 20.2 30.15 23.7 31.95 23.55 36.8 23.4 36.3 22.05 34.85 18.3 32.75 12.45 34.4 8.75 36.85 3.25 M12.65 9.9 L12.85 13.35 12.65 16.9 Q12.45 18.1 12.05 18.55 11.6 19.0 11.05 19.0 10.4 19.0 9.95 18.5 9.5 18.0 9.3 16.8 L9.1 13.5 9.3 10.0 Q9.5 8.75 9.9 8.25 10.35 7.75 10.95 7.75 11.6 7.7 12.0 8.2 12.45 8.65 12.65 9.9 M10.95 3.1 Q8.25 3.15 6.3 4.4 4.45 5.6 3.45 7.95 2.45 10.25 2.5 13.5 2.55 18.4 4.7 20.95 6.8 23.5 11.0 23.55 13.6 23.55 15.5 22.5 17.4 21.5 18.4 19.25 19.5 17.05 19.5 13.45 19.5 10.2 18.65 7.9 17.75 5.6 15.85 4.35 13.95 3.15 10.95 3.1 Z" fill="none" stroke="url(#gradient8)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.0"/>
+      <path d="M12.65 9.9 Q12.45 8.65 12.0 8.2 11.6 7.7 10.95 7.75 10.35 7.75 9.9 8.25 9.5 8.75 9.3 10.0 L9.1 13.5 9.3 16.8 Q9.5 18.0 9.95 18.5 10.4 19.0 11.05 19.0 11.6 19.0 12.05 18.55 12.45 18.1 12.65 16.9 L12.85 13.35 12.65 9.9 M10.95 3.1 Q13.95 3.15 15.85 4.35 17.75 5.6 18.65 7.9 19.5 10.2 19.5 13.45 19.5 17.05 18.4 19.25 17.4 21.5 15.5 22.5 13.6 23.55 11.0 23.55 6.8 23.5 4.7 20.95 2.55 18.4 2.5 13.5 2.45 10.25 3.45 7.95 4.45 5.6 6.3 4.4 8.25 3.15 10.95 3.1 M36.85 3.25 L34.4 8.75 32.75 12.45 34.85 18.3 36.3 22.05 36.8 23.4 31.95 23.55 30.15 23.7 29.15 20.2 28.4 17.65 26.75 20.65 26.8 22.15 26.8 22.65 22.25 22.65 20.7 22.7 20.7 15.15 20.7 9.2 20.7 5.3 20.7 3.85 25.1 3.95 26.75 3.9 26.7 8.45 26.7 12.35 29.35 5.3 30.25 3.0 35.15 3.2 36.85 3.25" fill="url(#gradient9)" fill-rule="evenodd" stroke="none"/>
+    </g>
+    <linearGradient gradientTransform="matrix(0.0, 0.0079, -0.0258, 0.0, 177.9, 8.5)" gradientUnits="userSpaceOnUse" id="gradient8" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.027450980392156862" stop-color="#39de39"/>
+      <stop offset="0.6039215686274509" stop-color="#006000"/>
+    </linearGradient>
+    <linearGradient gradientTransform="matrix(0.0, 0.0104, -0.0125, 0.0, 11.0, 11.5)" gradientUnits="userSpaceOnUse" id="gradient9" spreadMethod="pad" x1="-819.2" x2="819.2">
+      <stop offset="0.13725490196078433" stop-color="#cbffd2"/>
+      <stop offset="0.7803921568627451" stop-color="#00cc33"/>
+    </linearGradient>
+  </defs>
+</svg>
