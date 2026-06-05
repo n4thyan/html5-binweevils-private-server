@@ -1,10 +1,12 @@
 // Canvas renderer shell for Milestone 002.
 //
-// Current default mode is `debug`, which draws labelled placeholder layers.
-// Future `atlas` mode is intentionally gated so real frame drawing cannot be
-// mistaken for complete/final rendering before assets and coordinates are ready.
+// Modes:
+// - debug: lightweight visual-plan proof
+// - prototype: isolated transplant path for the visually-correct old demo renderer
+// - atlas: gated smoke-test path for future atlas drawing
 
 import { drawAtlasFrame, drawTintedAtlasFrame } from './AtlasFrameRenderer.js';
+import { WeevilPrototypeRenderer } from './WeevilPrototypeRenderer.js';
 import { WEEVIL_CANVAS_BOUNDS } from './WeevilVisualConfig.js';
 
 export class WeevilCanvasRenderer {
@@ -18,10 +20,15 @@ export class WeevilCanvasRenderer {
     this.mode = mode;
     this.originX = WEEVIL_CANVAS_BOUNDS.originX;
     this.originY = WEEVIL_CANVAS_BOUNDS.originY;
+    this.prototypeRenderer = new WeevilPrototypeRenderer({ width, height });
   }
 
   render(ctx, plan, x, y, options = {}) {
     const mode = options.mode ?? this.mode;
+
+    if (mode === 'prototype') {
+      return this.prototypeRenderer.render(ctx, plan, x, y, options);
+    }
 
     if (mode === 'atlas') {
       return this.renderAtlas(ctx, plan, x, y, options);
