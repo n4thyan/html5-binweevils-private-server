@@ -6,19 +6,27 @@ import {
   getLowerLegFrame,
   getMouthAtlas
 } from './WeevilPartMap.js';
+import { createPoseState } from './WeevilPose.js';
 
 export function createWeevilRenderPlan(rawDef, options = {}) {
   const definition = rawDef instanceof WeevilDef ? rawDef : new WeevilDef(rawDef);
   const decoded = definition.toJSON();
-  const expression = Number(options.expression ?? 0);
+  const pose = createPoseState({
+    ps: options.pose ?? options.ps ?? 0,
+    ex: options.expression ?? options.ex ?? 0,
+    r: options.rotation ?? options.r ?? 0
+  });
 
   return {
     source: {
       rawDef: decoded.raw,
-      expression,
+      expression: pose.expression,
+      pose: pose.ps,
+      rotation: pose.rotation,
       status: 'prototype-derived-plan'
     },
     validation: WeevilDef.validate(decoded.raw),
+    pose,
     parts: {
       body: {
         type: decoded.bodyType,
@@ -37,8 +45,8 @@ export function createWeevilRenderPlan(rawDef, options = {}) {
         lids: decoded.lids
       },
       mouth: {
-        expression,
-        atlas: getMouthAtlas(expression)
+        expression: pose.expression,
+        atlas: getMouthAtlas(pose.expression)
       },
       antennae: {
         type: decoded.antennaType,
