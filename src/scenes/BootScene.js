@@ -2,6 +2,7 @@ import { AvatarState } from '../avatar/AvatarState.js';
 import { RENDERER_BASELINE_SAMPLES, createBaselineUserVars } from '../avatar/RendererBaselineSamples.js';
 import { WeevilCanvasRenderer } from '../avatar/WeevilCanvasRenderer.js';
 import { SAMPLE_WEEVIL_DEF } from '../avatar/WeevilDefSamples.js';
+import { GameShellRenderer } from '../ui/GameShellRenderer.js';
 
 export class BootScene {
   constructor({ stage }) {
@@ -24,6 +25,7 @@ export class BootScene {
     });
     this.renderPlan = this.avatar.createRenderPlan();
     this.renderer = new WeevilCanvasRenderer({ mode: 'legacy-demo-assets' });
+    this.shell = new GameShellRenderer({ width: this.stage.width, height: this.stage.height });
     this.samplePlans = RENDERER_BASELINE_SAMPLES.map((sample, index) => ({
       sample,
       avatar: AvatarState.fromUserVars(createBaselineUserVars(sample, index + 1))
@@ -46,37 +48,37 @@ export class BootScene {
     const ctx = this.stage.context;
     this.stage.clear();
 
-    ctx.fillStyle = '#171717';
-    ctx.fillRect(0, 0, this.stage.width, this.stage.height);
+    this.shell.render(ctx, {
+      title: 'Bin Weevils HTML5 Port Foundation',
+      subtitle: 'Milestone 004 shell preview, renderer locked'
+    });
 
-    ctx.fillStyle = '#f4e9bd';
-    ctx.font = '24px Arial, sans-serif';
-    ctx.fillText('Bin Weevils HTML5 Port Foundation', 40, 70);
+    ctx.fillStyle = '#fff6b8';
+    ctx.font = '18px Arial, sans-serif';
+    ctx.fillText('Milestone 004: client shell preview', 62, 132);
 
-    ctx.fillStyle = '#d2c48b';
-    ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 003: asset renderer baseline lock', 40, 105);
-    ctx.fillText('Using the proven old HTML5 demo renderer and extracted weevil assets.', 40, 132);
+    ctx.fillStyle = '#e4d895';
+    ctx.font = '13px Arial, sans-serif';
+    ctx.fillText('Static UI frame only. Rooms, chat, movement and backend are not active yet.', 62, 154);
 
-    this.renderDefinitionPanel(ctx, 40, 180);
-    this.renderStatePanel(ctx, 640, 180);
-    this.renderBaselinePanel(ctx, 640, 462);
-    this.renderer.render(ctx, this.renderPlan, 700, 385, { mode: 'legacy-demo-assets' });
+    this.renderDefinitionPanel(ctx, 62, 188);
+    this.renderStatePanel(ctx, 640, 188);
+    this.renderBaselinePanel(ctx, 640, 464);
+    this.renderer.render(ctx, this.renderPlan, 690, 384, { mode: 'legacy-demo-assets' });
   }
 
   renderDefinitionPanel(ctx, x, y) {
     const decoded = this.avatar.weevilDef.toJSON();
 
-    ctx.strokeStyle = '#f4e9bd';
-    ctx.strokeRect(x, y, 560, 340);
+    this.panel(ctx, x, y, 520, 302);
 
-    ctx.fillStyle = '#f4e9bd';
+    ctx.fillStyle = '#fff6b8';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('WeevilDef source-format decode', x + 20, y + 32);
+    ctx.fillText('WeevilDef source-format decode', x + 20, y + 30);
 
-    ctx.font = '14px Consolas, Monaco, monospace';
-    ctx.fillText(`raw: ${this.avatar.weevilDef.raw}`, x + 20, y + 66);
-    ctx.fillText(`valid: ${this.validation.ok ? 'yes' : 'no'}`, x + 20, y + 90);
+    ctx.font = '12px Consolas, Monaco, monospace';
+    ctx.fillText(`raw: ${this.avatar.weevilDef.raw}`, x + 20, y + 62);
+    ctx.fillText(`valid: ${this.validation.ok ? 'yes' : 'no'}`, x + 20, y + 84);
 
     const rows = [
       ['headType', decoded.headType],
@@ -93,22 +95,22 @@ export class BootScene {
     ];
 
     rows.forEach(([label, value], index) => {
-      const rowY = y + 122 + index * 18;
+      const rowY = y + 112 + index * 15;
       ctx.fillStyle = '#d2c48b';
       ctx.fillText(`${label}:`, x + 20, rowY);
-      ctx.fillStyle = '#f4e9bd';
-      ctx.fillText(String(value), x + 220, rowY);
+      ctx.fillStyle = '#fff6b8';
+      ctx.fillText(String(value), x + 188, rowY);
     });
 
-    this.renderColourSwatch(ctx, 'head', decoded.colours.head, x + 360, y + 110);
-    this.renderColourSwatch(ctx, 'body', decoded.colours.body, x + 360, y + 150);
-    this.renderColourSwatch(ctx, 'eyes', decoded.colours.eyes, x + 360, y + 190);
-    this.renderColourSwatch(ctx, 'antennae', decoded.colours.antennae, x + 360, y + 230);
-    this.renderColourSwatch(ctx, 'legs', decoded.colours.legs, x + 360, y + 270);
+    this.renderColourSwatch(ctx, 'head', decoded.colours.head, x + 316, y + 106);
+    this.renderColourSwatch(ctx, 'body', decoded.colours.body, x + 316, y + 140);
+    this.renderColourSwatch(ctx, 'eyes', decoded.colours.eyes, x + 316, y + 174);
+    this.renderColourSwatch(ctx, 'antennae', decoded.colours.antennae, x + 316, y + 208);
+    this.renderColourSwatch(ctx, 'legs', decoded.colours.legs, x + 316, y + 242);
 
     ctx.fillStyle = '#d2c48b';
-    ctx.font = '14px Arial, sans-serif';
-    ctx.fillText(`runtime: ${Math.floor(this.elapsedMs)}ms`, x + 20, y + 315);
+    ctx.font = '12px Arial, sans-serif';
+    ctx.fillText(`runtime: ${Math.floor(this.elapsedMs)}ms`, x + 20, y + 282);
   }
 
   renderStatePanel(ctx, x, y) {
@@ -127,62 +129,68 @@ export class BootScene {
       ['legs', `${plan.parts.legs.name} ${plan.parts.legs.lowerFrame}`]
     ];
 
-    ctx.strokeStyle = '#f4e9bd';
-    ctx.strokeRect(x, y, 340, 260);
+    this.panel(ctx, x, y, 300, 246);
 
-    ctx.fillStyle = '#f4e9bd';
-    ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('AvatarState + RenderPlan', x + 20, y + 32);
+    ctx.fillStyle = '#fff6b8';
+    ctx.font = '15px Arial, sans-serif';
+    ctx.fillText('AvatarState + RenderPlan', x + 18, y + 28);
 
     ctx.fillStyle = '#d2c48b';
-    ctx.font = '13px Arial, sans-serif';
-    ctx.fillText('Source-backed fields, demo-backed visuals.', x + 20, y + 58);
+    ctx.font = '11px Arial, sans-serif';
+    ctx.fillText('Source-backed fields, demo-backed visuals.', x + 18, y + 52);
 
-    ctx.font = '13px Consolas, Monaco, monospace';
+    ctx.font = '11px Consolas, Monaco, monospace';
     rows.forEach(([label, value], index) => {
-      const rowY = y + 90 + index * 17;
+      const rowY = y + 82 + index * 15;
       ctx.fillStyle = '#d2c48b';
-      ctx.fillText(`${label}:`, x + 20, rowY);
-      ctx.fillStyle = '#f4e9bd';
-      ctx.fillText(String(value), x + 120, rowY);
+      ctx.fillText(`${label}:`, x + 18, rowY);
+      ctx.fillStyle = '#fff6b8';
+      ctx.fillText(String(value), x + 112, rowY);
     });
   }
 
   renderBaselinePanel(ctx, x, y) {
-    ctx.strokeStyle = '#f4e9bd';
-    ctx.strokeRect(x, y, 340, 180);
+    this.panel(ctx, x, y, 300, 104);
 
-    ctx.fillStyle = '#f4e9bd';
-    ctx.font = '15px Arial, sans-serif';
-    ctx.fillText('Renderer baseline samples', x + 20, y + 28);
-
-    ctx.fillStyle = '#d2c48b';
-    ctx.font = '11px Consolas, Monaco, monospace';
-    ctx.fillText('Different definitions rendered through same asset path.', x + 20, y + 48);
+    ctx.fillStyle = '#fff6b8';
+    ctx.font = '14px Arial, sans-serif';
+    ctx.fillText('Renderer baseline samples', x + 18, y + 24);
 
     this.samplePlans.forEach((entry, index) => {
-      const drawX = x + 18 + index * 104;
-      const drawY = y + 62;
+      const drawX = x + 16 + index * 92;
+      const drawY = y + 30;
       this.renderer.render(ctx, entry.plan, drawX, drawY, {
         mode: 'legacy-demo-assets',
-        displayWidth: 96,
-        displayHeight: 96
+        displayWidth: 82,
+        displayHeight: 82
       });
       ctx.fillStyle = '#d2c48b';
-      ctx.font = '9px Consolas, Monaco, monospace';
-      ctx.fillText(entry.sample.id, drawX + 2, y + 164);
+      ctx.font = '8px Consolas, Monaco, monospace';
+      ctx.fillText(entry.sample.id, drawX + 2, y + 94);
     });
   }
 
   renderColourSwatch(ctx, label, colour, x, y) {
     ctx.fillStyle = colour.hex ?? '#000000';
-    ctx.fillRect(x, y - 14, 26, 18);
+    ctx.fillRect(x, y - 12, 24, 16);
 
-    ctx.strokeStyle = '#f4e9bd';
-    ctx.strokeRect(x, y - 14, 26, 18);
+    ctx.strokeStyle = '#fff6b8';
+    ctx.strokeRect(x, y - 12, 24, 16);
 
-    ctx.fillStyle = '#f4e9bd';
-    ctx.font = '13px Consolas, Monaco, monospace';
-    ctx.fillText(`${label}: ${colour.hex ?? 'n/a'} [${colour.index}]`, x + 36, y);
+    ctx.fillStyle = '#fff6b8';
+    ctx.font = '11px Consolas, Monaco, monospace';
+    ctx.fillText(`${label}: ${colour.hex ?? 'n/a'} [${colour.index}]`, x + 34, y);
+  }
+
+  panel(ctx, x, y, w, h) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(12, 18, 9, 0.78)';
+    ctx.strokeStyle = '#b9e660';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 12);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 }
