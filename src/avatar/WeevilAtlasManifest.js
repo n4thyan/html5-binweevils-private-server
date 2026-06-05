@@ -1,0 +1,60 @@
+// Prototype-derived avatar atlas manifest from the uploaded HTML5 demo.
+//
+// Source archive path:
+// public/weevil-creator/assets/atlases/manifest.json
+//
+// Status: reference/loading scaffold only. Final asset provenance must still be
+// matched against OG source/extracted assets before renderer fidelity is claimed.
+
+export const WEEVIL_ATLAS_BASE_PATH = '/assets/weevil/atlases';
+
+export const WEEVIL_ATLAS_MANIFEST = {
+  'body/cone': { png: 'body_cone.png', json: 'body_cone.json' },
+  'body/cone_narrow_inv': { png: 'body_cone_narrow_inv.png', json: 'body_cone_narrow_inv.json' },
+  'body/cuboid': { png: 'body_cuboid.png', json: 'body_cuboid.json' },
+  'body/spheroid': { png: 'body_spheroid.png', json: 'body_spheroid.json' },
+
+  eyes: { png: 'eyes.png', json: 'eyes.json' },
+  'eyes/Eye_iris1_mc': { png: 'eyes_Eye_iris1_mc.png', json: 'eyes_Eye_iris1_mc.json' },
+  'eyes/Eye_iris2_mc': { png: 'eyes_Eye_iris2_mc.png', json: 'eyes_Eye_iris2_mc.json' },
+  'eyes/Eye_lid1_mc': { png: 'eyes_Eye_lid1_mc.png', json: 'eyes_Eye_lid1_mc.json' },
+  'eyes/Eye_lid2_mc': { png: 'eyes_Eye_lid2_mc.png', json: 'eyes_Eye_lid2_mc.json' },
+  'eyes/Eye_white1_mc': { png: 'eyes_Eye_white1_mc.png', json: 'eyes_Eye_white1_mc.json' },
+
+  'head/cone': { png: 'head_cone.png', json: 'head_cone.json' },
+  'head/cone_inv': { png: 'head_cone_inv.png', json: 'head_cone_inv.json' },
+  'head/cuboid': { png: 'head_cuboid.png', json: 'head_cuboid.json' },
+  'head/spheroid': { png: 'head_spheroid.png', json: 'head_spheroid.json' },
+  'head/spheroid_mask': { png: 'head_spheroid_mask.png', json: 'head_spheroid_mask.json' },
+
+  misc: { png: 'misc.png', json: 'misc.json' },
+  'misc/Prob1_mc': { png: 'misc_Prob1_mc.png', json: 'misc_Prob1_mc.json' },
+
+  'mouth/Mouth1_mc': { png: 'mouth_Mouth1_mc.png', json: 'mouth_Mouth1_mc.json' },
+  'mouth/Mouth2_mc': { png: 'mouth_Mouth2_mc.png', json: 'mouth_Mouth2_mc.json' },
+  'mouth/Mouth3_mc': { png: 'mouth_Mouth3_mc.png', json: 'mouth_Mouth3_mc.json' },
+  'mouth/Mouth4_mc': { png: 'mouth_Mouth4_mc.png', json: 'mouth_Mouth4_mc.json' },
+  'mouth/Mouth5_mc': { png: 'mouth_Mouth5_mc.png', json: 'mouth_Mouth5_mc.json' },
+  'mouth/Mouth6_mc': { png: 'mouth_Mouth6_mc.png', json: 'mouth_Mouth6_mc.json' },
+  'mouth/Mouth7_mc': { png: 'mouth_Mouth7_mc.png', json: 'mouth_Mouth7_mc.json' },
+
+  'hats/tophat': { png: 'hats_tophat.png', json: 'hats_tophat.json' }
+};
+
+export function getAtlasEntry(key) {
+  return WEEVIL_ATLAS_MANIFEST[key] ?? null;
+}
+
+export function getAtlasUrls(key, basePath = WEEVIL_ATLAS_BASE_PATH) {
+  const entry = getAtlasEntry(key);
+  if (!entry) return null;
+
+  return {
+    png: `${basePath}/${entry.png}`,
+    json: `${basePath}/${entry.json}`
+  };
+}
+
+export function listAtlasKeys() {
+  return Object.keys(WEEVIL_ATLAS_MANIFEST);
+}
