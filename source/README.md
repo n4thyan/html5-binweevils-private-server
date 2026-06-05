@@ -12,7 +12,15 @@ docs/
 
 This `source/` folder is not the new client code. It is evidence and raw material for porting.
 
-## Suggested layout
+## Primary source folder
+
+The full KnowYourKnot/Binweevils repository should be committed here:
+
+```text
+source/knowyourknot-binweevils/
+```
+
+Expected layout after import:
 
 ```text
 source/
@@ -20,8 +28,16 @@ source/
     README.md
     game-full/
     server/
+    electron/
     bwps.sql
+```
 
+This lets the porting work happen from GitHub without relying on uncommitted local files.
+
+## Optional source folders
+
+```text
+source/
   prototype-html5-demo/
     README.md
     public/weevil-creator/src/runtime/
@@ -32,11 +48,13 @@ source/
     README.md
 ```
 
+The prototype folder is only for the bad HTML5 demo/reference renderer. It is not authoritative.
+
 ## Git LFS
 
 Large/binary files under `source/` are tracked with Git LFS through the repo `.gitattributes` file.
 
-Before adding large source assets locally, run:
+Before adding source assets locally, run:
 
 ```powershell
 git lfs install
@@ -48,6 +66,28 @@ Then check what will be committed:
 git status
 git lfs status
 ```
+
+## Import command idea
+
+From the repo root on Windows:
+
+```powershell
+mkdir source -Force
+git clone https://github.com/KnowYourKnot/Binweevils.git .\source\knowyourknot-binweevils
+Remove-Item .\source\knowyourknot-binweevils\.git -Recurse -Force
+```
+
+Then commit it into this private repo:
+
+```powershell
+git add .gitattributes source/knowyourknot-binweevils
+git status
+git lfs status
+git commit -m "Add KnowYourKnot source reference"
+git push
+```
+
+Removing the nested `.git` folder is important. Otherwise it becomes a nested Git repository instead of normal source files inside this repo.
 
 ## Do not
 
