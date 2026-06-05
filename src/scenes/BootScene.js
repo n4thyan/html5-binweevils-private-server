@@ -1,14 +1,27 @@
+import { AvatarState } from '../avatar/AvatarState.js';
 import { WeevilCanvasRenderer } from '../avatar/WeevilCanvasRenderer.js';
-import { WeevilDef } from '../avatar/WeevilDef.js';
 import { SAMPLE_WEEVIL_DEF } from '../avatar/WeevilDefSamples.js';
-import { createWeevilRenderPlan } from '../avatar/WeevilRenderPlan.js';
 
 export class BootScene {
   constructor({ stage }) {
     this.stage = stage;
     this.elapsedMs = 0;
-    this.sampleDef = new WeevilDef(SAMPLE_WEEVIL_DEF);
-    this.renderPlan = createWeevilRenderPlan(this.sampleDef, { expression: 0 });
+    this.avatar = AvatarState.fromUserVars({
+      userId: 1,
+      idx: 1,
+      name: 'debug_weevil',
+      weevilDef: SAMPLE_WEEVIL_DEF,
+      x: 420,
+      y: 0,
+      z: 260,
+      r: 0,
+      ps: 0,
+      ex: 0,
+      apparel: '|null:-140,-140,-140',
+      doorID: 0,
+      locID: 0
+    });
+    this.renderPlan = this.avatar.createRenderPlan();
     this.renderer = new WeevilCanvasRenderer();
     this.validation = this.renderPlan.validation;
   }
@@ -34,16 +47,16 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 002: debug renderer pipeline proof', 40, 105);
+    ctx.fillText('Milestone 002: AvatarState-driven renderer proof', 40, 105);
     ctx.fillText('Placeholder shapes only. Final atlas rendering is not ported yet.', 40, 132);
 
     this.renderDefinitionPanel(ctx, 40, 180);
-    this.renderPlanPanel(ctx, 640, 180);
-    this.renderer.renderDebug(ctx, this.renderPlan, 720, 420);
+    this.renderStatePanel(ctx, 640, 180);
+    this.renderer.render(ctx, this.renderPlan, 720, 420, { mode: 'debug' });
   }
 
   renderDefinitionPanel(ctx, x, y) {
-    const decoded = this.sampleDef.toJSON();
+    const decoded = this.avatar.weevilDef.toJSON();
 
     ctx.strokeStyle = '#f4e9bd';
     ctx.strokeRect(x, y, 560, 340);
@@ -53,7 +66,7 @@ export class BootScene {
     ctx.fillText('WeevilDef source-format decode', x + 20, y + 32);
 
     ctx.font = '14px Consolas, Monaco, monospace';
-    ctx.fillText(`raw: ${SAMPLE_WEEVIL_DEF}`, x + 20, y + 66);
+    ctx.fillText(`raw: ${this.avatar.weevilDef.raw}`, x + 20, y + 66);
     ctx.fillText(`valid: ${this.validation.ok ? 'yes' : 'no'}`, x + 20, y + 90);
 
     const rows = [
@@ -89,31 +102,36 @@ export class BootScene {
     ctx.fillText(`runtime: ${Math.floor(this.elapsedMs)}ms`, x + 20, y + 315);
   }
 
-  renderPlanPanel(ctx, x, y) {
+  renderStatePanel(ctx, x, y) {
+    const avatar = this.avatar.toJSON();
     const plan = this.renderPlan;
     const rows = [
+      ['name', avatar.name],
+      ['userId', avatar.userId],
+      ['idx', avatar.idx],
+      ['x/y/z/r', `${avatar.x}/${avatar.y}/${avatar.z}/${avatar.r}`],
+      ['ps/ex', `${avatar.ps}/${avatar.ex}`],
       ['body', plan.parts.body.atlas],
       ['head', plan.parts.head.atlas],
       ['eyes', plan.parts.eyes.atlasSet],
       ['mouth', plan.parts.mouth.atlas],
-      ['antennae', plan.parts.antennae.type],
       ['legs', plan.parts.legs.lowerFrame]
     ];
 
     ctx.strokeStyle = '#f4e9bd';
-    ctx.strokeRect(x, y, 340, 220);
+    ctx.strokeRect(x, y, 340, 260);
 
     ctx.fillStyle = '#f4e9bd';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('WeevilRenderPlan', x + 20, y + 32);
+    ctx.fillText('AvatarState + RenderPlan', x + 20, y + 32);
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '13px Arial, sans-serif';
-    ctx.fillText('Bridge only. Debug renderer below.', x + 20, y + 58);
+    ctx.fillText('Source-backed packet fields, local only.', x + 20, y + 58);
 
     ctx.font = '13px Consolas, Monaco, monospace';
     rows.forEach(([label, value], index) => {
-      const rowY = y + 90 + index * 20;
+      const rowY = y + 90 + index * 17;
       ctx.fillStyle = '#d2c48b';
       ctx.fillText(`${label}:`, x + 20, rowY);
       ctx.fillStyle = '#f4e9bd';
