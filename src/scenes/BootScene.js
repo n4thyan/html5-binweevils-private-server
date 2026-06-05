@@ -1,3 +1,4 @@
+import { WeevilCanvasRenderer } from '../avatar/WeevilCanvasRenderer.js';
 import { WeevilDef } from '../avatar/WeevilDef.js';
 import { SAMPLE_WEEVIL_DEF } from '../avatar/WeevilDefSamples.js';
 import { createWeevilRenderPlan } from '../avatar/WeevilRenderPlan.js';
@@ -8,6 +9,7 @@ export class BootScene {
     this.elapsedMs = 0;
     this.sampleDef = new WeevilDef(SAMPLE_WEEVIL_DEF);
     this.renderPlan = createWeevilRenderPlan(this.sampleDef, { expression: 0 });
+    this.renderer = new WeevilCanvasRenderer();
     this.validation = this.renderPlan.validation;
   }
 
@@ -32,11 +34,12 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 002: WeevilDef and render-plan proof', 40, 105);
-    ctx.fillText('No room, chat, account, or multiplayer systems are active yet.', 40, 132);
+    ctx.fillText('Milestone 002: debug renderer pipeline proof', 40, 105);
+    ctx.fillText('Placeholder shapes only. Final atlas rendering is not ported yet.', 40, 132);
 
     this.renderDefinitionPanel(ctx, 40, 180);
     this.renderPlanPanel(ctx, 640, 180);
+    this.renderer.renderDebug(ctx, this.renderPlan, 720, 420);
   }
 
   renderDefinitionPanel(ctx, x, y) {
@@ -98,7 +101,7 @@ export class BootScene {
     ];
 
     ctx.strokeStyle = '#f4e9bd';
-    ctx.strokeRect(x, y, 340, 260);
+    ctx.strokeRect(x, y, 340, 220);
 
     ctx.fillStyle = '#f4e9bd';
     ctx.font = '16px Arial, sans-serif';
@@ -106,7 +109,7 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '13px Arial, sans-serif';
-    ctx.fillText('Bridge only. Drawing not ported yet.', x + 20, y + 58);
+    ctx.fillText('Bridge only. Debug renderer below.', x + 20, y + 58);
 
     ctx.font = '13px Consolas, Monaco, monospace';
     rows.forEach(([label, value], index) => {
