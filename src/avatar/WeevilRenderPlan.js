@@ -1,12 +1,17 @@
 import { WeevilDef } from './WeevilDef.js';
-import {
-  getBodyAtlas,
-  getEyeAtlasSet,
-  getHeadAtlas,
-  getLowerLegFrame,
-  getMouthAtlas
-} from './WeevilPartMap.js';
 import { createPoseState } from './WeevilPose.js';
+import {
+  WEEVIL_DRAW_ORDER,
+  getAntennaName,
+  getBodyVisual,
+  getEyePosition,
+  getEyeVisual,
+  getHeadVisual,
+  getLegName,
+  getLegVisual,
+  getMouthVisual,
+  getYawDerivedValues
+} from './WeevilVisualConfig.js';
 
 export function createWeevilRenderPlan(rawDef, options = {}) {
   const definition = rawDef instanceof WeevilDef ? rawDef : new WeevilDef(rawDef);
@@ -16,6 +21,14 @@ export function createWeevilRenderPlan(rawDef, options = {}) {
     ex: options.expression ?? options.ex ?? 0,
     r: options.rotation ?? options.r ?? 0
   });
+  const yaw = Number(options.yaw ?? pose.rotation ?? 0);
+  const yawDerived = getYawDerivedValues(yaw);
+  const bodyVisual = getBodyVisual(decoded.bodyType);
+  const headVisual = getHeadVisual(decoded.headType);
+  const eyeVisual = getEyeVisual(decoded.eyeType);
+  const eyePosition = getEyePosition(decoded.headType, decoded.eyeType);
+  const mouthVisual = getMouthVisual(pose.expression);
+  const legVisual = getLegVisual(decoded.legType);
 
   return {
     source: {
@@ -23,53 +36,67 @@ export function createWeevilRenderPlan(rawDef, options = {}) {
       expression: pose.expression,
       pose: pose.ps,
       rotation: pose.rotation,
+      yaw,
       status: 'prototype-derived-plan'
     },
     validation: WeevilDef.validate(decoded.raw),
     pose,
+    yaw: yawDerived,
+    visuals: {
+      body: bodyVisual,
+      head: headVisual,
+      eyes: {
+        ...eyeVisual,
+        position: eyePosition
+      },
+      mouth: mouthVisual,
+      antennae: {
+        name: getAntennaName(decoded.antennaType)
+      },
+      legs: {
+        ...legVisual,
+        name: getLegName(decoded.legType)
+      }
+    },
     parts: {
       body: {
         type: decoded.bodyType,
-        atlas: getBodyAtlas(decoded.bodyType),
-        colour: decoded.colours.body
+        atlas: bodyVisual.atlas,
+        colour: decoded.colours.body,
+        visual: bodyVisual
       },
       head: {
         type: decoded.headType,
-        atlas: getHeadAtlas(decoded.headType),
-        colour: decoded.colours.head
+        atlas: headVisual.atlas,
+        colour: decoded.colours.head,
+        visual: headVisual
       },
       eyes: {
         type: decoded.eyeType,
-        atlasSet: getEyeAtlasSet(decoded.eyeType),
+        atlasSet: eyeVisual.set,
         colour: decoded.colours.eyes,
-        lids: decoded.lids
+        lids: decoded.lids,
+        visual: eyeVisual,
+        position: eyePosition
       },
       mouth: {
         expression: pose.expression,
-        atlas: getMouthAtlas(pose.expression)
+        atlas: mouthVisual.atlas,
+        visual: mouthVisual
       },
       antennae: {
         type: decoded.antennaType,
+        name: getAntennaName(decoded.antennaType),
         colour: decoded.colours.antennae
       },
       legs: {
         type: decoded.legType,
-        lowerFrame: getLowerLegFrame(decoded.legType),
-        colour: decoded.colours.legs
+        name: getLegName(decoded.legType),
+        lowerFrame: legVisual.lowerFrame,
+        colour: decoded.colours.legs,
+        visual: legVisual
       }
     },
-    // This is a high-level order only. Exact draw order/coordinates still need
-    // to be ported from the audited canvas renderer.
-    order: [
-      'legs.back',
-      'body',
-      'head',
-      'eyes.whites',
-      'eyes.irises',
-      'eyes.lids',
-      'mouth',
-      'antennae',
-      'legs.front'
-    ]
+    order: WEEVIL_DRAW_ORDER
   };
 }
