@@ -14,7 +14,7 @@ const cases = [
     expected: {
       bodyType: 1,
       headType: 1,
-      eyeType: 3,
+      eyeType: 1,
       expression: 0,
       poseName: 'default',
       bodyLabel: 'spheroid',
