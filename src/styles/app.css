@@ -1,0 +1,50 @@
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #101010;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.bw-port-root {
+  position: relative;
+  width: 1024px;
+  height: 640px;
+  background: #171717;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.bw-stage {
+  position: absolute;
+  inset: 0;
+}
+
+.bw-stage-canvas {
+  display: block;
+  width: 1024px;
+  height: 640px;
+  image-rendering: auto;
+}
+
+.bw-debug-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  min-width: 180px;
+  margin: 0;
+  padding: 10px 12px;
+  color: #f4e9bd;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(244, 233, 189, 0.35);
+  border-radius: 8px;
+  font: 12px/1.35 Consolas, Monaco, monospace;
+  pointer-events: none;
+}
