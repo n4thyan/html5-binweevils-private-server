@@ -5,12 +5,19 @@
 // mistaken for complete/final rendering before assets and coordinates are ready.
 
 import { drawAtlasFrame, drawTintedAtlasFrame } from './AtlasFrameRenderer.js';
+import { WEEVIL_CANVAS_BOUNDS } from './WeevilVisualConfig.js';
 
 export class WeevilCanvasRenderer {
-  constructor({ width = 180, height = 220, mode = 'debug' } = {}) {
+  constructor({
+    width = WEEVIL_CANVAS_BOUNDS.width,
+    height = WEEVIL_CANVAS_BOUNDS.height,
+    mode = 'debug'
+  } = {}) {
     this.width = width;
     this.height = height;
     this.mode = mode;
+    this.originX = WEEVIL_CANVAS_BOUNDS.originX;
+    this.originY = WEEVIL_CANVAS_BOUNDS.originY;
   }
 
   render(ctx, plan, x, y, options = {}) {
@@ -27,7 +34,7 @@ export class WeevilCanvasRenderer {
     ctx.save();
     ctx.translate(x, y);
 
-    this.drawStage(ctx, 'debug placeholder');
+    this.drawStage(ctx, 'debug visual-plan proof');
     this.drawLegs(ctx, plan);
     this.drawBody(ctx, plan);
     this.drawHead(ctx, plan);
@@ -82,6 +89,14 @@ export class WeevilCanvasRenderer {
     ctx.fillStyle = 'rgba(244, 233, 189, 0.08)';
     ctx.fillRect(0, 0, this.width, this.height);
 
+    ctx.strokeStyle = 'rgba(244, 233, 189, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(this.originX - 8, this.originY);
+    ctx.lineTo(this.originX + 8, this.originY);
+    ctx.moveTo(this.originX, this.originY - 8);
+    ctx.lineTo(this.originX, this.originY + 8);
+    ctx.stroke();
+
     if (label) {
       ctx.fillStyle = '#d2c48b';
       ctx.font = '10px Consolas, Monaco, monospace';
@@ -90,9 +105,16 @@ export class WeevilCanvasRenderer {
   }
 
   drawBody(ctx, plan) {
+    const visual = plan.parts.body.visual;
+    const scale = 0.42;
+    const width = visual.width * scale;
+    const height = visual.height * scale;
+    const x = this.originX;
+    const y = this.originY - 18;
+
     ctx.fillStyle = plan.parts.body.colour.hex ?? '#777777';
     ctx.beginPath();
-    ctx.ellipse(90, 132, 48, 62, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y, width / 2, height / 2, 0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.strokeStyle = '#111111';
@@ -100,9 +122,17 @@ export class WeevilCanvasRenderer {
   }
 
   drawHead(ctx, plan) {
+    const visual = plan.parts.head.visual;
+    const scale = 0.38;
+    const width = visual.width * scale;
+    const height = visual.height * scale;
+    const yawOffset = plan.yaw.yawFactor * 8;
+    const x = this.originX + yawOffset;
+    const y = this.originY + visual.y * 0.35;
+
     ctx.fillStyle = plan.parts.head.colour.hex ?? '#999999';
     ctx.beginPath();
-    ctx.ellipse(90, 70, 42, 38, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y, width / 2, height / 2, 0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.strokeStyle = '#111111';
@@ -110,41 +140,66 @@ export class WeevilCanvasRenderer {
   }
 
   drawEyes(ctx, plan) {
+    const headVisual = plan.parts.head.visual;
+    const eye = plan.parts.eyes.position;
+    const yaw = plan.yaw;
+    const baseX = this.originX + yaw.yawFactor * 8;
+    const baseY = this.originY + headVisual.y * 0.35;
+    const eyeScale = 0.22;
+    const offsetY = eye.y * eyeScale;
+    const spacing = eye.dx * eyeScale * yaw.faceCompress;
+    const leftX = baseX - spacing / 2 + yaw.yawFactor * 7;
+    const rightX = baseX + spacing / 2 + yaw.yawFactor * 7;
+    const eyeY = baseY + offsetY;
+    const rx = 10 * eye.sx;
+    const ry = 13 * eye.sy;
+
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.ellipse(74, 64, 11, 14, 0, 0, Math.PI * 2);
-    ctx.ellipse(106, 64, 11, 14, 0, 0, Math.PI * 2);
+    ctx.ellipse(leftX, eyeY, rx, ry, 0, 0, Math.PI * 2);
+    ctx.ellipse(rightX, eyeY, rx, ry, 0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = plan.parts.eyes.colour.hex ?? '#000000';
     ctx.beginPath();
-    ctx.arc(74, 66, 5, 0, Math.PI * 2);
-    ctx.arc(106, 66, 5, 0, Math.PI * 2);
+    ctx.arc(leftX + yaw.yawFactor * 2, eyeY + 2, 5, 0, Math.PI * 2);
+    ctx.arc(rightX + yaw.yawFactor * 2, eyeY + 2, 5, 0, Math.PI * 2);
     ctx.fill();
   }
 
   drawMouth(ctx, plan) {
+    const headVisual = plan.parts.head.visual;
+    const yaw = plan.yaw;
+    const x = this.originX + yaw.yawFactor * 12;
+    const y = this.originY + headVisual.y * 0.35 + headVisual.mouthY * 0.35;
+    const width = 16 * yaw.faceCompress;
+
     ctx.strokeStyle = '#111111';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(90, 82, 15, 0.1, Math.PI - 0.1);
+    ctx.arc(x, y, width, 0.1, Math.PI - 0.1);
     ctx.stroke();
   }
 
   drawAntennae(ctx, plan) {
+    const headVisual = plan.parts.head.visual;
+    const baseY = this.originY + headVisual.y * 0.35 - 25;
+    const yaw = plan.yaw;
+    const baseX = this.originX + yaw.yawFactor * 8;
+
     ctx.strokeStyle = plan.parts.antennae.colour.hex ?? '#999999';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(70, 40);
-    ctx.lineTo(52, 16);
-    ctx.moveTo(110, 40);
-    ctx.lineTo(128, 16);
+    ctx.moveTo(baseX - 20, baseY + 6);
+    ctx.lineTo(baseX - 38 + yaw.yawFactor * 3, baseY - 18);
+    ctx.moveTo(baseX + 20, baseY + 6);
+    ctx.lineTo(baseX + 38 + yaw.yawFactor * 3, baseY - 18);
     ctx.stroke();
 
     ctx.fillStyle = plan.parts.antennae.colour.hex ?? '#999999';
     ctx.beginPath();
-    ctx.arc(52, 16, 6, 0, Math.PI * 2);
-    ctx.arc(128, 16, 6, 0, Math.PI * 2);
+    ctx.arc(baseX - 38 + yaw.yawFactor * 3, baseY - 18, 6, 0, Math.PI * 2);
+    ctx.arc(baseX + 38 + yaw.yawFactor * 3, baseY - 18, 6, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -152,10 +207,14 @@ export class WeevilCanvasRenderer {
     ctx.strokeStyle = plan.parts.legs.colour.hex ?? '#777777';
     ctx.lineWidth = 6;
 
-    for (const footX of [52, 76, 104, 128]) {
+    const rootX = this.originX;
+    const rootY = this.originY + 42;
+    const yawOffset = plan.yaw.yawFactor * 4;
+
+    for (const footX of [-42, -18, 18, 42]) {
       ctx.beginPath();
-      ctx.moveTo(90, 180);
-      ctx.lineTo(footX, 206);
+      ctx.moveTo(rootX + yawOffset, rootY - 22);
+      ctx.lineTo(rootX + footX + yawOffset, rootY + 18);
       ctx.stroke();
     }
   }
@@ -163,8 +222,9 @@ export class WeevilCanvasRenderer {
   drawLabels(ctx, plan) {
     ctx.fillStyle = '#f4e9bd';
     ctx.font = '10px Consolas, Monaco, monospace';
-    ctx.fillText(plan.parts.body.atlas, 8, this.height - 34);
-    ctx.fillText(plan.parts.head.atlas, 8, this.height - 22);
-    ctx.fillText(plan.parts.mouth.atlas, 8, this.height - 10);
+    ctx.fillText(`${plan.parts.body.visual.label} / ${plan.parts.head.visual.label}`, 8, this.height - 46);
+    ctx.fillText(`${plan.parts.eyes.visual.label} / ${plan.parts.mouth.atlas}`, 8, this.height - 34);
+    ctx.fillText(`${plan.parts.antennae.name}`, 8, this.height - 22);
+    ctx.fillText(`${plan.parts.legs.name} / ${plan.pose.poseName}`, 8, this.height - 10);
   }
 }
