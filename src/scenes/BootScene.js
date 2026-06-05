@@ -22,7 +22,7 @@ export class BootScene {
       locID: 0
     });
     this.renderPlan = this.avatar.createRenderPlan();
-    this.renderer = new WeevilCanvasRenderer({ mode: 'prototype' });
+    this.renderer = new WeevilCanvasRenderer({ mode: 'legacy-demo-assets' });
     this.validation = this.renderPlan.validation;
   }
 
@@ -47,12 +47,12 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 002: prototype renderer transplant path', 40, 105);
-    ctx.fillText('Vector shell using demo-backed visual data. Final atlas rendering is not ported yet.', 40, 132);
+    ctx.fillText('Milestone 002: legacy demo asset renderer path', 40, 105);
+    ctx.fillText('Using the proven old HTML5 demo renderer and extracted weevil assets.', 40, 132);
 
     this.renderDefinitionPanel(ctx, 40, 180);
     this.renderStatePanel(ctx, 640, 180);
-    this.renderer.render(ctx, this.renderPlan, 720, 420, { mode: 'prototype' });
+    this.renderer.render(ctx, this.renderPlan, 700, 385, { mode: 'legacy-demo-assets' });
   }
 
   renderDefinitionPanel(ctx, x, y) {
