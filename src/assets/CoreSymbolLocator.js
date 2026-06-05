@@ -1,8 +1,10 @@
 // Source-backed locator for important exported core5.swf symbols.
 //
-// Decompilation exports timeline symbols by numeric id. symbolClass/symbols.csv
-// gives the id-to-class mapping; this module turns those ids into stable paths
-// for later asset-backed rendering.
+// FFDec exports sprite timelines as folders like:
+// sprites/DefineSprite_<id>_<className>/<frame>.svg
+//
+// symbolClass/symbols.csv gives the id-to-class mapping; this module turns
+// those ids/classes into stable frame paths for later asset-backed rendering.
 
 export const CORE_DECOMPILED_ROOT = 'reference/decompiled-dumpassets/dumpassets/core5.swf';
 export const CORE_SYMBOLS_CSV = `${CORE_DECOMPILED_ROOT}/symbolClass/symbols.csv`;
@@ -61,20 +63,42 @@ export const CORE_PHRASE_SYMBOL_RANGE = Object.freeze({
   description: 'phrase_* quick chat symbols in symbols.csv'
 });
 
-export function getCoreSymbolAssetPath(symbol) {
+export function getCoreSymbolAssetPath(symbol, frame = 1) {
   const entry = typeof symbol === 'number'
     ? CORE_UI_SYMBOLS.find((candidate) => candidate.id === symbol)
     : CORE_UI_SYMBOLS.find((candidate) => candidate.className === symbol || candidate.role === symbol);
 
   if (!entry) return null;
 
-  return buildCoreAssetPath(entry.id, entry.assetType);
+  return buildCoreAssetPath(entry, frame);
 }
 
-export function buildCoreAssetPath(id, assetType = CORE_SYMBOL_ASSET_TYPES.SPRITE) {
+export function buildCoreAssetPath(symbolOrId, frameOrAssetType = 1, maybeFrame = 1) {
+  if (typeof symbolOrId === 'object' && symbolOrId != null) {
+    return buildPathFromEntry(symbolOrId, Number(frameOrAssetType) || 1);
+  }
+
+  const id = Number(symbolOrId);
+  const assetType = typeof frameOrAssetType === 'string' ? frameOrAssetType : CORE_SYMBOL_ASSET_TYPES.SPRITE;
+  const frame = typeof frameOrAssetType === 'number' ? frameOrAssetType : (Number(maybeFrame) || 1);
+  const entry = CORE_UI_SYMBOLS.find((candidate) => candidate.id === id && candidate.assetType === assetType);
+
+  if (entry) {
+    return buildPathFromEntry(entry, frame);
+  }
+
   const folder = folderForAssetType(assetType);
   const extension = extensionForAssetType(assetType);
-  return `${CORE_DECOMPILED_ROOT}/${folder}/${id}.${extension}`;
+  return `${CORE_DECOMPILED_ROOT}/${folder}/Define${capitalise(assetType)}_${id}/${frame}.${extension}`;
+}
+
+export function getCoreSymbolAssetDirectory(symbol) {
+  const entry = typeof symbol === 'number'
+    ? CORE_UI_SYMBOLS.find((candidate) => candidate.id === symbol)
+    : CORE_UI_SYMBOLS.find((candidate) => candidate.className === symbol || candidate.role === symbol);
+
+  if (!entry) return null;
+  return `${CORE_DECOMPILED_ROOT}/${folderForAssetType(entry.assetType)}/${buildExportFolderName(entry)}`;
 }
 
 export function findCoreUISymbol(query) {
@@ -102,6 +126,16 @@ export function summariseCoreSymbolLocator() {
   });
 }
 
+function buildPathFromEntry(entry, frame = 1) {
+  const folder = folderForAssetType(entry.assetType);
+  const extension = extensionForAssetType(entry.assetType);
+  return `${CORE_DECOMPILED_ROOT}/${folder}/${buildExportFolderName(entry)}/${frame}.${extension}`;
+}
+
+function buildExportFolderName(entry) {
+  return `${definePrefixForAssetType(entry.assetType)}_${entry.id}_${entry.className}`;
+}
+
 function folderForAssetType(assetType) {
   switch (assetType) {
     case CORE_SYMBOL_ASSET_TYPES.SHAPE:
@@ -120,6 +154,24 @@ function folderForAssetType(assetType) {
   }
 }
 
+function definePrefixForAssetType(assetType) {
+  switch (assetType) {
+    case CORE_SYMBOL_ASSET_TYPES.SHAPE:
+      return 'DefineShape';
+    case CORE_SYMBOL_ASSET_TYPES.BUTTON:
+      return 'DefineButton';
+    case CORE_SYMBOL_ASSET_TYPES.IMAGE:
+      return 'DefineImage';
+    case CORE_SYMBOL_ASSET_TYPES.SOUND:
+      return 'DefineSound';
+    case CORE_SYMBOL_ASSET_TYPES.FONT:
+      return 'DefineFont';
+    case CORE_SYMBOL_ASSET_TYPES.SPRITE:
+    default:
+      return 'DefineSprite';
+  }
+}
+
 function extensionForAssetType(assetType) {
   switch (assetType) {
     case CORE_SYMBOL_ASSET_TYPES.IMAGE:
@@ -134,4 +186,9 @@ function extensionForAssetType(assetType) {
     default:
       return 'svg';
   }
+}
+
+function capitalise(value) {
+  const text = String(value || '');
+  return text.length === 0 ? text : `${text[0].toUpperCase()}${text.slice(1)}`;
 }
