@@ -1,0 +1,26 @@
+[
+  {
+    "id": "7bd8ef2f-e092-4516-a8cb-83008f70658f",
+    "userId": "0802503c-a19d-4475-9f84-1cbdecd7c9e2",
+    "username": "admin1",
+    "expiresAt": "2026-04-14T15:16:14.142Z"
+  },
+  {
+    "id": "e5b0da6a-af82-4965-9f0d-b1e85f5d05fc",
+    "userId": "1960d061-d87f-4a08-aef4-09206cfc6796",
+    "username": "tester123",
+    "expiresAt": "2026-04-15T15:46:20.438Z"
+  },
+  {
+    "id": "a9906462-736d-4b5b-b5a4-281c09fc8fc1",
+    "userId": "7c1f1ea6-38f3-4431-8841-7ae5683636c1",
+    "username": "tester124",
+    "expiresAt": "2026-04-15T16:01:08.055Z"
+  },
+  {
+    "id": "0195ca65-e465-4bda-ac5d-8207e1ef6261",
+    "userId": "7c1f1ea6-38f3-4431-8841-7ae5683636c1",
+    "username": "tester124",
+    "expiresAt": "2026-04-15T16:01:27.654Z"
+  }
+]

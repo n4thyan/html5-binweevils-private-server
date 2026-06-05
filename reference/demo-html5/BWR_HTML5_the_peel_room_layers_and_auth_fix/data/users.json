@@ -1,0 +1,67 @@
+[
+  {
+    "id": "0802503c-a19d-4475-9f84-1cbdecd7c9e2",
+    "username": "admin1",
+    "email": "a@a.com",
+    "role": "admin",
+    "isMuted": false,
+    "isBanned": false,
+    "passwordSalt": "d5a9acea57a2583e271a5eb8622bbaf0",
+    "passwordHash": "2b3b48b7f55fd721441843da6ddd2257442dc2a4cd531f85484a66af077d3799a21370f9cb198a275ba758e3d0be2ee4196edb0b23c003141ce0f30f6dd7178d",
+    "bio": "",
+    "avatar": {
+      "weevilDef": "401135129001323200",
+      "expression": 0,
+      "proboscis": 0,
+      "hatId": 0,
+      "preferredRenderer": "svg"
+    },
+    "avatarConfigured": true,
+    "avatarUpdatedAt": "2026-03-31T15:16:45.216Z",
+    "createdAt": "2026-03-31T15:16:14.140Z"
+  },
+  {
+    "id": "1960d061-d87f-4a08-aef4-09206cfc6796",
+    "username": "tester123",
+    "email": "tester123@example.com",
+    "role": "user",
+    "isMuted": false,
+    "isBanned": false,
+    "passwordSalt": "c3e2b0268bf3e60b50791916e75ae563",
+    "passwordHash": "5a3aba2b7a983f9d5a0024f6461c3e1bdb1513d1300ecd2e92fde528df2f5d77802331ba58a7be36dc28b1e0aea569d8e81d9ff5c10b03a734621b296b7054c2",
+    "bio": "",
+    "avatar": {
+      "weevilDef": "320417643010151500",
+      "expression": 0,
+      "proboscis": 0,
+      "hatId": 0,
+      "hatColour": 7620096,
+      "preferredRenderer": "html5-canvas"
+    },
+    "avatarConfigured": true,
+    "avatarUpdatedAt": "2026-04-01T15:46:20.437Z",
+    "createdAt": "2026-04-01T15:46:20.437Z"
+  },
+  {
+    "id": "7c1f1ea6-38f3-4431-8841-7ae5683636c1",
+    "username": "tester124",
+    "email": "tester124@example.com",
+    "role": "user",
+    "isMuted": false,
+    "isBanned": false,
+    "passwordSalt": "06e8c7deced33599584e4ef714496750",
+    "passwordHash": "c9ad631ccbc247cba2728bd5950a299dc413efb4b726795a1bd1d8465f6cdac1f0cfec0b803fcf12e245ce24f8c2323f7488b932a0499ee166c250fac1dfb54c",
+    "bio": "",
+    "avatar": {
+      "weevilDef": "320417643010151500",
+      "expression": 0,
+      "proboscis": 0,
+      "hatId": 0,
+      "hatColour": 7620096,
+      "preferredRenderer": "html5-canvas"
+    },
+    "avatarConfigured": true,
+    "avatarUpdatedAt": "2026-04-01T16:01:08.054Z",
+    "createdAt": "2026-04-01T16:01:08.054Z"
+  }
+]

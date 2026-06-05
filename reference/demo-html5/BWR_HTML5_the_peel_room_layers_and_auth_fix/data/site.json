@@ -1,0 +1,23 @@
+{
+  "siteName": "Bin Weevils Rewritten",
+  "owner": "BWR Team",
+  "clientVersion": "1.0.4",
+  "downloads": {
+    "windows": {
+      "label": "Windows",
+      "url": "https://github.com/BWRewritten/Bin-Weevils-Rewritten-Client/releases/download/1.0.4/BWR-1.0.4_Win_Installer_Guide.zip"
+    },
+    "mac": {
+      "label": "Mac",
+      "url": "https://github.com/BWRewritten/Bin-Weevils-Rewritten-Client/releases/download/1.0.4/BWR-1.0.4_Mac_Installer_Guide.zip"
+    },
+    "linux": {
+      "label": "Linux",
+      "url": "https://github.com/BWRewritten/Bin-Weevils-Rewritten-Client/releases/download/1.0.4/BWR_Installer_1.0.4-amd64.deb"
+    },
+    "chromebook": {
+      "label": "Chromebook",
+      "url": "https://github.com/BWRewritten/Bin-Weevils-Rewritten-Client/releases/download/1.0.4/BWR_Installer_1.0.4-amd64.deb"
+    }
+  }
+}

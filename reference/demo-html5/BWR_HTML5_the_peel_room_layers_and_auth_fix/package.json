@@ -1,0 +1,12 @@
+{
+  "name": "bwr-mirror-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Community-facing BWR mirror site built from scraped source assets.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "import:news": "node scripts/import-news.mjs",
+    "check:paths": "node scripts/check-paths.mjs"
+  }
+}

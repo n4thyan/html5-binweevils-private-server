@@ -1,0 +1,9 @@
+Reference font files have been included in this project:
+- demo/assets/fonts/big_bloke_bb/BIGBB___.TTF
+- demo/assets/fonts/gosmick_sans/GosmickSans.ttf
+- demo/assets/fonts/gosmick_sans/GosmickSansBold.ttf
+- demo/assets/fonts/gosmick_sans/GosmickSansOblique.ttf
+- demo/assets/fonts/gosmick_sans/GosmickSansBoldOblique.ttf
+
+Big Bloke BB is used for the title, side labels, spin text, and sign-up button.
+GosmickSans is used for body copy and form text.

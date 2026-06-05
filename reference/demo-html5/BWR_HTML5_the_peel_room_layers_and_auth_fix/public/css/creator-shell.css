@@ -1,0 +1,119 @@
+.creator-shell-wrap {
+  display: grid;
+  gap: 18px;
+}
+
+.creator-flow-card {
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(70, 96, 160, 0.18);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 32px rgba(30, 60, 120, 0.08);
+}
+
+.creator-flow-card h2 {
+  margin: 0 0 8px;
+}
+
+.creator-flow-card p {
+  margin: 0;
+}
+
+.creator-frame-shell {
+  background: linear-gradient(180deg, #e9eef8 0%, #dfe7f4 100%);
+  border: 1px solid rgba(49, 79, 140, 0.18);
+  border-radius: 22px;
+  padding: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 16px 40px rgba(20, 42, 88, 0.1);
+}
+
+.creator-frame {
+  display: block;
+  width: 100%;
+  min-height: 920px;
+  border: 0;
+  border-radius: 16px;
+  background: #177129;
+  opacity: 0;
+  transition: opacity 120ms ease-in;
+}
+
+.creator-frame.is-ready {
+  opacity: 1;
+}
+
+.creator-sidebar-note {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.profile-avatar-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.profile-avatar-summary dl {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px 12px;
+  margin: 0;
+}
+
+.profile-avatar-summary dt {
+  font-weight: 700;
+}
+
+.profile-avatar-summary dd {
+  margin: 0;
+  word-break: break-word;
+}
+
+
+.profile-weevil-preview-card {
+  display: grid;
+  gap: 10px;
+}
+
+.profile-weevil-preview {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  border-radius: 20px;
+  background: radial-gradient(circle at 48% 34%, rgba(235, 220, 68, 0.72) 0%, rgba(145, 199, 42, 0.52) 15%, rgba(54, 156, 49, 0.14) 38%, rgba(23, 118, 40, 0) 58%), linear-gradient(180deg, #1d972f 0%, #28942d 20%, #2c8d28 48%, #1b7a27 76%, #136522 100%);
+  box-shadow: inset 0 0 0 3px rgba(30, 83, 22, 0.32), inset 0 -18px 32px rgba(12, 52, 16, 0.22), 0 10px 24px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  position: relative;
+}
+
+.profile-weevil-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 3px, rgba(0,0,0,0.015) 3px 6px);
+  mix-blend-mode: soft-light;
+}
+
+.profile-weevil-preview canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.profile-weevil-preview-copy {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+  color: #4a6238;
+}
+
+.mirror-pill-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}

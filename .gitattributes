@@ -1,7 +1,6 @@
 # Large/binary original source assets should use Git LFS.
 # This keeps the normal Git history usable while still allowing source assets
 # to exist in the private repo for audit and porting work.
-
 source/**/*.png filter=lfs diff=lfs merge=lfs -text
 source/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 source/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
@@ -18,3 +17,14 @@ source/**/*.zip filter=lfs diff=lfs merge=lfs -text
 source/**/*.7z filter=lfs diff=lfs merge=lfs -text
 source/**/*.rar filter=lfs diff=lfs merge=lfs -text
 source/**/*.sql filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.webp filter=lfs diff=lfs merge=lfs -text
+*.ttf filter=lfs diff=lfs merge=lfs -text
+*.otf filter=lfs diff=lfs merge=lfs -text
+*.woff filter=lfs diff=lfs merge=lfs -text
+*.woff2 filter=lfs diff=lfs merge=lfs -text
+*.swf filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,1385 @@
+--- orig/server.mjs	2026-03-31 15:15:09.000000000 +0000
++++ bw/server.mjs	2026-04-01 12:48:25.791819694 +0000
+@@ -6,6 +6,8 @@
+ import { bootstrapData, loadAllData, readJson, writeJson } from './lib/store.mjs';
+ import { hashPassword, verifyPassword, createSession, destroySession, getCurrentUser } from './lib/auth.mjs';
+ import { ROOM_WORLD, getRoomDefinition, clampRoomPosition, roomSpawnForUser, getPublicRoomConfig } from './lib/room-data.mjs';
++import { defaultAvatar, avatarPayloadFromForm, normaliseAvatar, validateAvatarPayload, validateRegistration } from './lib/services/creator-service.mjs';
++import { buildSessionState } from './lib/services/session-state.mjs';
+ import {
+   renderHome,
+   renderAuth,
+@@ -35,16 +37,10 @@
+ 
+ bootstrapData(ROOT_DIR);
+ 
+-const DEFAULT_AVATAR = Object.freeze({
+-  weevilDef: '401135129001323200',
+-  expression: 0,
+-  proboscis: 0,
+-  hatId: 0,
+-  preferredRenderer: 'svg'
+-});
++const DEFAULT_AVATAR = Object.freeze(defaultAvatar());
+ 
+-const DEFAULT_POST_LOGIN_PATH = '/room';
+-const DEFAULT_STUDIO_PATH = '/weevil-studio?next=%2Froom';
++const DEFAULT_POST_LOGIN_PATH = '/profile';
++const DEFAULT_STUDIO_PATH = '/weevil-studio?next=%2Fprofile';
+ const roomClients = new Set();
+ const roomPresence = new Map();
+ const roomConnections = new Map();
+@@ -64,7 +60,8 @@
+     expression: Number.parseInt(String(avatar.expression ?? '0'), 10) || 0,
+     proboscis: Number.parseInt(String(avatar.proboscis ?? '0'), 10) || 0,
+     hatId: Number.parseInt(String(avatar.hatId ?? '0'), 10) || 0,
+-    preferredRenderer: String(avatar.preferredRenderer || DEFAULT_AVATAR.preferredRenderer) === 'pixi' ? 'pixi' : 'svg'
++    hatColour: Number.parseInt(String(avatar.hatColour ?? avatar.hatColor ?? DEFAULT_AVATAR.hatColour), 10) || DEFAULT_AVATAR.hatColour,
++    preferredRenderer: ['pixi', 'html5-canvas'].includes(String(avatar.preferredRenderer || DEFAULT_AVATAR.preferredRenderer)) ? String(avatar.preferredRenderer || DEFAULT_AVATAR.preferredRenderer) : 'svg'
+   };
+ }
+ 
+@@ -77,6 +74,7 @@
+     || avatar.expression !== DEFAULT_AVATAR.expression
+     || avatar.proboscis !== DEFAULT_AVATAR.proboscis
+     || avatar.hatId !== DEFAULT_AVATAR.hatId
++    || avatar.hatColour !== DEFAULT_AVATAR.hatColour
+     || avatar.preferredRenderer !== DEFAULT_AVATAR.preferredRenderer
+   );
+ }
+@@ -808,6 +806,12 @@
+       return serveStatic(res, path.join(ROOT_DIR, 'public', pathname.slice(1)));
+     }
+ 
++    if (pathname === '/weevil-creator' || pathname.startsWith('/weevil-creator/')) {
++      const relative = pathname === '/weevil-creator' ? 'index.html' : pathname.slice('/weevil-creator/'.length);
++      const safePath = path.normalize(relative).replace(/^(\.\.[/\\])+/, '');
++      return serveStatic(res, path.join(ROOT_DIR, 'public', 'weevil-creator', safePath));
++    }
++
+     if (pathname.startsWith('/img/')) {
+       return serveStatic(res, path.join(ROOT_DIR, 'public', pathname.slice(1)));
+     }
+@@ -891,80 +895,18 @@
+     }
+ 
+     if (req.method === 'GET' && pathname === '/register') {
+-      const nextPath = parseNext(url, DEFAULT_POST_LOGIN_PATH);
+-      const formHtml = `
+-      <form action="/register" id="register-form" method="POST">
+-        <input type="hidden" name="next" value="${nextPath}">
+-        <div class="formContainer registerForm">
+-          <label class="mirror-field">
+-            <span>Username</span>
+-            <input autocomplete="off" class="userInput" name="username" type="text" maxlength="24" required>
+-          </label>
+-          <label class="mirror-field">
+-            <span>Email <small>(optional · no verification sent)</small></span>
+-            <input autocomplete="off" class="userInput" name="email" type="text" inputmode="email" maxlength="120" placeholder="anything@example.com">
+-          </label>
+-          <label class="mirror-field">
+-            <span>Password</span>
+-            <input class="passInput" name="password" type="password" minlength="6" required>
+-          </label>
+-          <label class="mirror-field">
+-            <span>Confirm password</span>
+-            <input class="passInput" name="confirmPassword" type="password" minlength="6" required>
+-          </label>
+-          <div class="loginBtn"><button class="mirror-submit" type="submit">Create mirror account</button></div>
+-        </div>
+-      </form>`;
+-      return send(res, 200, renderAuth({ mode: 'register', user: currentUserView, message: parseMessage(url), error: parseError(url), formHtml }));
++      if (currentUserView) return redirect(res, withFlash('/weevil-studio', { message: 'You are already signed in. Edit your existing weevil instead.', next: parseNext(url, DEFAULT_POST_LOGIN_PATH) }));
++      return send(res, 200, renderWeevilStudio({
++        user: null,
++        message: parseMessage(url),
++        error: parseError(url),
++        nextPath: parseNext(url, DEFAULT_POST_LOGIN_PATH),
++        mode: 'register'
++      }));
+     }
+ 
+     if (req.method === 'POST' && pathname === '/register') {
+-      if (!enforceSameOrigin(req, res, { redirectPath: '/register', message: 'This sign-up request did not come from the mirror site.' })) return;
+-      if (!rateLimitRedirect(req, res, 'register', '/register', 'Too many sign-up attempts from this connection. Try again in a few minutes.', 5, 15 * 60_000)) return;
+-      const form = await readBody(req);
+-      const username = String(form.get('username') || '').trim();
+-      const email = String(form.get('email') || '').trim().toLowerCase();
+-      const password = String(form.get('password') || '');
+-      const confirmPassword = String(form.get('confirmPassword') || '');
+-      const nextPath = safeNextPath(form.get('next'), DEFAULT_POST_LOGIN_PATH);
+-
+-      if (!validateUsername(username)) {
+-        return redirect(res, withFlash('/register', { error: 'Use 3-24 letters, numbers, underscores or hyphens.', next: nextPath }));
+-      }
+-      if (password.length < 6) {
+-        return redirect(res, withFlash('/register', { error: 'Use a password with at least 6 characters.', next: nextPath }));
+-      }
+-      if (password !== confirmPassword) {
+-        return redirect(res, withFlash('/register', { error: 'Passwords did not match.', next: nextPath }));
+-      }
+-      if (users.some((user) => user.username.toLowerCase() === username.toLowerCase())) {
+-        return redirect(res, withFlash('/register', { error: 'That mirror username is already taken.', next: nextPath }));
+-      }
+-      const passwordBits = hashPassword(password);
+-      const bootstrapAdmin = ensureAdminBootstrapForNewUser({ users, site, username });
+-      const nextUsers = [...users, {
+-        id: crypto.randomUUID(),
+-        username,
+-        email,
+-        role: bootstrapAdmin ? 'admin' : 'user',
+-        isMuted: false,
+-        isBanned: false,
+-        passwordSalt: passwordBits.salt,
+-        passwordHash: passwordBits.hash,
+-        bio: '',
+-        avatar: { ...DEFAULT_AVATAR },
+-        avatarConfigured: false,
+-        avatarUpdatedAt: '',
+-        createdAt: new Date().toISOString()
+-      }];
+-      writeJson(dataFile('users.json'), nextUsers);
+-
+-      const created = nextUsers.at(-1);
+-      createSession(ROOT_DIR, created, res);
+-      return redirect(res, withFlash('/weevil-studio', {
+-        message: bootstrapAdmin ? 'Mirror account created. You are the first admin on this site. Save your weevil first, then head into the chatroom.' : 'Mirror account created. First, save your weevil, then head into the chatroom.',
+-        next: nextPath
+-      }));
++      return redirect(res, withFlash('/register', { error: 'The legacy form is disabled. Use the HTML5 creator on this page instead.' }));
+     }
+ 
+     if (req.method === 'GET' && pathname === '/logout') {
+@@ -1018,12 +960,13 @@
+ 
+ 
+     if (req.method === 'GET' && pathname === '/weevil-studio') {
+-      if (!currentUserView) return redirect(res, withFlash('/login', { error: 'Sign in to open your weevil studio.', next: '/weevil-studio' }));
++      if (!currentUserView) return redirect(res, withFlash('/login', { error: 'Sign in to open your weevil creator.', next: '/weevil-studio' }));
+       return send(res, 200, renderWeevilStudio({
+         user: currentUserView,
+         message: parseMessage(url),
+         error: parseError(url),
+-        nextPath: parseNext(url, '/room')
++        nextPath: parseNext(url, '/profile'),
++        mode: 'edit'
+       }));
+     }
+ 
+@@ -1471,11 +1414,61 @@
+       return sendJson(res, 200, { ok: true, winnerUserId: match.winnerUserId });
+     }
+ 
++    if (req.method === 'GET' && pathname === '/api/session') {
++      return sendJson(res, 200, buildSessionState({
++        user: currentUserView,
++        mode: String(url.searchParams.get('mode') || 'view').trim() || 'view',
++        nextPath: parseNext(url, DEFAULT_POST_LOGIN_PATH)
++      }));
++    }
++
++    if (req.method === 'POST' && pathname === '/api/register-with-creator') {
++      if (currentUserView) return sendJson(res, 409, { ok: false, error: 'You are already signed in. Use edit mode instead.' });
++      if (!enforceSameOrigin(req, res, { asJson: true, message: 'This sign-up request did not come from the mirror site.' })) return;
++      if (!enforceRateLimit(req, res, 'register-creator', { limit: 5, windowMs: 15 * 60_000, message: 'Too many creator sign-up attempts. Try again in a few minutes.', asJson: true })) return;
++      const form = await readBody(req);
++      const username = String(form.get('username') || '').trim();
++      const email = String(form.get('email') || '').trim().toLowerCase();
++      const password = String(form.get('password') || '');
++      const passwordConfirm = String(form.get('passwordConfirm') || '');
++      const nextPath = safeNextPath(form.get('nextPath'), DEFAULT_POST_LOGIN_PATH);
++      const registrationError = validateRegistration({ username, email, password, passwordConfirm });
++      if (registrationError) return sendJson(res, 400, { ok: false, error: registrationError });
++      if (users.some((user) => user.username.toLowerCase() === username.toLowerCase())) {
++        return sendJson(res, 409, { ok: false, error: 'That mirror username is already taken.' });
++      }
++      const avatar = avatarPayloadFromForm(form, DEFAULT_AVATAR);
++      const avatarError = validateAvatarPayload(avatar);
++      if (avatarError) return sendJson(res, 400, { ok: false, error: avatarError });
++      const passwordBits = hashPassword(password);
++      const bootstrapAdmin = ensureAdminBootstrapForNewUser({ users, site, username });
++      const createdAt = new Date().toISOString();
++      const created = {
++        id: crypto.randomUUID(),
++        username,
++        email,
++        role: bootstrapAdmin ? 'admin' : 'user',
++        isMuted: false,
++        isBanned: false,
++        passwordSalt: passwordBits.salt,
++        passwordHash: passwordBits.hash,
++        bio: '',
++        avatar,
++        avatarConfigured: true,
++        avatarUpdatedAt: createdAt,
++        createdAt
++      };
++      writeJson(dataFile('users.json'), [...users, created]);
++      createSession(ROOT_DIR, created, res);
++      const redirectPath = withFlash(nextPath || '/profile', { message: bootstrapAdmin ? 'Account and weevil created. You are the first admin on this site.' : 'Account and weevil created.' });
++      return sendJson(res, 200, { ok: true, redirectPath, userId: created.id });
++    }
++
+     if (req.method === 'GET' && pathname === '/api/me/avatar') {
+       if (!currentUserView) return sendJson(res, 401, { ok: false, error: 'Sign in first.' });
+       return sendJson(res, 200, {
+         ok: true,
+-        avatar: currentUserView.avatar || {},
++        avatar: normaliseAvatar(currentUserView.avatar || {}, DEFAULT_AVATAR),
+         avatarConfigured: hasCustomAvatarSetup(currentUserView)
+       });
+     }
+@@ -1485,18 +1478,11 @@
+       if (!enforceSameOrigin(req, res, { asJson: true, message: 'This request did not come from the mirror site.' })) return;
+       if (!enforceRateLimit(req, res, 'avatar-save', { limit: 25, windowMs: 5 * 60_000, message: 'Avatar saves are being rate-limited for a moment.', asJson: true })) return;
+       const form = await readBody(req);
+-      const avatar = {
+-        weevilDef: String(form.get('weevilDef') || '').trim(),
+-        expression: Number.parseInt(String(form.get('expression') || '0'), 10) || 0,
+-        proboscis: Number.parseInt(String(form.get('proboscis') || '0'), 10) || 0,
+-        hatId: Number.parseInt(String(form.get('hatId') || '0'), 10) || 0,
+-        preferredRenderer: String(form.get('preferredRenderer') || 'svg').trim() === 'pixi' ? 'pixi' : 'svg'
+-      };
+-      if (!/^\d{18}$/.test(avatar.weevilDef)) {
+-        return sendJson(res, 400, { ok: false, error: 'Compact WeevilDef must be 18 digits.' });
+-      }
+-      if (avatar.expression < 0 || avatar.expression > 6 || avatar.proboscis < 0 || avatar.proboscis > 4 || avatar.hatId < 0 || avatar.hatId > 12) {
+-        return sendJson(res, 400, { ok: false, error: 'Avatar payload was out of range.' });
++      const nextPath = safeNextPath(form.get('nextPath'), '/profile');
++      const avatar = avatarPayloadFromForm(form, currentUserView.avatar || DEFAULT_AVATAR);
++      const avatarError = validateAvatarPayload(avatar);
++      if (avatarError) {
++        return sendJson(res, 400, { ok: false, error: avatarError });
+       }
+       const updatedAt = new Date().toISOString();
+       const nextUsers = users.map((user) => user.id === currentUserView.id ? {
+@@ -1513,7 +1499,13 @@
+         roomPresence.set(currentUserView.id, activePresence);
+         broadcastRoom();
+       }
+-      return sendJson(res, 200, { ok: true, avatar, avatarConfigured: true, avatarUpdatedAt: updatedAt });
++      return sendJson(res, 200, {
++        ok: true,
++        avatar,
++        avatarConfigured: true,
++        avatarUpdatedAt: updatedAt,
++        redirectPath: withFlash(nextPath || '/profile', { message: 'Weevil saved.' })
++      });
+     }
+ 
+     if (req.method === 'GET' && pathname === '/admin') {
+--- orig/lib/render.mjs	2026-03-31 15:13:22.000000000 +0000
++++ bw/lib/render.mjs	2026-04-01 12:42:33.111908230 +0000
+@@ -123,7 +123,7 @@
+           </ul>
+         </div>
+         <div class="col-sm-8 col-xs-12">
+-          <a class="pull-left footer-ltd" style="float:left">Bin Weevils Rewritten Mirror 2026 · independent fan mirror · downloads, site tools and chatroom</a>
++          <a class="pull-left footer-ltd" style="float:left">Bin Weevils Rewritten Mirror 2026 · independent fan mirror · downloads, account tools and HTML5 weevil creator</a>
+         </div>
+       </div>
+     </div>
+@@ -158,8 +158,8 @@
+   `).join('');
+ 
+   const accountLine = user
+-    ? `<div class="home-user-note">Signed in as <strong>${escapeHtml(user.username)}</strong>. Open your <a href="/profile">profile</a>, jump into <a href="/weevil-studio?next=%2Froom">Weevil Studio</a>, or head straight for the <a href="/room">chatroom</a>.</div>`
+-    : `<div class="home-user-note">Mirror accounts are for comments, saved weevils, and the chatroom. Game login still happens in the client.</div>`;
++    ? `<div class="home-user-note">Signed in as <strong>${escapeHtml(user.username)}</strong>. Open your <a href="/profile">account</a> or jump straight into the <a href="/weevil-studio?next=%2Fprofile">HTML5 weevil creator</a>.</div>`
++    : `<div class="home-user-note">Mirror accounts are for comments, saved weevils, account tools, and the new HTML5 creator flow. Game login still happens in the client.</div>`;
+ 
+   return shell({
+     title: 'Bin Weevils Rewritten Mirror',
+@@ -187,7 +187,7 @@
+     <img src="${asset('binweevils.app/assetsHome/images/mainImage0.png__ver=1')}" alt="">
+     <div class="home-overlay-card">
+       <h1>Bin Weevils Rewritten Mirror</h1>
+-      <p>This mirror is a separate fan-run site for downloads, mirrored news, Weevil Studio and the chatroom, with the website flow kept easy to understand for testers.</p>
++      <p>This mirror is a separate fan-run site for downloads, mirrored news, account pages and the HTML5 Weevil creator flow, with the website shell kept easy to understand for testers.</p>
+       <p>This site is <strong>not</strong> the main Bin Weevils Rewritten game service. The actual game login still happens through the client, while this mirror handles website features only.</p>
+       <div class="home-cta-row">
+         <a class="mirror-pill" href="/downloads">Download client</a>
+@@ -207,7 +207,7 @@
+   <div class="shopWhatsNew">
+     <img src="${asset('binweevils.app/assetsHome/images/ShopWhatsNew_BG.png')}" alt="">
+     <div class="whatsNewBlog"><a href="/news"><img class="clickBtn" src="${asset('binweevils.app/assetsHome/images/WhatsNew_Up.png')}" alt="What's New"></a></div>
+-    <div class="bwDesc">Built from mirrored source files with targeted cleanup so downloads, mirrored news, Weevil Studio and the chatroom all make sense as one separate mirror-side website.</div>
++    <div class="bwDesc">Built from mirrored source files with targeted cleanup so downloads, mirrored news, account pages and the HTML5 creator all make sense as one separate mirror-side website.</div>
+   </div>
+ 
+   <section class="home-latest-strip">
+@@ -229,7 +229,7 @@
+       <a href="/rules">Rules</a> |
+       <a href="/news">News</a>
+     </div>
+-    <div class="copyright">Bin Weevils Rewritten Mirror 2026 · separate website for downloads, profiles, weevils and chatroom</div>
++    <div class="copyright">Bin Weevils Rewritten Mirror 2026 · separate website for downloads, profiles, news and the HTML5 weevil creator</div>
+   </div>
+ </div>`
+   });
+@@ -238,13 +238,13 @@
+ function renderAuth({ mode, user, message, error, formHtml }) {
+   const leftHeading = mode === 'login' ? 'Sign in to the mirror site' : 'Make a mirror-site account';
+   const leftCopy = mode === 'login'
+-    ? 'This sign-in is only for the mirror website. Use it for comments, your profile, your saved weevil and the chatroom. It is not the main game login.'
++    ? 'This sign-in is only for the mirror website. Use it for comments, your profile, your saved weevil and the HTML5 creator flow. It is not the main game login.'
+     : 'This keeps the original page style, but the account it creates is only for this mirror website. It does not connect to the game client or replace the main Bin Weevils Rewritten account flow.';
+   const art = mode === 'login'
+     ? asset('binweevils.app/assets/login/images/returning_player.png')
+     : asset('binweevils.app/assets/login/images/new_player-up.png');
+   const flowLinks = mode === 'login'
+-    ? `<div class="auth-flow-box"><h2>After sign-in</h2><p>You can open your <strong>Weevil Studio</strong> straight away, then head into the <strong>chatroom</strong> with the same mirror account.</p><div class="auth-side-links auth-side-links-stack"><a class="mirror-pill" href="/weevil-studio?next=%2Froom">Open Weevil Studio</a><a class="mirror-pill mirror-pill-alt" href="/room">Open Chat Room</a></div></div>`
++    ? `<div class="auth-flow-box"><h2>After sign-in</h2><p>You can open the <strong>HTML5 Weevil Creator</strong> straight away, save your weevil into your account, and come back later without another auth prompt.</p><div class="auth-side-links auth-side-links-stack"><a class="mirror-pill" href="/weevil-studio?next=%2Fprofile">Open Weevil Creator</a><a class="mirror-pill mirror-pill-alt" href="/profile">Open account</a></div></div>`
+     : `<div class="auth-flow-box"><h2>After registration</h2><p>The flow stays simple: make the account, save your weevil once, then head into the room.</p></div>`;
+ 
+   return shell({
+@@ -272,7 +272,7 @@
+         ${flowLinks}
+         <div class="discord auth-side-box">
+           <h2>Quick reminder</h2>
+-          <p>This is a separate mirror website for downloads, mirrored posts, saved weevils and the chatroom. It is here to support testing and site features without pretending to be the main game website.</p>
++          <p>This is a separate mirror website for downloads, mirrored posts, saved weevils and the new HTML5 creator flow. It is here to support testing and site features without pretending to be the main game website.</p>
+         </div>
+       </div>
+       <div class="newWeevil">
+@@ -336,13 +336,13 @@
+   <a href="/downloads">Downloads</a>
+   <a href="/news">News</a>
+   <a href="/community">Community</a>
+-  <a href="/weevil-studio">Weevil Studio</a>
+-  <a href="/room">Chat Room</a>
++  <a href="/weevil-studio?next=%2Fprofile">Weevil Creator</a>
++  ${user ? '<a href="/profile">Account</a>' : '<a href="/register">Register</a>'}
+   ${user?.isAdmin ? '<a href="/admin">Admin</a>' : ''}
+   <a href="/hall-of-shame">Hall of Shame</a>
+   <a href="/about">About</a>
+   <a href="/rules">Rules</a>
+-  <a href="${user ? '/profile' : '/login'}">${user ? 'Profile' : 'Login'}</a>
++  <a href="${user ? '/logout' : '/login'}">${user ? 'Logout' : 'Login'}</a>
+ </nav>`;
+ }
+ 
+@@ -501,7 +501,7 @@
+     </li>`).join('');
+   const avatarRecord = user.avatar || {};
+   const avatarReady = Boolean(user.avatarConfigured || user.avatarUpdatedAt);
+-  const nextStudioHref = '/weevil-studio?next=%2Froom';
++  const nextStudioHref = '/weevil-studio?next=%2Fprofile';
+   const content = `
+     ${flashBox(error, 'error')}
+     ${flashBox(message, 'success')}
+@@ -510,9 +510,9 @@
+         <h2>${escapeHtml(user.username)}</h2>
+         <p><strong>Joined:</strong> ${escapeHtml(formatLongDate(user.createdAt.slice(0, 10)))}</p>
+         <div class="mirror-flow-note">
+-          <h3>Mirror flow</h3>
+-          <p><strong>1.</strong> Sign in. <strong>2.</strong> Make or tweak your weevil in the studio. <strong>3.</strong> Save it to your mirror profile. <strong>4.</strong> Jump into the chatroom.</p>
+-          <p>${avatarReady ? 'Your weevil has been saved at least once, so the room is unlocked.' : 'You have not saved a weevil yet, so the room still sends you through the studio first.'}</p>
++          <h3>Account → creator flow</h3>
++          <p><strong>1.</strong> Sign in. <strong>2.</strong> Open the HTML5 creator. <strong>3.</strong> Save your weevil back into this account.</p>
++          <p>${avatarReady ? 'Your creator-backed weevil is already saved and can be edited in-place.' : 'You have not saved a weevil yet, so the account still needs its first creator save.'}</p>
+         </div>
+         <form method="post" action="/profile" class="profile-form">
+           <label for="bio">Profile bio</label>
+@@ -520,12 +520,18 @@
+           <button type="submit" class="mirror-pill">Save profile</button>
+         </form>
+       </div>
+-      <aside class="mirror-profile-avatar-box">
+-        <h3>Weevil avatar</h3>
+-        <div class="mirror-profile-avatar-stage" data-avatar-profile-preview data-avatar-record='${serialiseDatasetJson(avatarRecord)}'></div>
+-        <p class="panel-intro">This preview uses the current HTML5 weevil renderer that powers your saved profile and room avatar.</p>
+-        <p><a class="mirror-pill" href="${nextStudioHref}">${avatarReady ? 'Edit Weevil Studio' : 'Create your weevil first'}</a></p>
+-        <p><a class="mirror-pill mirror-pill-alt" href="/room">Enter Chatroom</a></p>
++      <aside class="mirror-profile-avatar-box profile-avatar-summary">
++        <h3>Saved creator data</h3>
++        <dl>
++          <dt>Weevil def</dt><dd>${escapeHtml(String(avatarRecord.weevilDef || 'Not saved yet'))}</dd>
++          <dt>Expression</dt><dd>${escapeHtml(String(avatarRecord.expression ?? 0))}</dd>
++          <dt>Proboscis</dt><dd>${escapeHtml(String(avatarRecord.proboscis ?? 0))}</dd>
++          <dt>Hat</dt><dd>${escapeHtml(String(avatarRecord.hatId ?? 0))}</dd>
++          <dt>Hat colour</dt><dd>${escapeHtml(String(avatarRecord.hatColour ?? avatarRecord.hatColor ?? 'n/a'))}</dd>
++          <dt>Saved</dt><dd>${user.avatarUpdatedAt ? escapeHtml(formatLongDate(user.avatarUpdatedAt.slice(0, 10))) : 'Not saved yet'}</dd>
++        </dl>
++        <p class="panel-intro">This account now uses the new HTML5 creator as the source of truth for weevil creation and editing.</p>
++        <p><a class="mirror-pill" href="${nextStudioHref}">${avatarReady ? 'Edit my weevil' : 'Create your weevil'}</a></p>
+       </aside>
+     </section>
+     <section class="info-box">
+@@ -537,37 +543,46 @@
+   return pagePanelLayout({
+     user,
+     title: 'Profile',
+-    intro: 'Your mirror profile lives here. It stays separate from the actual game login.',
+-    sidebarTitle: 'Profile',
++    intro: 'Your mirror account lives here, with the HTML5 weevil creator wired directly into your saved session.',
++    sidebarTitle: 'Account',
+     sidebar: sidebarNav(user) + `<div class="sidebar-note">Signed in as <strong>${escapeHtml(user.username)}</strong> · <a href="/logout">log out</a></div>`,
+     content,
+-    moduleScripts: ['/js/avatar-studio/profile-avatar.js']
++    styles: ['/css/creator-shell.css']
+   });
+ }
+ 
+-function renderWeevilStudio({ user, message = '', error = '', nextPath = '/room' }) {
+-  const avatarReady = Boolean(user.avatarConfigured || user.avatarUpdatedAt);
++function renderWeevilStudio({ user, message = '', error = '', nextPath = '/profile', mode = 'edit' }) {
++  const isRegister = mode === 'register';
++  const framePath = `/weevil-creator/index.html?mode=${isRegister ? 'register' : 'edit'}&next=${encodeURIComponent(nextPath || '/profile')}`;
+   const content = `
+     ${flashBox(error, 'error')}
+     ${flashBox(message, 'success')}
+-    <div class="info-box mirror-studio-flow-box">
+-      <h2>Register → Weevil Studio → Chatroom</h2>
+-      <p>This is where you make the weevil used on your profile and in the chatroom. Save it here, then carry on into the room.</p>
+-      <p>${avatarReady ? 'Your avatar has already been saved before, so you can tweak it and jump back into the room whenever you want.' : 'Your room avatar is not locked in yet. Save it once here to finish setup.'}</p>
++    <div class="creator-shell-wrap">
++      <section class="creator-flow-card">
++        <h2>${isRegister ? 'Register through the creator' : 'Edit my weevil'}</h2>
++        <p>${isRegister
++          ? 'The old registration form has been replaced. The HTML5 creator is now the actual sign-up and character-creation flow for new accounts.'
++          : 'The legacy editor has been replaced. This HTML5 creator now edits the weevil already attached to your signed-in mirror account.'}</p>
++      </section>
++      <section class="creator-frame-shell">
++        <iframe class="creator-frame" data-creator-frame src="${framePath}" title="HTML5 Weevil Creator"></iframe>
++      </section>
+     </div>
+-    <div id="weevilStudioApp" data-avatar-record='${serialiseDatasetJson(user.avatar || {})}' data-after-save-path="${escapeHtml(nextPath)}" data-avatar-configured="${avatarReady ? '1' : '0'}"></div>
+-    <noscript>This page needs JavaScript enabled.</noscript>
+   `;
+ 
+   return pagePanelLayout({
+     user,
+-    title: 'Weevil Studio',
+-    intro: 'HTML5 avatar editor for your mirror profile and chatroom avatar. Saved changes stay on this website only.',
+-    sidebarTitle: 'Avatar Studio',
+-    sidebar: sidebarNav(user) + `<div class="sidebar-note">Signed in as <strong>${escapeHtml(user.username)}</strong>. Saves go to your mirror profile and chatroom avatar, not the game client.</div>`,
++    title: isRegister ? 'Register' : 'Weevil Creator',
++    intro: isRegister
++      ? 'BW Find4 stays as the site shell, while the new HTML5 creator now handles the real registration and weevil-creation flow.'
++      : 'This creator runs inside the site account/session shell and saves directly back into the logged-in account.',
++    sidebarTitle: isRegister ? 'New account flow' : 'Creator',
++    sidebar: sidebarNav(user) + `<div class="sidebar-note creator-sidebar-note">${isRegister
++      ? 'Create the account and the weevil in one step. No separate legacy registration form is used any more.'
++      : `Signed in as <strong>${escapeHtml(user?.username || '')}</strong>. The creator loads your saved session state directly.`}</div>`,
+     content,
+-    styles: ['/css/avatar-studio.css'],
+-    scripts: ['/js/avatar-studio/standalone.js'],
++    styles: ['/css/creator-shell.css'],
++    scripts: ['/js/creator-host.js'],
+     bodyClass: 'panel-page weevil-studio-page'
+   });
+ }
+--- /dev/null	2026-04-01 11:59:17.672869411 +0000
++++ bw/lib/services/creator-service.mjs	2026-04-01 12:35:59.114350391 +0000
+@@ -0,0 +1,85 @@
++const DEFAULT_AVATAR = Object.freeze({
++  weevilDef: '401135129001323200',
++  expression: 0,
++  proboscis: 0,
++  hatId: 0,
++  hatColour: 7620096,
++  preferredRenderer: 'html5-canvas'
++});
++
++function clampInt(value, min, max, fallback = min) {
++  const parsed = Number.parseInt(String(value ?? ''), 10);
++  if (Number.isNaN(parsed)) return fallback;
++  return Math.min(max, Math.max(min, parsed));
++}
++
++export function defaultAvatar() {
++  return { ...DEFAULT_AVATAR };
++}
++
++export function normaliseAvatar(input = {}, fallback = DEFAULT_AVATAR) {
++  const base = { ...DEFAULT_AVATAR, ...(fallback || {}) };
++  const weevilDef = /^\d{18}$/.test(String(input.weevilDef || '').trim())
++    ? String(input.weevilDef).trim()
++    : String(base.weevilDef);
++  return {
++    weevilDef,
++    expression: clampInt(input.expression, 0, 6, base.expression),
++    proboscis: clampInt(input.proboscis, 0, 4, base.proboscis),
++    hatId: clampInt(input.hatId, 0, 12, base.hatId),
++    hatColour: clampInt(input.hatColour ?? input.hatColor, 0, 16777215, base.hatColour),
++    preferredRenderer: ['svg', 'pixi', 'html5-canvas'].includes(String(input.preferredRenderer || '').trim())
++      ? String(input.preferredRenderer).trim()
++      : String(base.preferredRenderer || DEFAULT_AVATAR.preferredRenderer)
++  };
++}
++
++export function avatarPayloadFromForm(form, fallback = DEFAULT_AVATAR) {
++  return normaliseAvatar({
++    weevilDef: form.get('weevilDef'),
++    expression: form.get('expression'),
++    proboscis: form.get('proboscis'),
++    hatId: form.get('hatId'),
++    hatColour: form.get('hatColour') ?? form.get('hatColor'),
++    preferredRenderer: form.get('preferredRenderer')
++  }, fallback);
++}
++
++export function validateAvatarPayload(avatar = {}) {
++  if (!/^\d{18}$/.test(String(avatar.weevilDef || ''))) {
++    return 'Compact WeevilDef must be 18 digits.';
++  }
++  if (!Number.isInteger(Number(avatar.expression)) || avatar.expression < 0 || avatar.expression > 6) {
++    return 'Expression value was out of range.';
++  }
++  if (!Number.isInteger(Number(avatar.proboscis)) || avatar.proboscis < 0 || avatar.proboscis > 4) {
++    return 'Proboscis value was out of range.';
++  }
++  if (!Number.isInteger(Number(avatar.hatId)) || avatar.hatId < 0 || avatar.hatId > 12) {
++    return 'Hat value was out of range.';
++  }
++  if (!Number.isInteger(Number(avatar.hatColour)) || avatar.hatColour < 0 || avatar.hatColour > 16777215) {
++    return 'Hat colour value was out of range.';
++  }
++  return '';
++}
++
++export function validateRegistration({ username = '', email = '', password = '', passwordConfirm = '' } = {}) {
++  const cleanUsername = String(username || '').trim();
++  const cleanEmail = String(email || '').trim();
++  const cleanPassword = String(password || '');
++  const cleanPasswordConfirm = String(passwordConfirm || '');
++  if (!/^[a-zA-Z0-9_-]{3,24}$/.test(cleanUsername)) {
++    return 'Use 3-24 letters, numbers, underscores or hyphens.';
++  }
++  if (!cleanEmail || !cleanEmail.includes('@') || cleanEmail.length > 120) {
++    return 'Enter a valid email address.';
++  }
++  if (cleanPassword.length < 6) {
++    return 'Use a password with at least 6 characters.';
++  }
++  if (cleanPasswordConfirm && cleanPassword !== cleanPasswordConfirm) {
++    return 'Passwords did not match.';
++  }
++  return '';
++}
+--- /dev/null	2026-04-01 11:59:17.672869411 +0000
++++ bw/lib/services/session-state.mjs	2026-04-01 12:35:59.127005417 +0000
+@@ -0,0 +1,19 @@
++import { normaliseAvatar } from './creator-service.mjs';
++
++export function buildSessionState({ user = null, mode = 'view', nextPath = '/profile' } = {}) {
++  const avatarConfigured = Boolean(user && (user.avatarConfigured || user.avatarUpdatedAt));
++  return {
++    ok: true,
++    authenticated: Boolean(user),
++    mode,
++    nextPath,
++    user: user ? {
++      id: user.id,
++      username: user.username,
++      email: user.email || '',
++      role: user.role || 'user'
++    } : null,
++    avatar: normaliseAvatar(user?.avatar || {}),
++    avatarConfigured
++  };
++}
+--- /dev/null	2026-04-01 11:59:17.672869411 +0000
++++ bw/public/css/creator-shell.css	2026-04-01 12:39:36.340946785 +0000
+@@ -0,0 +1,69 @@
++.creator-shell-wrap {
++  display: grid;
++  gap: 18px;
++}
++
++.creator-flow-card {
++  background: rgba(255,255,255,0.9);
++  border: 1px solid rgba(70, 96, 160, 0.18);
++  border-radius: 18px;
++  padding: 18px 20px;
++  box-shadow: 0 12px 32px rgba(30, 60, 120, 0.08);
++}
++
++.creator-flow-card h2 {
++  margin: 0 0 8px;
++}
++
++.creator-flow-card p {
++  margin: 0;
++}
++
++.creator-frame-shell {
++  background: linear-gradient(180deg, #e9eef8 0%, #dfe7f4 100%);
++  border: 1px solid rgba(49, 79, 140, 0.18);
++  border-radius: 22px;
++  padding: 14px;
++  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 16px 40px rgba(20, 42, 88, 0.1);
++}
++
++.creator-frame {
++  display: block;
++  width: 100%;
++  min-height: 920px;
++  border: 0;
++  border-radius: 16px;
++  background: #177129;
++  opacity: 0;
++  transition: opacity 120ms ease-in;
++}
++
++.creator-frame.is-ready {
++  opacity: 1;
++}
++
++.creator-sidebar-note {
++  font-size: 14px;
++  line-height: 1.5;
++}
++
++.profile-avatar-summary {
++  display: grid;
++  gap: 12px;
++}
++
++.profile-avatar-summary dl {
++  display: grid;
++  grid-template-columns: 140px 1fr;
++  gap: 8px 12px;
++  margin: 0;
++}
++
++.profile-avatar-summary dt {
++  font-weight: 700;
++}
++
++.profile-avatar-summary dd {
++  margin: 0;
++  word-break: break-word;
++}
+--- /dev/null	2026-04-01 11:59:17.672869411 +0000
++++ bw/public/js/creator-host.js	2026-04-01 12:39:36.330772801 +0000
+@@ -0,0 +1,15 @@
++const frames = Array.from(document.querySelectorAll('[data-creator-frame]'));
++
++window.addEventListener('message', (event) => {
++  if (event.origin !== window.location.origin) return;
++  const data = event.data || {};
++  if (data.type === 'creator:navigate' && typeof data.href === 'string' && data.href.startsWith('/')) {
++    window.location.href = data.href;
++  }
++});
++
++frames.forEach((frame) => {
++  frame.addEventListener('load', () => {
++    frame.classList.add('is-ready');
++  });
++});
+--- /dev/null	2026-04-01 11:59:17.672869411 +0000
++++ bw/public/weevil-creator/src/main.js	2026-04-01 12:38:25.529625249 +0000
+@@ -0,0 +1,710 @@
++import { loadAtlasMap, loadImage } from "./runtime/canvasAtlasLoader.js";
++import { clrs1, clrs2, getDefObj, getDefStr, intToHex } from "./runtime/WeevilDef.js";
++import { WeevilCanvasRenderer } from "./runtime/WeevilCanvasRenderer.js";
++
++const canvas = document.querySelector("#weevilCanvas");
++const stageArea = document.querySelector("#viewer");
++const statusEl = document.querySelector("#statusBar");
++const selectorPanel = document.querySelector("#selectorPanel");
++const typeGrid = document.querySelector("#typeGrid");
++const colorTools = document.querySelector("#colorTools");
++const paletteGrid = document.querySelector("#paletteGrid");
++const panelHint = document.querySelector("#panelHint");
++const hexColorText = document.querySelector("#hexColorText");
++const applyHexBtn = document.querySelector("#applyHexBtn");
++const categoryButtons = Array.from(document.querySelectorAll('.category-btn[data-category]'));
++const randomizeBtn = document.querySelector("#randomizeBtn");
++const defEditorBtn = document.querySelector("#defEditorBtn");
++const defEditor = document.querySelector("#defEditor");
++const defInput = document.querySelector("#defInput");
++const applyDefBtn = document.querySelector("#applyDefBtn");
++const spinLeftBtn = document.querySelector("#spinLeft");
++const spinRightBtn = document.querySelector("#spinRight");
++const signupCta = document.querySelector("#signupCta");
++const signupModal = document.querySelector("#signupModal");
++const closeSignupBtn = document.querySelector("#closeSignup");
++const confirmSignupBtn = document.querySelector("#confirmSignup");
++const lookCodeEl = document.querySelector("#lookCode");
++const signupNameEl = document.querySelector("#signupName");
++const signupEmailEl = document.querySelector("#signupEmail");
++const signupPasswordEl = document.querySelector("#signupPassword");
++const signupTitleEl = document.querySelector("#signupTitle");
++const signupBlurbEl = signupTitleEl?.nextElementSibling;
++const urlParams = new URLSearchParams(window.location.search);
++const creatorMode = urlParams.get("mode") === "edit" ? "edit" : "register";
++const nextPath = (() => {
++  const raw = String(urlParams.get("next") || "/profile").trim();
++  return raw.startsWith("/") && !raw.startsWith("//") ? raw : "/profile";
++})();
++
++const demoBaseUrl = new URL("../", import.meta.url).href.replace(/\/$/, "");
++const [atlases, upperLegImage, lowerLegImage, lowerLegStripyImage] = await Promise.all([
++  loadAtlasMap(demoBaseUrl),
++  loadImage(`${demoBaseUrl}/assets/raw/misc/upper_leg.png`),
++  loadImage(`${demoBaseUrl}/assets/raw/misc/lower_leg.png`),
++  loadImage(`${demoBaseUrl}/assets/raw/misc/lower_leg_stripy.png`),
++]);
++
++const renderer = new WeevilCanvasRenderer(
++  canvas,
++  atlases,
++  new Map([
++    ["upper_leg.png", upperLegImage],
++    ["lower_leg.png", lowerLegImage],
++    ["lower_leg_stripy.png", lowerLegStripyImage],
++  ]),
++);
++
++const BODY_SWATCHES = [
++  clrs1[0], clrs1[1], clrs1[2], clrs1[27], clrs1[10],
++  clrs1[5], clrs1[40], clrs1[7], clrs1[8], clrs1[19],
++  clrs1[37], clrs1[46], clrs1[11], clrs1[12], clrs1[13],
++  clrs1[20], clrs1[14], clrs1[15], clrs1[16], clrs1[17],
++  clrs1[21], clrs1[29], clrs1[18], clrs1[33], clrs1[48],
++];
++
++const EYE_SWATCHES = [
++  clrs2[30], clrs2[1], clrs2[41], clrs2[31], clrs2[43],
++  clrs2[19], clrs2[4], clrs2[2], clrs2[20], clrs2[16],
++  clrs2[0], clrs2[14], clrs2[21], clrs2[55], clrs2[57],
++];
++
++const ANTENNA_OPTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
++const LEG_OPTIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
++const HAT_OPTIONS = [0, 1];
++const DEF_EDITOR_CATEGORY = "def";
++
++const CATEGORY_CONFIG = {
++  head: {
++    label: "Head",
++    typeKey: "ht",
++    colorKey: "hc",
++    palette: BODY_SWATCHES,
++    options: [1, 2, 3, 4],
++    hint: "",
++  },
++  body: {
++    label: "Body",
++    typeKey: "bt",
++    colorKey: "bc",
++    palette: BODY_SWATCHES,
++    options: [1, 2, 3, 4],
++    hint: "",
++  },
++  eyes: {
++    label: "Eyes",
++    typeKey: "et",
++    colorKey: "ec",
++    palette: EYE_SWATCHES,
++    options: [1, 2, 3, 4, 5, 6],
++    hint: "",
++  },
++  antenna: {
++    label: "Antenna",
++    typeKey: "at",
++    colorKey: "ac",
++    palette: BODY_SWATCHES,
++    options: ANTENNA_OPTIONS,
++    hint: "",
++  },
++  hats: {
++    label: "Hats",
++    typeKey: "hat",
++    colorKey: "hatc",
++    palette: BODY_SWATCHES,
++    options: HAT_OPTIONS,
++    hint: "",
++  },
++  legs: {
++    label: "Legs",
++    typeKey: "lt",
++    colorKey: "lc",
++    palette: BODY_SWATCHES,
++    options: LEG_OPTIONS,
++    hint: "",
++  },
++};
++
++let currentCategory = "body";
++let expressionIndex = 0;
++let currentPitch = 16;
++let currentYaw = 302;
++let renderQueued = false;
++let currentProboscis = 0;
++let currentPreferredRenderer = "html5-canvas";
++
++let currentDefObj = getDefObj("100100100040000000");
++currentDefObj = {
++  ...currentDefObj,
++  ht: "2",
++  hc: clrs1[20],
++  bt: "1",
++  bc: clrs1[13],
++  et: "1",
++  ec: clrs2[30],
++  at: "05",
++  ac: clrs1[14],
++  hat: "0",
++  hatc: clrs1[27],
++  lc: clrs1[15],
++  lt: "00",
++};
++
++renderer.autoRotate = false;
++
++function resizeRenderer() {
++  const rect = stageArea.getBoundingClientRect();
++  renderer.resize(rect.width, rect.height);
++  queueRender();
++}
++
++window.addEventListener("resize", resizeRenderer);
++if (typeof ResizeObserver !== "undefined") {
++  const resizeObserver = new ResizeObserver(() => resizeRenderer());
++  resizeObserver.observe(stageArea);
++}
++
++function queueRender() {
++  if (renderQueued) return;
++  renderQueued = true;
++  requestAnimationFrame(() => {
++    renderQueued = false;
++    renderer.setDefinition(structuredClone(currentDefObj), { expressionIndex });
++    renderer.setView(currentPitch, currentYaw);
++    renderer.render();
++  });
++}
++
++function setStatus(message) {
++  statusEl.textContent = message;
++  lookCodeEl.textContent = getDefStr(currentDefObj);
++}
++
++function formatTypeValue(category, value) {
++  if (category === "antenna") return String(Number(value)).padStart(2, "0");
++  if (category === "legs") return String(Number(value)).padStart(2, "0");
++  if (category === "hats") return String(Number(value));
++  return String(Number(value));
++}
++
++function getCurrentValue(key) {
++  return Number(currentDefObj[key]);
++}
++
++function randomChoice(values) {
++  return values[Math.floor(Math.random() * values.length)];
++}
++
++function randomizeWeevil() {
++  Object.entries(CATEGORY_CONFIG).forEach(([category, config]) => {
++    currentDefObj[config.typeKey] = formatTypeValue(category, randomChoice(config.options));
++    currentDefObj[config.colorKey] = Number(randomChoice(config.palette));
++  });
++  expressionIndex = Math.floor(Math.random() * 7);
++}
++
++function normalizeHex(value) {
++  const cleaned = String(value || "").trim().replace(/^#/, "");
++  if (!/^[0-9a-fA-F]{6}$/.test(cleaned)) return null;
++  return `#${cleaned.toLowerCase()}`;
++}
++
++function hexToInt(hex) {
++  return Number.parseInt(hex.slice(1), 16);
++}
++
++function syncColorInputs(category = currentCategory) {
++  const config = CATEGORY_CONFIG[category];
++  if (!config) return;
++  const hex = intToHex(Number(currentDefObj[config.colorKey]) || 0).toUpperCase();
++  hexColorText.value = hex;
++}
++
++function applyCurrentHexColor() {
++  const config = CATEGORY_CONFIG[currentCategory];
++  if (!config) return;
++  const normalizedHex = normalizeHex(hexColorText.value);
++  if (!normalizedHex) {
++    syncColorInputs(currentCategory);
++    setStatus("Enter a valid 6-digit hex colour like #A1B2C3.");
++    return;
++  }
++
++  hexColorText.value = normalizedHex.toUpperCase();
++  currentDefObj[config.colorKey] = hexToInt(normalizedHex);
++  renderPalette(currentCategory);
++  queueRender();
++  setStatus(`${config.label} colour updated.`);
++}
++
++function svgWrap(inner, viewBox = "0 0 100 72") {
++  return `<svg viewBox="${viewBox}" aria-hidden="true" focusable="false">${inner}</svg>`;
++}
++
++function shapeIcon(value) {
++  const fill = "#f4f4f4";
++  const stroke = "#9f9f9f";
++  if (value === 1) {
++    return svgWrap(`<ellipse cx="50" cy="36" rx="24" ry="22" fill="${fill}" stroke="${stroke}" stroke-width="4" />`);
++  }
++  if (value === 2) {
++    return svgWrap(`<path d="M50 10 L76 58 Q78 64 71 64 H29 Q22 64 24 58 Z" fill="${fill}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round" />`);
++  }
++  if (value === 3) {
++    return svgWrap(`<path d="M22 14 H78 Q84 14 81 21 L60 61 Q57 66 50 66 Q43 66 40 61 L19 21 Q16 14 22 14 Z" fill="${fill}" stroke="${stroke}" stroke-width="4" stroke-linejoin="round" />`);
++  }
++  return svgWrap(`<rect x="23" y="12" width="54" height="50" rx="12" ry="12" fill="${fill}" stroke="${stroke}" stroke-width="4" />`);
++}
++
++function eyeIcon(value) {
++  const irisOffsets = {
++    1: [40, 60],
++    2: [33, 67],
++    3: [45, 55],
++    4: [50, 50],
++    5: [28, 72],
++    6: [18, 82],
++  };
++  const [leftIris, rightIris] = irisOffsets[value] || irisOffsets[1];
++  return svgWrap(`
++    <ellipse cx="32" cy="36" rx="20" ry="16" fill="#ffffff" stroke="#9f9f9f" stroke-width="4" />
++    <ellipse cx="68" cy="36" rx="20" ry="16" fill="#ffffff" stroke="#9f9f9f" stroke-width="4" />
++    <circle cx="${leftIris}" cy="36" r="5" fill="#7ab800" />
++    <circle cx="${rightIris}" cy="36" r="5" fill="#7ab800" />
++    <circle cx="${leftIris}" cy="36" r="2.5" fill="#111111" />
++    <circle cx="${rightIris}" cy="36" r="2.5" fill="#111111" />
++  `);
++}
++
++function antennaIcon(value) {
++  const grey = "#8e8e8e";
++  const ball = "#f0f0f0";
++  const stalk = (x1, y1, x2, y2) => `<path d="M${x1} ${y1} Q ${(x1 + x2) / 2} ${(y1 + y2) / 2 - 10}, ${x2} ${y2}" fill="none" stroke="${grey}" stroke-width="5" stroke-linecap="round" />`;
++  const tip = (x, y) => `<circle cx="${x}" cy="${y}" r="6" fill="${ball}" stroke="#9f9f9f" stroke-width="3" />`;
++  const parts = [];
++  if (value === 0) {
++    parts.push(`<path d="M25 52 H75" stroke="#bbbbbb" stroke-width="5" stroke-linecap="round" />`);
++  }
++  if (value === 1) {
++    parts.push(stalk(50, 58, 50, 22), tip(50, 22));
++  }
++  if (value === 2) {
++    parts.push(stalk(50, 58, 50, 14), tip(50, 14));
++  }
++  if (value === 3) {
++    parts.push(stalk(50, 58, 66, 18), tip(66, 18));
++  }
++  if (value === 4) {
++    parts.push(stalk(38, 58, 28, 26), tip(28, 26), stalk(62, 58, 72, 26), tip(72, 26));
++  }
++  if (value === 5) {
++    parts.push(stalk(38, 58, 26, 16), tip(26, 16), stalk(62, 58, 74, 16), tip(74, 16));
++  }
++  if (value === 6) {
++    parts.push(stalk(38, 58, 18, 18), tip(18, 18), stalk(62, 58, 82, 18), tip(82, 18));
++  }
++  if (value === 7) {
++    parts.push(stalk(50, 58, 50, 16), tip(50, 16), stalk(38, 58, 28, 26), tip(28, 26), stalk(62, 58, 72, 26), tip(72, 26));
++  }
++  if (value === 8) {
++    parts.push(stalk(50, 58, 50, 10), tip(50, 10), stalk(38, 58, 24, 18), tip(24, 18), stalk(62, 58, 76, 18), tip(76, 18));
++  }
++  if (value === 9) {
++    parts.push(stalk(50, 58, 60, 10), tip(60, 10), stalk(38, 58, 16, 18), tip(16, 18), stalk(62, 58, 84, 18), tip(84, 18));
++  }
++  if (value === 10) {
++    parts.push(
++      stalk(50, 58, 50, 8), tip(50, 8),
++      stalk(50, 58, 26, 12), tip(26, 12),
++      stalk(50, 58, 74, 12), tip(74, 12),
++      stalk(50, 58, 14, 22), tip(14, 22),
++      stalk(50, 58, 86, 22), tip(86, 22),
++    );
++  }
++  return svgWrap(parts.join(""));
++}
++
++function hatIcon(value) {
++  if (value === 0) {
++    return svgWrap(`<path d="M18 56 H82" stroke="#bcbcbc" stroke-width="6" stroke-linecap="round" />`);
++  }
++  return svgWrap(`
++    <ellipse cx="50" cy="52" rx="30" ry="10" fill="#ececec" stroke="#9f9f9f" stroke-width="4" />
++    <path d="M30 18 H70 L66 52 H34 Z" fill="#e7e7e7" stroke="#9f9f9f" stroke-width="4" stroke-linejoin="round" />
++  `);
++}
++
++function legIcon(value) {
++  const grey = "#8e8e8e";
++  const accent = value === 0 ? "#dddddd" : value === 1 ? "#f7c833" : value === 2 ? "#f08bff" : value === 3 ? "#91eaff" : value === 4 ? "#f86b6b" : value === 5 ? "#9cff6f" : value === 6 ? "#ffffff" : value === 7 ? "#ffd966" : value === 8 ? "#c7a4ff" : "#9f9f9f";
++  return svgWrap(`
++    <path d="M28 12 L20 54" stroke="${grey}" stroke-width="6" stroke-linecap="round" />
++    <path d="M50 12 L46 54" stroke="${grey}" stroke-width="6" stroke-linecap="round" />
++    <path d="M72 12 L78 54" stroke="${grey}" stroke-width="6" stroke-linecap="round" />
++    <path d="M20 54 H30" stroke="${accent}" stroke-width="8" stroke-linecap="round" />
++    <path d="M46 54 H56" stroke="${accent}" stroke-width="8" stroke-linecap="round" />
++    <path d="M70 54 H80" stroke="${accent}" stroke-width="8" stroke-linecap="round" />
++  `);
++}
++
++function iconMarkup(category, value) {
++  if (category === "head" || category === "body") return shapeIcon(value);
++  if (category === "eyes") return eyeIcon(value);
++  if (category === "antenna") return antennaIcon(value);
++  if (category === "hats") return hatIcon(value);
++  return legIcon(value);
++}
++
++function renderTypeButtons(category) {
++  const config = CATEGORY_CONFIG[category];
++  const current = getCurrentValue(config.typeKey);
++  typeGrid.className = "";
++  typeGrid.classList.add(`layout-${category}`);
++  typeGrid.replaceChildren();
++  config.options.forEach((value) => {
++    const button = document.createElement("button");
++    button.type = "button";
++    button.className = "type-btn";
++    if (Number(current) === Number(value)) button.classList.add("is-active");
++    button.innerHTML = iconMarkup(category, value);
++    button.setAttribute("aria-label", `${config.label} option ${value}`);
++    button.addEventListener("click", () => {
++      currentDefObj[config.typeKey] = formatTypeValue(category, value);
++      renderControls();
++      queueRender();
++      setStatus(`${config.label} updated.`);
++    });
++    typeGrid.appendChild(button);
++  });
++}
++
++function renderPalette(category) {
++  const config = CATEGORY_CONFIG[category];
++  const activeColor = Number(currentDefObj[config.colorKey]);
++  paletteGrid.replaceChildren();
++  config.palette.forEach((color) => {
++    const button = document.createElement("button");
++    button.type = "button";
++    button.className = "swatch-btn";
++    button.style.setProperty("--swatch", intToHex(color));
++    if (Number(color) === activeColor) button.classList.add("is-active");
++    button.title = intToHex(color).toUpperCase();
++    button.addEventListener("click", () => {
++      currentDefObj[config.colorKey] = Number(color);
++      syncColorInputs(category);
++      renderPalette(category);
++      queueRender();
++      setStatus(`${config.label} colour updated.`);
++    });
++    paletteGrid.appendChild(button);
++  });
++}
++
++function renderControls() {
++  const isDefMode = currentCategory === DEF_EDITOR_CATEGORY;
++  selectorPanel.classList.toggle("is-def-mode", isDefMode);
++  selectorPanel.dataset.category = isDefMode ? DEF_EDITOR_CATEGORY : currentCategory;
++  defEditor.hidden = !isDefMode;
++  colorTools.hidden = isDefMode;
++  paletteGrid.hidden = isDefMode;
++
++  categoryButtons.forEach((button) => {
++    button.classList.toggle("is-active", !isDefMode && button.dataset.category === currentCategory);
++  });
++  randomizeBtn.classList.remove("is-active");
++  defEditorBtn.classList.toggle("is-active", isDefMode);
++
++  if (isDefMode) {
++    typeGrid.className = "";
++    typeGrid.replaceChildren();
++    defInput.value = getDefStr(currentDefObj);
++    panelHint.textContent = "";
++    return;
++  }
++
++  renderTypeButtons(currentCategory);
++  renderPalette(currentCategory);
++  syncColorInputs(currentCategory);
++  panelHint.textContent = "";
++}
++
++function openSignup() {
++  lookCodeEl.textContent = getDefStr(currentDefObj);
++  signupModal.classList.add("is-open");
++  signupModal.setAttribute("aria-hidden", "false");
++  signupNameEl.focus();
++}
++
++function closeSignup() {
++  signupModal.classList.remove("is-open");
++  signupModal.setAttribute("aria-hidden", "true");
++}
++
++function safeJson(response) {
++  return response.json().catch(() => ({ ok: false, error: "Unexpected server response." }));
++}
++
++function creatorPayload() {
++  return {
++    weevilDef: getDefStr(currentDefObj),
++    expression: expressionIndex,
++    proboscis: currentProboscis,
++    hatId: Number(currentDefObj.hat || 0),
++    hatColour: Number(currentDefObj.hatc || clrs1[27]),
++    preferredRenderer: currentPreferredRenderer || "html5-canvas",
++  };
++}
++
++function applyAvatarRecord(record = {}) {
++  const nextDef = /^\d{18}$/.test(String(record.weevilDef || "")) ? String(record.weevilDef) : getDefStr(currentDefObj);
++  currentDefObj = {
++    ...currentDefObj,
++    ...getDefObj(nextDef),
++    hat: String(Number(record.hatId ?? currentDefObj.hat ?? 0) || 0),
++    hatc: Number(record.hatColour ?? record.hatColor ?? currentDefObj.hatc ?? clrs1[27]) || clrs1[27],
++  };
++  expressionIndex = Number(record.expression ?? expressionIndex ?? 0) || 0;
++  currentProboscis = Number(record.proboscis ?? currentProboscis ?? 0) || 0;
++  currentPreferredRenderer = String(record.preferredRenderer || currentPreferredRenderer || "html5-canvas");
++}
++
++function notifyParentAndNavigate(href) {
++  const nextHref = String(href || "/profile");
++  try {
++    window.parent?.postMessage({ type: "creator:navigate", href: nextHref }, window.location.origin);
++  } catch {}
++  try {
++    if (window.top && window.top !== window) {
++      window.top.location.href = nextHref;
++      return;
++    }
++  } catch {}
++  window.location.href = nextHref;
++}
++
++async function bootstrapCreator() {
++  if (creatorMode !== "edit") {
++    signupCta.textContent = "SIGN UP";
++    signupTitleEl.textContent = "Sign Up";
++    if (signupBlurbEl) signupBlurbEl.textContent = "Pick a name, enter your details, and keep this weevil def with your new weevil.";
++    setStatus("Body options opened.");
++    return;
++  }
++
++  signupCta.textContent = "SAVE WEEVIL";
++  signupTitleEl.textContent = "Save Weevil";
++  if (signupBlurbEl) signupBlurbEl.textContent = "Your site session is already active. Saving here updates your existing weevil without another login prompt.";
++  closeSignupBtn.textContent = "Close";
++  confirmSignupBtn.textContent = "Save now";
++
++  const response = await fetch("/api/me/avatar", { headers: { Accept: "application/json" }, credentials: "same-origin" });
++  const payload = await safeJson(response);
++  if (!response.ok || !payload.ok) {
++    notifyParentAndNavigate(`/login?next=${encodeURIComponent('/weevil-studio')}&error=${encodeURIComponent(payload.error || 'Sign in first.')}`);
++    return;
++  }
++  applyAvatarRecord(payload.avatar || {});
++  renderControls();
++  queueRender();
++  setStatus("Existing weevil loaded. Save when you are ready.");
++}
++
++async function submitRegistration() {
++  const username = signupNameEl.value.trim();
++  const email = signupEmailEl.value.trim();
++  const password = signupPasswordEl.value.trim();
++  if (!username || !email || !password) {
++    setStatus("Add a weevil name, email, and password to create your account.");
++    return;
++  }
++
++  confirmSignupBtn.disabled = true;
++  try {
++    const response = await fetch("/api/register-with-creator", {
++      method: "POST",
++      credentials: "same-origin",
++      headers: { "Content-Type": "application/json", Accept: "application/json" },
++      body: JSON.stringify({
++        username,
++        email,
++        password,
++        passwordConfirm: password,
++        nextPath,
++        ...creatorPayload(),
++      }),
++    });
++    const payload = await safeJson(response);
++    if (!response.ok || !payload.ok) {
++      setStatus(payload.error || "Registration failed.");
++      return;
++    }
++    closeSignup();
++    notifyParentAndNavigate(payload.redirectPath || nextPath || "/profile");
++  } finally {
++    confirmSignupBtn.disabled = false;
++  }
++}
++
++async function saveExistingWeevil() {
++  signupCta.disabled = true;
++  try {
++    const response = await fetch("/api/me/avatar", {
++      method: "POST",
++      credentials: "same-origin",
++      headers: { "Content-Type": "application/json", Accept: "application/json" },
++      body: JSON.stringify({
++        nextPath,
++        ...creatorPayload(),
++      }),
++    });
++    const payload = await safeJson(response);
++    if (!response.ok || !payload.ok) {
++      setStatus(payload.error || "Save failed.");
++      return;
++    }
++    notifyParentAndNavigate(payload.redirectPath || nextPath || "/profile");
++  } finally {
++    signupCta.disabled = false;
++  }
++}
++
++function validateWeevilDef(defString) {
++  if (!/^\d{18}$/.test(defString)) {
++    return { valid: false, message: "Weevil def must be exactly 18 digits." };
++  }
++
++  const values = {
++    ht: Number(defString.slice(0, 1)),
++    hc: Number(defString.slice(1, 3)),
++    bt: Number(defString.slice(3, 4)),
++    bc: Number(defString.slice(4, 6)),
++    et: Number(defString.slice(6, 7)),
++    ec: Number(defString.slice(7, 9)),
++    lids: Number(defString.slice(9, 10)),
++    at: Number(defString.slice(10, 12)),
++    ac: Number(defString.slice(12, 14)),
++    lc: Number(defString.slice(14, 16)),
++    lt: Number(defString.slice(16, 18)),
++  };
++
++  if (values.ht < 1 || values.ht > 4) return { valid: false, message: "Head type must be between 1 and 4." };
++  if (values.hc < 0 || values.hc >= clrs1.length) return { valid: false, message: "Head colour index is out of range." };
++  if (values.bt < 1 || values.bt > 4) return { valid: false, message: "Body type must be between 1 and 4." };
++  if (values.bc < 0 || values.bc >= clrs1.length) return { valid: false, message: "Body colour index is out of range." };
++  if (values.et < 1 || values.et > 6) return { valid: false, message: "Eye type must be between 1 and 6." };
++  if (values.ec < 0 || values.ec >= clrs2.length) return { valid: false, message: "Eye colour index is out of range." };
++  if (values.lids < 0 || values.lids > 9) return { valid: false, message: "Lid value must be a single digit." };
++  if (values.at < 0 || values.at > 10) return { valid: false, message: "Antenna type must be between 00 and 10." };
++  if (values.ac < 0 || values.ac >= clrs1.length) return { valid: false, message: "Antenna colour index is out of range." };
++  if (values.lc < 0 || values.lc >= clrs1.length) return { valid: false, message: "Leg colour index is out of range." };
++  if (values.lt < 0 || values.lt > 9) return { valid: false, message: "Leg type must be between 00 and 09." };
++
++  return { valid: true, defObj: getDefObj(defString) };
++}
++
++categoryButtons.forEach((button) => {
++  button.addEventListener("click", () => {
++    currentCategory = button.dataset.category;
++    renderControls();
++    setStatus(`${CATEGORY_CONFIG[currentCategory].label} options opened.`);
++  });
++});
++
++randomizeBtn.addEventListener("click", () => {
++  currentCategory = "body";
++  randomizeWeevil();
++  renderControls();
++  queueRender();
++  setStatus("Weevil randomised.");
++});
++
++defEditorBtn.addEventListener("click", () => {
++  currentCategory = DEF_EDITOR_CATEGORY;
++  renderControls();
++  setStatus("Paste a weevil def and click Apply.");
++  defInput.focus();
++  defInput.select();
++});
++
++applyHexBtn.addEventListener("click", applyCurrentHexColor);
++hexColorText.addEventListener("keydown", (event) => {
++  if (event.key === "Enter") {
++    event.preventDefault();
++    applyCurrentHexColor();
++  }
++});
++hexColorText.addEventListener("blur", () => {
++  if (normalizeHex(hexColorText.value)) {
++    applyCurrentHexColor();
++  } else {
++    syncColorInputs(currentCategory);
++  }
++});
++
++applyDefBtn.addEventListener("click", () => {
++  const proposedDef = defInput.value.trim();
++  const result = validateWeevilDef(proposedDef);
++  if (!result.valid) {
++    setStatus(result.message);
++    defInput.focus();
++    defInput.select();
++    return;
++  }
++
++  currentDefObj = { ...currentDefObj, ...result.defObj };
++  currentCategory = "body";
++  renderControls();
++  queueRender();
++  setStatus(`Weevil def applied: ${proposedDef}.`);
++});
++
++defInput.addEventListener("keydown", (event) => {
++  if (event.key === "Enter") {
++    event.preventDefault();
++    applyDefBtn.click();
++  }
++});
++
++spinLeftBtn.addEventListener("click", () => {
++  currentYaw = (currentYaw - 20 + 360) % 360;
++  queueRender();
++  setStatus("Preview spun left.");
++});
++
++spinRightBtn.addEventListener("click", () => {
++  currentYaw = (currentYaw + 20) % 360;
++  queueRender();
++  setStatus("Preview spun right.");
++});
++
++signupCta.addEventListener("click", () => {
++  if (creatorMode === "edit") {
++    saveExistingWeevil();
++    return;
++  }
++  openSignup();
++});
++closeSignupBtn.addEventListener("click", closeSignup);
++signupModal.addEventListener("click", (event) => {
++  if (event.target === signupModal) closeSignup();
++});
++
++document.addEventListener("keydown", (event) => {
++  if (event.key === "Escape" && signupModal.classList.contains("is-open")) {
++    closeSignup();
++  }
++});
++
++confirmSignupBtn.addEventListener("click", () => {
++  if (creatorMode === "edit") {
++    closeSignup();
++    saveExistingWeevil();
++    return;
++  }
++  submitRegistration();
++});
++
++renderControls();
++resizeRenderer();
++queueRender();
++await bootstrapCreator();

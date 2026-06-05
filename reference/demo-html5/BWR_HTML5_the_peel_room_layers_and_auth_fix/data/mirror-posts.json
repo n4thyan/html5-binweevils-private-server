@@ -1,0 +1,54 @@
+[
+  {
+    "slug": "test-post",
+    "title": "Welcome to Bin Weevils Rewritten",
+    "author": "BWR Team",
+    "publishedAt": "2026-03-31",
+    "originalDateText": "31/03/2026",
+    "introHtml": "<p>Bin Weevils Rewritten now has a website flow that matches the project properly: a familiar Bin Weevils shell, a modern HTML5 creator, and one account system for registration, profiles and saved weevils.</p>",
+    "thumbnail": "/img/single-room-floor.png",
+    "contentHtml": "<div class=\"mirror-post-body\">\n  <p><strong>Welcome to Bin Weevils Rewritten.</strong> This website is here to support the project as a proper HTML5 remake, not just as a simple archive or asset viewer.</p>\n  <p>The aim is straightforward:</p>\n  <ul>\n    <li>download the current client build</li>\n    <li>follow project news and archived Bin Weevils posts in one place</li>\n    <li>create or edit your weevil in the HTML5 creator</li>\n    <li>manage your website account, saved look and profile from one clean flow</li>\n  </ul>\n  <p>The classic Bin Weevils styling has been kept on purpose, but the identity of the site now belongs to the rewrite itself. Registration, account pages and weevil editing are all being rebuilt around HTML5.</p>\n  <p>If you are new here, head to the <a href=\"/register\">registration page</a>, design your weevil, save it, and the site will take care of the rest.</p>\n</div>",
+    "sourceUrl": "",
+    "originLabel": "Project post",
+    "type": "mirror"
+  },
+  {
+    "slug": "welcome-to-bin-weevils-rewritten-mirror",
+    "title": "Why the Website Keeps the Classic Bin Weevils Look",
+    "author": "BWR Team",
+    "publishedAt": "2026-03-27",
+    "originalDateText": "27/03/2026",
+    "introHtml": "<p>The site still looks like old Bin Weevils on purpose, but the project is no longer being presented as a simple mirror. The styling is familiar; the flow is now firmly rewrite-focused.</p>",
+    "thumbnail": "/mirror-src/official-mirror/news.binweevils.app/assets/img/blog/How_to_draw_a_Binweevil_185x300.jpg",
+    "contentHtml": "<div class=\"mirror-post-body\">\n  <p>The website keeps the classic Bin Weevils shell because it feels right for the project, but the goal is bigger than preserving a familiar layout.</p>\n  <ul>\n    <li><strong>The styling stays familiar:</strong> green bars, classic buttons and the overall Bin Weevils web feel.</li>\n    <li><strong>The functionality is being rebuilt:</strong> HTML5 weevil creation, account pages, saved profile data and modern browser support.</li>\n    <li><strong>The messaging is changing too:</strong> this is now clearly presented as Bin Weevils Rewritten, a true HTML5 remake.</li>\n  </ul>\n  <p>That balance matters. The website should still feel recognisable to long-time players, while also making it obvious that the creator, account flow and wider project are moving forward as a rebuilt HTML5 experience.</p>\n  <p>In short: the look is classic, but the project direction is modern.</p>\n</div>",
+    "sourceUrl": "",
+    "originLabel": "Project post",
+    "type": "mirror"
+  },
+  {
+    "slug": "how-the-mirror-site-works",
+    "title": "The HTML5 Creator Is Now the Main Weevil Flow",
+    "author": "BWR Team",
+    "publishedAt": "2026-03-27",
+    "originalDateText": "27/03/2026",
+    "introHtml": "<p>The old split between website registration and weevil creation is gone. New accounts now begin in the HTML5 creator, and existing accounts use the same tool to edit their saved weevil.</p>",
+    "thumbnail": "/mirror-src/official-mirror/news.binweevils.app/assets/img/blog/Battle-of-The-Bin-Winners-Thumbnail.png",
+    "contentHtml": "<div class=\"mirror-post-body\">\n  <p>The HTML5 creator now sits at the centre of the website flow.</p>\n  <p>That means:</p>\n  <ul>\n    <li>new players create their account and their first weevil in one place</li>\n    <li>existing players open the same creator in edit mode without signing in twice</li>\n    <li>saved weevil data lives with the website account and feeds back into the profile page</li>\n  </ul>\n  <p>This is a major step for the rewrite because it replaces the old creator/editor split with one cleaner HTML5 path. The creator is no longer a side experiment; it is the real front-end tool for designing and saving your Bin Weevil.</p>\n  <p>It also gives the site a clearer identity. Instead of relying on older creator systems, the website now leads with the rebuild.</p>\n</div>",
+    "sourceUrl": "",
+    "originLabel": "Project post",
+    "type": "mirror"
+  },
+  {
+    "slug": "weevil-studio-and-chatroom-demo",
+    "title": "Website Progress: Login, Account, News and Creator Integration",
+    "author": "BWR Team",
+    "publishedAt": "2026-03-29",
+    "originalDateText": "29/03/2026",
+    "introHtml": "<p>The current milestone focuses on the public website flow first: sign in, account pages, news, registration through the creator, and editing through the same HTML5 tool once you are logged in.</p>",
+    "thumbnail": "/mirror-src/official-mirror/news.binweevils.app/assets/img/blog/Wild-West-Items-Thumbnail.png",
+    "contentHtml": "<div class=\"mirror-post-body\">\n  <p>This stage of the project is about getting the core website experience working cleanly from end to end.</p>\n  <ul>\n    <li>login is handled through the website account system</li>\n    <li>registration now flows through the HTML5 creator</li>\n    <li>the account page stores and displays your saved weevil data</li>\n    <li>the news feed combines archived Bin Weevils posts with project updates written for the remake</li>\n  </ul>\n  <p>More systems can come later, but this first step matters because it establishes the public-facing shell of Bin Weevils Rewritten properly. The website now has a clear purpose and a clear tone: classic on the outside, rebuilt in HTML5 underneath.</p>\n  <p>As more features arrive, they can plug into the same account, creator and website flow instead of feeling like separate test tools.</p>\n</div>",
+    "sourceUrl": "",
+    "originLabel": "Project post",
+    "type": "mirror"
+  }
+]
