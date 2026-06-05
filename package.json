@@ -1,0 +1,17 @@
+{
+  "name": "html5-binweevils-private-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Faithful Flash-to-HTML5 port foundation for Bin Weevils.",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173"
+  },
+  "dependencies": {
+    "@vitejs/plugin-legacy": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {}
+}
