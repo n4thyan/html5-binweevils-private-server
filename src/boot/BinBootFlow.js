@@ -89,11 +89,11 @@ export const DEFAULT_BOOT_PARAMS = Object.freeze({
 
 export function createBootContext(params = {}) {
   const loginPath = normaliseLoginPath(params.loginPath ?? DEFAULT_BOOT_PARAMS.loginPath);
-  const cluster = String(params.cluster ?? DEFAULT_BOOT_PARAMS.cluster || 'uk');
+  const cluster = String((params.cluster ?? DEFAULT_BOOT_PARAMS.cluster) || 'uk');
   const coreVersion = Number(params.coreVersion ?? DEFAULT_BOOT_PARAMS.coreVersion) || 0;
   const defaultLocID = loginPath == null
     ? DEFAULT_BOOT_PARAMS.defaultLocID
-    : Number(params.defaultLocID ?? DEFAULT_BOOT_PARAMS.defaultLocID) || DEFAULT_BOOT_PARAMS.defaultLocID;
+    : (Number(params.defaultLocID ?? DEFAULT_BOOT_PARAMS.defaultLocID) || DEFAULT_BOOT_PARAMS.defaultLocID);
 
   return Object.freeze({
     cluster,
