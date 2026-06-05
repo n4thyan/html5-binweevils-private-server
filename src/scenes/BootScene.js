@@ -22,7 +22,7 @@ export class BootScene {
       locID: 0
     });
     this.renderPlan = this.avatar.createRenderPlan();
-    this.renderer = new WeevilCanvasRenderer();
+    this.renderer = new WeevilCanvasRenderer({ mode: 'prototype' });
     this.validation = this.renderPlan.validation;
   }
 
@@ -47,12 +47,12 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 002: AvatarState-driven renderer proof', 40, 105);
-    ctx.fillText('Placeholder shapes only. Final atlas rendering is not ported yet.', 40, 132);
+    ctx.fillText('Milestone 002: prototype renderer transplant path', 40, 105);
+    ctx.fillText('Vector shell using demo-backed visual data. Final atlas rendering is not ported yet.', 40, 132);
 
     this.renderDefinitionPanel(ctx, 40, 180);
     this.renderStatePanel(ctx, 640, 180);
-    this.renderer.render(ctx, this.renderPlan, 720, 420, { mode: 'debug' });
+    this.renderer.render(ctx, this.renderPlan, 720, 420, { mode: 'prototype' });
   }
 
   renderDefinitionPanel(ctx, x, y) {
@@ -111,11 +111,11 @@ export class BootScene {
       ['idx', avatar.idx],
       ['x/y/z/r', `${avatar.x}/${avatar.y}/${avatar.z}/${avatar.r}`],
       ['ps/ex', `${avatar.ps}/${avatar.ex}`],
-      ['body', plan.parts.body.atlas],
-      ['head', plan.parts.head.atlas],
-      ['eyes', plan.parts.eyes.atlasSet],
+      ['body', `${plan.parts.body.visual.label} ${plan.parts.body.visual.width}x${plan.parts.body.visual.height}`],
+      ['head', `${plan.parts.head.visual.label} ${plan.parts.head.visual.width}x${plan.parts.head.visual.height}`],
+      ['eyes', `${plan.parts.eyes.visual.label} ${plan.parts.eyes.atlasSet}`],
       ['mouth', plan.parts.mouth.atlas],
-      ['legs', plan.parts.legs.lowerFrame]
+      ['legs', `${plan.parts.legs.name} ${plan.parts.legs.lowerFrame}`]
     ];
 
     ctx.strokeStyle = '#f4e9bd';
@@ -127,7 +127,7 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '13px Arial, sans-serif';
-    ctx.fillText('Source-backed packet fields, local only.', x + 20, y + 58);
+    ctx.fillText('Source-backed fields, demo-backed visuals.', x + 20, y + 58);
 
     ctx.font = '13px Consolas, Monaco, monospace';
     rows.forEach(([label, value], index) => {
