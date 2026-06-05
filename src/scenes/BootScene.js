@@ -1,20 +1,14 @@
 import { WeevilDef } from '../avatar/WeevilDef.js';
 import { SAMPLE_WEEVIL_DEF } from '../avatar/WeevilDefSamples.js';
-import {
-  getBodyAtlas,
-  getEyeAtlasSet,
-  getHeadAtlas,
-  getLowerLegFrame,
-  getMouthAtlas
-} from '../avatar/WeevilPartMap.js';
-import { listAtlasKeys } from '../avatar/WeevilAtlasManifest.js';
+import { createWeevilRenderPlan } from '../avatar/WeevilRenderPlan.js';
 
 export class BootScene {
   constructor({ stage }) {
     this.stage = stage;
     this.elapsedMs = 0;
     this.sampleDef = new WeevilDef(SAMPLE_WEEVIL_DEF);
-    this.validation = WeevilDef.validate(SAMPLE_WEEVIL_DEF);
+    this.renderPlan = createWeevilRenderPlan(this.sampleDef, { expression: 0 });
+    this.validation = this.renderPlan.validation;
   }
 
   enter() {
@@ -38,11 +32,11 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 002: WeevilDef + prototype atlas mapping proof', 40, 105);
+    ctx.fillText('Milestone 002: WeevilDef and render-plan proof', 40, 105);
     ctx.fillText('No room, chat, account, or multiplayer systems are active yet.', 40, 132);
 
     this.renderDefinitionPanel(ctx, 40, 180);
-    this.renderAtlasPanel(ctx, 640, 180);
+    this.renderPlanPanel(ctx, 640, 180);
   }
 
   renderDefinitionPanel(ctx, x, y) {
@@ -92,36 +86,35 @@ export class BootScene {
     ctx.fillText(`runtime: ${Math.floor(this.elapsedMs)}ms`, x + 20, y + 315);
   }
 
-  renderAtlasPanel(ctx, x, y) {
-    const decoded = this.sampleDef.toJSON();
-    const atlasKeys = listAtlasKeys();
+  renderPlanPanel(ctx, x, y) {
+    const plan = this.renderPlan;
     const rows = [
-      ['atlas keys', atlasKeys.length],
-      ['body atlas', getBodyAtlas(decoded.bodyType)],
-      ['head atlas', getHeadAtlas(decoded.headType)],
-      ['eye set', getEyeAtlasSet(decoded.eyeType)],
-      ['mouth atlas ex0', getMouthAtlas(0)],
-      ['lower leg frame', getLowerLegFrame(decoded.legType)]
+      ['body', plan.parts.body.atlas],
+      ['head', plan.parts.head.atlas],
+      ['eyes', plan.parts.eyes.atlasSet],
+      ['mouth', plan.parts.mouth.atlas],
+      ['antennae', plan.parts.antennae.type],
+      ['legs', plan.parts.legs.lowerFrame]
     ];
 
     ctx.strokeStyle = '#f4e9bd';
-    ctx.strokeRect(x, y, 340, 220);
+    ctx.strokeRect(x, y, 340, 260);
 
     ctx.fillStyle = '#f4e9bd';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Prototype atlas/part map', x + 20, y + 32);
+    ctx.fillText('WeevilRenderPlan', x + 20, y + 32);
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '13px Arial, sans-serif';
-    ctx.fillText('Reference only until OG provenance is verified.', x + 20, y + 58);
+    ctx.fillText('Bridge only. Drawing not ported yet.', x + 20, y + 58);
 
     ctx.font = '13px Consolas, Monaco, monospace';
     rows.forEach(([label, value], index) => {
-      const rowY = y + 92 + index * 20;
+      const rowY = y + 90 + index * 20;
       ctx.fillStyle = '#d2c48b';
       ctx.fillText(`${label}:`, x + 20, rowY);
       ctx.fillStyle = '#f4e9bd';
-      ctx.fillText(String(value), x + 150, rowY);
+      ctx.fillText(String(value), x + 120, rowY);
     });
   }
 
