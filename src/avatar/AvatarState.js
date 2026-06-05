@@ -1,5 +1,6 @@
 import { WeevilDef } from './WeevilDef.js';
 import { createWeevilRenderPlan } from './WeevilRenderPlan.js';
+import { createPoseState, normaliseExpression, normalisePoseState, normaliseRotation } from './WeevilPose.js';
 
 export class AvatarState {
   constructor({
@@ -25,9 +26,9 @@ export class AvatarState {
     this.x = Number(x);
     this.y = Number(y);
     this.z = Number(z);
-    this.r = Number(r);
-    this.ps = Number(ps);
-    this.ex = Number(ex);
+    this.r = normaliseRotation(r);
+    this.ps = normalisePoseState(ps);
+    this.ex = normaliseExpression(ex);
     this.apparel = apparel;
     this.doorId = Number(doorId);
     this.locId = locId;
@@ -57,18 +58,26 @@ export class AvatarState {
     this.x = Number(x);
     this.y = Number(y);
     this.z = Number(z);
-    this.r = Number(r);
+    this.r = normaliseRotation(r);
     return this;
   }
 
   updatePose({ ps = this.ps, ex = this.ex } = {}) {
-    this.ps = Number(ps);
-    this.ex = Number(ex);
+    this.ps = normalisePoseState(ps);
+    this.ex = normaliseExpression(ex);
     return this;
   }
 
+  getPoseState() {
+    return createPoseState({ ps: this.ps, ex: this.ex, r: this.r });
+  }
+
   createRenderPlan() {
-    return createWeevilRenderPlan(this.weevilDef, { expression: this.ex });
+    return createWeevilRenderPlan(this.weevilDef, {
+      expression: this.ex,
+      pose: this.ps,
+      rotation: this.r
+    });
   }
 
   toJSON() {
@@ -83,6 +92,7 @@ export class AvatarState {
       r: this.r,
       ps: this.ps,
       ex: this.ex,
+      pose: this.getPoseState(),
       apparel: this.apparel,
       doorId: this.doorId,
       locId: this.locId,
