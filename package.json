@@ -9,9 +9,10 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4173",
     "test:boot-flow": "node tests/boot-flow-smoke.mjs",
+    "test:core-init-flow": "node tests/core-init-flow-smoke.mjs",
     "test:render-plan": "node tests/render-plan-smoke.mjs",
     "test:prototype-renderer": "node tests/prototype-renderer-smoke.mjs",
-    "test": "npm run test:boot-flow && npm run test:render-plan && npm run test:prototype-renderer"
+    "test": "npm run test:boot-flow && npm run test:core-init-flow && npm run test:render-plan && npm run test:prototype-renderer"
   },
   "dependencies": {
     "@vitejs/plugin-legacy": "latest",
