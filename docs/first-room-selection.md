@@ -1,73 +1,93 @@
 # First room selection
 
-The first playable HTML5 slice should port one real Bin Weevils room with the smallest amount of guesswork.
+Room work is not the current milestone. The active milestone remains the avatar/rendering foundation.
 
-## Selected first room: Ink's Orange / Orange Peel
+When room work begins, do not use the old `The Peel`, `Ink's Orange`, or custom-room plan as the first target. That plan came from the earlier bad HTML5 proof-of-concept and should not drive the faithful port.
 
-Status: selected for milestone 002.
+## Correct first-room policy
 
-Why this is now selected:
+The first room should be one verified original `fixedCam` room from the committed KnowYourKnot source.
 
-- The original source contains a full `location` block for `id="106" name="InksOrange"`.
-- The location has a real floor reference: `floors/inks.jpg`.
-- The location has movement data: rectangular boundary, entry position, entry direction, camera values, and weevil scale.
-- The location has door definitions and a radial no-go area.
-- The location has object placements for `orangePeel.swf`, `orangeSegment.swf`, `orangeBlob.swf`, `cottonReel.swf`, `needle.swf`, `signMsgBoard.swf`, arrows, and mini-game slots.
-- The source also includes matching room asset files under `cdn.binw.net/assets3D/`.
+It does not matter which `fixedCam` room is selected first, as long as it has enough source evidence to port cleanly.
 
-Detailed room audit:
-
-- `docs/rooms/inks-orange.md`
-
-## Candidate 2: Peel Park
-
-Status: fallback/later public-room port.
-
-Needs verification:
-
-- source room art
-- room config
-- movement/collision data
-- matching UI assets
-
-## Candidate 3: Nest room
-
-Status: technical fallback/later private-room port.
-
-A nest room may still be useful for account/session/avatar rendering, but it is no longer needed as the first room because Orange Peel has enough original config data to drive a real port.
-
-## Milestone 002 target
-
-Build a small Apache/XAMPP-served HTML5 Orange Peel room shell using source data from:
+Required evidence:
 
 ```text
-legacy-reference/Binweevils-main/game-full/binConfig/getFile/1/uk/locationDefinitions.xml
+locationDefinitions entry
+fixedCam room background/SWF reference
+walk boundary data
+entry position
+camera/scale values
+object/layer references where available
+matching source asset files
 ```
 
-The first playable demo should support:
+## Candidate source areas
+
+Audit these when room work starts:
 
 ```text
-real source room floor/reference asset
-source-derived room JSON
-source-derived object placement data
-HTML5 room renderer in original coordinate space
-click-to-move using boundary and no-go data
-existing HTML5 weevil renderer placed at entryPos
-original-style chat bubble
-basic local chat/admin command parser
+source/knowyourknot-binweevils/game-full/binConfig/
+source/knowyourknot-binweevils/game-full/binConfig/getFile/
+source/knowyourknot-binweevils/game-full/cdn.binw.net/
+source/knowyourknot-binweevils/game-full/cdn.binw.net/assets3D/
 ```
 
-## Not part of first slice
+Look for room references like:
 
-These systems are important, but should wait until the room foundation feels right:
+```text
+fixedCam/*.swf
+fixedCam/*.jpg
+fixedCam/*.png
+```
 
-- full map
-- full login/register polish
-- buddy list
-- mailbox
-- shops
-- inventory
-- mulch/XP/level bank/prestige UI
-- minigames
-- functional door transitions
-- external UI popups
+## Selection rule
+
+Pick the first room by evidence quality, not preference.
+
+Good first candidate:
+
+```text
+small fixedCam room
+clear locationDefinitions block
+simple rectangular or simple no-go boundary
+few objects
+obvious entry position
+assets present in source/
+```
+
+Avoid for the first room:
+
+```text
+custom rooms from the old demo
+The Peel / Ink's Orange custom plan
+rooms with lots of minigame-specific scripting
+rooms with missing assets
+rooms requiring backend/session logic to look correct
+```
+
+## Not part of room milestone
+
+Do not begin these until avatar rendering and a local room shell are reliable:
+
+```text
+backend login/session
+multiplayer sync
+full map
+buddy list
+mailbox
+shops
+inventory
+mulch/XP/level systems
+minigames
+full door transition network
+external UI popups
+```
+
+## Current status
+
+```text
+rooms: deferred
+current priority: source-backed avatar renderer foundation
+future room target: verified original fixedCam room
+```
