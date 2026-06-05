@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Core UI Asset Probe</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #151515;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #151515;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0 0 18px;
+      color: #d2c48b;
+    }
+
+    .note {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      max-width: 1100px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-width: 1440px;
+    }
+
+    .card {
+      border: 1px solid #5c5230;
+      background: #0f0f0f;
+      padding: 12px;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .label {
+      font-weight: 700;
+      color: #fff2a8;
+    }
+
+    .class-name,
+    .path {
+      font: 11px Consolas, Monaco, monospace;
+      color: #d2c48b;
+      overflow-wrap: anywhere;
+    }
+
+    .preview {
+      flex: 1;
+      min-height: 140px;
+      border: 1px dashed #4f472b;
+      background: #252525;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+      padding: 8px;
+    }
+
+    .preview img {
+      max-width: 240px;
+      max-height: 160px;
+      object-fit: contain;
+      background: transparent;
+    }
+
+    .status {
+      font: 11px Consolas, Monaco, monospace;
+      color: #9fd36b;
+    }
+
+    .status.error {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Core UI Asset Probe</h1>
+  <p>Debug-only visual check for real exported FFDec SVGs from <code>core5.swf</code>.</p>
+
+  <div class="note">
+    This page is not the final UI shell. It exists only to prove that source-backed UI symbols from the decompiled SWF export can be loaded by the browser before any real ported UI layout is built.
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <script type="module">
+    const assets = [
+      ['weevil-profile', 'core390_fla.weevilProfile_467', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_2502_core390_fla.weevilProfile_467/1.svg'],
+      ['control-tab', 'core390_fla.controlTab_450', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_2359_core390_fla.controlTab_450/1.svg'],
+      ['alert-box', 'core390_fla.alertBox_1370', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_2832_core390_fla.alertBox_1370/1.svg'],
+      ['dialogue-box', 'core390_fla.dialogueBox_1357', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_2803_core390_fla.dialogueBox_1357/1.svg'],
+      ['side-buttons', 'core390_fla.sidebtnsflipout_549', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_2548_core390_fla.sidebtnsflipout_549/1.svg'],
+      ['actions-button', 'core390_fla.actionsBtn_134', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_1761_core390_fla.actionsBtn_134/1.svg'],
+      ['action-icons', 'core390_fla.actionIcons_246', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_2018_core390_fla.actionIcons_246/1.svg'],
+      ['mouth-icons', 'core390_fla.mouthIcons_213', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_1926_core390_fla.mouthIcons_213/1.svg'],
+      ['pet-profile', 'core390_fla.petProfile_3', '/reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_1685_core390_fla.petProfile_3/1.svg']
+    ];
+
+    const grid = document.getElementById('grid');
+
+    for (const [label, className, path] of assets) {
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      const title = document.createElement('div');
+      title.className = 'label';
+      title.textContent = label;
+
+      const klass = document.createElement('div');
+      klass.className = 'class-name';
+      klass.textContent = className;
+
+      const preview = document.createElement('div');
+      preview.className = 'preview';
+
+      const img = document.createElement('img');
+      img.alt = label;
+      img.src = path;
+
+      const status = document.createElement('div');
+      status.className = 'status';
+      status.textContent = 'loading...';
+
+      img.addEventListener('load', () => {
+        status.textContent = `loaded ${img.naturalWidth}x${img.naturalHeight}`;
+      });
+
+      img.addEventListener('error', () => {
+        status.className = 'status error';
+        status.textContent = 'failed to load';
+      });
+
+      const pathNode = document.createElement('div');
+      pathNode.className = 'path';
+      pathNode.textContent = path;
+
+      preview.appendChild(img);
+      card.append(title, klass, preview, status, pathNode);
+      grid.appendChild(card);
+    }
+  </script>
+</body>
+</html>
