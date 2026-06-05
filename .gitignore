@@ -1,5 +1,9 @@
 # Local/private source references
+og-source/
 legacy-reference/
+
+# Local prototype dumps
+prototype-reference/raw/
 
 # Local environment and dependencies
 node_modules/
