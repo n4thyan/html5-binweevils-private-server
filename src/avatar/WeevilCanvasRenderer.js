@@ -2,10 +2,12 @@
 //
 // Modes:
 // - debug: lightweight visual-plan proof
-// - prototype: isolated transplant path for the visually-correct old demo renderer
-// - atlas: gated smoke-test path for future atlas drawing
+// - prototype: isolated vector transplant path
+// - legacy-demo-assets: actual asset-backed renderer from the old working demo
+// - atlas: gated smoke-test path for future clean atlas drawing
 
 import { drawAtlasFrame, drawTintedAtlasFrame } from './AtlasFrameRenderer.js';
+import { LegacyDemoAssetRenderer } from './LegacyDemoAssetRenderer.js';
 import { WeevilPrototypeRenderer } from './WeevilPrototypeRenderer.js';
 import { WEEVIL_CANVAS_BOUNDS } from './WeevilVisualConfig.js';
 
@@ -21,10 +23,15 @@ export class WeevilCanvasRenderer {
     this.originX = WEEVIL_CANVAS_BOUNDS.originX;
     this.originY = WEEVIL_CANVAS_BOUNDS.originY;
     this.prototypeRenderer = new WeevilPrototypeRenderer({ width, height });
+    this.legacyDemoAssetRenderer = new LegacyDemoAssetRenderer({ width, height });
   }
 
   render(ctx, plan, x, y, options = {}) {
     const mode = options.mode ?? this.mode;
+
+    if (mode === 'legacy-demo-assets') {
+      return this.legacyDemoAssetRenderer.render(ctx, plan, x, y, options);
+    }
 
     if (mode === 'prototype') {
       return this.prototypeRenderer.render(ctx, plan, x, y, options);
