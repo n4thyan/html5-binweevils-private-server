@@ -1,4 +1,5 @@
 import { AvatarState } from '../avatar/AvatarState.js';
+import { RENDERER_BASELINE_SAMPLES, createBaselineUserVars } from '../avatar/RendererBaselineSamples.js';
 import { WeevilCanvasRenderer } from '../avatar/WeevilCanvasRenderer.js';
 import { SAMPLE_WEEVIL_DEF } from '../avatar/WeevilDefSamples.js';
 
@@ -23,6 +24,13 @@ export class BootScene {
     });
     this.renderPlan = this.avatar.createRenderPlan();
     this.renderer = new WeevilCanvasRenderer({ mode: 'legacy-demo-assets' });
+    this.samplePlans = RENDERER_BASELINE_SAMPLES.map((sample, index) => ({
+      sample,
+      avatar: AvatarState.fromUserVars(createBaselineUserVars(sample, index + 1))
+    })).map((entry) => ({
+      ...entry,
+      plan: entry.avatar.createRenderPlan()
+    }));
     this.validation = this.renderPlan.validation;
   }
 
@@ -47,11 +55,12 @@ export class BootScene {
 
     ctx.fillStyle = '#d2c48b';
     ctx.font = '16px Arial, sans-serif';
-    ctx.fillText('Milestone 002: legacy demo asset renderer path', 40, 105);
+    ctx.fillText('Milestone 003: asset renderer baseline lock', 40, 105);
     ctx.fillText('Using the proven old HTML5 demo renderer and extracted weevil assets.', 40, 132);
 
     this.renderDefinitionPanel(ctx, 40, 180);
     this.renderStatePanel(ctx, 640, 180);
+    this.renderBaselinePanel(ctx, 640, 462);
     this.renderer.render(ctx, this.renderPlan, 700, 385, { mode: 'legacy-demo-assets' });
   }
 
@@ -136,6 +145,32 @@ export class BootScene {
       ctx.fillText(`${label}:`, x + 20, rowY);
       ctx.fillStyle = '#f4e9bd';
       ctx.fillText(String(value), x + 120, rowY);
+    });
+  }
+
+  renderBaselinePanel(ctx, x, y) {
+    ctx.strokeStyle = '#f4e9bd';
+    ctx.strokeRect(x, y, 340, 180);
+
+    ctx.fillStyle = '#f4e9bd';
+    ctx.font = '15px Arial, sans-serif';
+    ctx.fillText('Renderer baseline samples', x + 20, y + 28);
+
+    ctx.fillStyle = '#d2c48b';
+    ctx.font = '11px Consolas, Monaco, monospace';
+    ctx.fillText('Different definitions rendered through same asset path.', x + 20, y + 48);
+
+    this.samplePlans.forEach((entry, index) => {
+      const drawX = x + 18 + index * 104;
+      const drawY = y + 62;
+      this.renderer.render(ctx, entry.plan, drawX, drawY, {
+        mode: 'legacy-demo-assets',
+        displayWidth: 96,
+        displayHeight: 96
+      });
+      ctx.fillStyle = '#d2c48b';
+      ctx.font = '9px Consolas, Monaco, monospace';
+      ctx.fillText(entry.sample.id, drawX + 2, y + 164);
     });
   }
 
