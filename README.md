@@ -1,56 +1,95 @@
-# HTML5 Binweevils Private Server
+# HTML5 Bin Weevils Private Server
 
-A faithful HTML5 port/rewrite of the KnowYourKnot/Binweevils private server project.
+This repository is being reset into a clean, faithful Flash-to-HTML5 port of Bin Weevils.
 
-The goal is not to make a generic Bin Weevils-inspired MMO. The goal is to preserve the original private-server structure, assets, UI style, room flow, backend logic, and weevil behaviour as closely as practical while replacing the Flash/SWF client with an HTML5 client.
+The goal is not to make a loose remake, a reimagining, or a generic Bin Weevils-inspired MMO. The goal is to port the original Flash client behaviour, layout, asset usage, room flow, avatar rendering, UI logic, and server expectations into a native HTML5/JavaScript client.
 
-## Current milestone
+## Current status
 
-Milestone 001 is a source audit and first-room selection pass.
+The old HTML5 build is now treated as a proof-of-concept only.
 
-Before building the game client, the repo will document:
+The only prototype work considered genuinely reusable at this stage is the weevil editor/rendering stack, because it proves that a weevil can be decoded and drawn in HTML5. All other systems must be rebuilt from the original source and verified assets.
 
-- where the local KnowYourKnot source is expected to live
-- which original assets exist
-- which room is cleanest for the first playable slice
-- which parts of the uploaded HTML5 prototype are reusable
-- which backend/database/game-server systems should be preserved
+## Source-of-truth order
 
-## Local source reference
+1. Original KnowYourKnot/Binweevils source and verified OG assets.
+2. Extracted or converted assets that can be traced back to the original files.
+3. The old HTML5 demo only where it preserves already-solved implementation knowledge.
+4. Temporary placeholders only when clearly labelled and removed before the relevant milestone is considered complete.
 
-Place the original KnowYourKnot/Binweevils source locally at:
+## Repository roles
 
 ```text
-legacy-reference/Binweevils-main/
+og-source/              External source/reference material. Do not edit as port code.
+prototype-reference/    Old demo notes and any preserved renderer reference work.
+src/                    Clean HTML5 port source code.
+public/                 Static files served by the browser during development.
+docs/                   Port rules, architecture notes, source audits, and milestone plans.
 ```
 
-`legacy-reference/` is ignored by Git on purpose. It is a source-of-truth reference folder, not something to blindly commit into this repo.
+## Porting rule
 
-## Preferred first playable slice
+Every ported system must answer these questions before implementation:
 
-Port one real room into HTML5:
+```text
+Which original Flash/ActionScript/source file controlled it?
+Which original assets did it use?
+Which data format did it expect?
+What is the matching HTML5 module?
+How will fidelity be tested?
+```
 
-1. Ink's Orange Peel / The Peel, if the original source has complete enough assets.
-2. Peel Park, if it is cleaner.
-3. A nest room only if public-room assets are harder to isolate.
+No feature should be accepted just because it looks close. If behaviour or visuals are guessed, they must be marked as temporary.
 
-The first playable demo should focus on:
+## Milestone 001: faithful client foundation
 
-- Apache/XAMPP-served HTML5 client
-- one real room background/assets from the original source
-- faithful UI frame/buttons using original UI assets
-- HTML5 weevil renderer using real weevil assets where possible
-- click-to-move
-- original-style chat bubble
-- basic chat and hidden/admin command parsing
-- backend/database flow kept close to the original where practical
+Milestone 001 does not aim to make a playable MMO room. It aims to build the clean runtime that later rooms and systems depend on.
 
-## Project docs
+Milestone 001 target:
 
-Start here:
+```text
+HTML5 app boots
+legacy stage/canvas exists
+core scene manager exists
+asset loader shell exists
+avatar renderer module boundary exists
+prototype renderer reference is documented
+one placeholder test scene renders
+no room/chat/account systems are faked as permanent code
+```
 
-- `docs/port-rules.md`
-- `docs/source-audit.md`
-- `docs/windows-audit-commands.md`
-- `docs/first-room-selection.md`
-- `docs/prototype-build-notes.md`
+## Planned port order
+
+1. Project charter and clean repo structure.
+2. Source setup for KnowYourKnot/Binweevils reference material.
+3. Core HTML5 runtime: stage, game loop, scene manager, input, debug overlay.
+4. Asset manifest/resolver for original file tracing.
+5. WeevilDef and avatar renderer port.
+6. UI primitives: buttons, panels, labels, chat bubble.
+7. First real room selected by source evidence.
+8. Room renderer, layers, walk area, depth sorting.
+9. Click-to-move.
+10. Local chat bubble and chatbar.
+11. Session/server bridge.
+12. Multiplayer room sync.
+
+## Development commands
+
+```bash
+npm install
+npm run dev
+```
+
+The initial app is intentionally small. It is a foundation for the faithful port, not a replacement for the original game yet.
+
+## Start here
+
+Read these first:
+
+```text
+docs/port-charter.md
+docs/architecture.md
+docs/milestones.md
+docs/prototype-reference.md
+docs/og-source-setup.md
+```
