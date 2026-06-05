@@ -2,6 +2,9 @@
 og-source/
 legacy-reference/
 
+# Committed source reference folder is allowed.
+# Large/binary files under source/ are tracked by Git LFS via .gitattributes.
+
 # Local prototype dumps
 prototype-reference/raw/
 
