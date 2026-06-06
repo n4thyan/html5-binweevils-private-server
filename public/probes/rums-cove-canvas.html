@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rums Cove Canvas Probe</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #151515;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #151515;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #d2c48b;
+      max-width: 1100px;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    .note,
+    .status,
+    .legend {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      max-width: 1100px;
+    }
+
+    .canvas-wrap {
+      display: inline-block;
+      border: 2px solid #8f7f44;
+      background: #0d0d0d;
+      padding: 12px;
+      max-width: calc(100vw - 72px);
+      overflow: auto;
+    }
+
+    canvas {
+      display: block;
+      background: #252525;
+      image-rendering: auto;
+    }
+
+    .path-list {
+      font: 12px Consolas, Monaco, monospace;
+      color: #d2c48b;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .ok {
+      color: #9fd36b;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rums Cove Canvas Probe</h1>
+  <p>Debug-only canvas check. This draws the exported room preview image and overlays approximate manifest points. It is not the final room renderer and does not claim accurate projection/depth yet.</p>
+
+  <div class="note">
+    <strong>Source-backed target:</strong><br />
+    locID 129 / RumsCove / FixedCam / <code>fixedCam/RumsAirport_180321.swf</code><br />
+    uploaded export family: <code>RumsAirport_dynamAds_videoPodv2_release</code>
+  </div>
+
+  <div id="status" class="status">Trying preview paths...</div>
+
+  <div class="canvas-wrap">
+    <canvas id="canvas" width="614" height="366" aria-label="Rums Cove room canvas probe"></canvas>
+  </div>
+
+  <div class="legend">
+    <strong>Overlay legend</strong>
+    <div class="path-list">green circle = entryPos [0, 80]
+yellow line/circles = active doors from locationDefinitions.xml
+cyan squares = XML objects
+orange rectangles = interactive actRects
+white rectangle = approximate boundary [-240, 60, 680, 90]
+
+Note: this overlay uses a simple debug mapping from X/Z room coordinates into the preview image. It is only for verifying manifest data is being consumed, not final projection fidelity.</div>
+  </div>
+
+  <script type="module">
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const status = document.getElementById('status');
+
+    const loc = {
+      id: 129,
+      name: 'RumsCove',
+      boundary: [-240, 60, 680, 90],
+      entryPos: [0, 80],
+      entryDir: 180,
+      weevilScale: 0.18
+    };
+
+    const doors = [
+      { id: 1, toLoc: 107, x1: -190, z1: 125, x2: -260, z2: 125, entryDir: 180 },
+      { id: 2, toLoc: 103, x1: 180, z1: 92, x2: 250, z2: 92, entryDir: 180 },
+      { id: 3, toLoc: 132, x1: 15, z1: 155, x2: 15, z2: 260, entryDir: 0 },
+      { id: 4, toLoc: 154, x1: -179, z1: 155, x2: -179, z2: 260, entryDir: 0 },
+      { id: 5, toLoc: 104, x1: 100, z1: 130, x2: 326, z2: 132, y2: 1500, entryDir: 0 }
+    ];
+
+    const objects = [
+      { name: 'door6_mc', x: 137, y: 0, z: 115 },
+      { name: 'mulchtasticBooth', x: 80, y: 0, z: 150 },
+      { name: 'buildings', x: -150, y: 0, z: 198 },
+      { name: 'fence', x: 0, y: 0, z: 160 },
+      { name: 'door3_mc', x: 0, y: 0, z: 190 },
+      { name: 'door4_mc', x: 0, y: 0, z: 191 },
+      { name: 'door5_mc', x: 0, y: 0, z: 0 },
+      { name: 'bobbleOverlay_mc', x: 0, y: 0, z: 335 }
+    ];
+
+    const interactives = [
+      { type: 'door', path: 'buildings.airport.slidingDoors_mc', actRect: [-20, 140, 60, 200] },
+      { type: 'door', path: 'buildings.diner.slidingDoors_mc', actRect: [-200, 140, 50, 200] }
+    ];
+
+    const candidatePaths = [
+      '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/reference/decompiled-rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/public/rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png'
+    ];
+
+    const image = new Image();
+    let index = 0;
+    const tried = [];
+
+    image.addEventListener('load', () => {
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      drawProbe(image);
+      const cleanPath = image.src.replace(/\?cacheBust=.*/, '');
+      status.innerHTML = '<span class="ok">Loaded canvas probe.</span><br /><code>' + cleanPath + '</code><br />natural size: ' + image.naturalWidth + 'x' + image.naturalHeight;
+    });
+
+    image.addEventListener('error', tryNextPath);
+
+    tryNextPath();
+
+    function tryNextPath() {
+      if (index >= candidatePaths.length) {
+        status.innerHTML = '<span class="fail">No preview image found yet.</span><br /><br />Expected one of these paths:<br /><div class="path-list">' + tried.join('\n') + '</div>';
+        drawMissing();
+        return;
+      }
+
+      const path = candidatePaths[index++];
+      tried.push(path);
+      status.innerHTML = 'Trying:<br /><code>' + path + '</code>';
+      image.src = path + '?cacheBust=' + Date.now();
+    }
+
+    function drawMissing() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#252525';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ff8e8e';
+      ctx.font = '18px Arial, sans-serif';
+      ctx.fillText('Rums preview image not found', 24, 48);
+    }
+
+    function drawProbe(img) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      drawBoundary();
+      drawDoors();
+      drawObjects();
+      drawInteractives();
+      drawEntry();
+      drawHudText();
+    }
+
+    function mapPoint(x, z) {
+      // Simple debug-only mapping from source room coordinates to preview pixels.
+      // The boundary is [-240, 60, 680, 90], meaning minX=-240, minZ=60,
+      // width=680, depth=90. It is expanded slightly so out-of-bound door
+      // endpoints remain visible.
+      const [minX, minZ, width, depth] = loc.boundary;
+      const padX = 60;
+      const padZ = 170;
+      const spanX = width + padX * 2;
+      const spanZ = depth + padZ;
+      const px = ((x - minX + padX) / spanX) * canvas.width;
+      const py = canvas.height - (((z - minZ + 28) / spanZ) * canvas.height);
+      return [px, py];
+    }
+
+    function drawBoundary() {
+      const [minX, minZ, width, depth] = loc.boundary;
+      const corners = [
+        mapPoint(minX, minZ),
+        mapPoint(minX + width, minZ),
+        mapPoint(minX + width, minZ + depth),
+        mapPoint(minX, minZ + depth)
+      ];
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 5]);
+      ctx.beginPath();
+      ctx.moveTo(corners[0][0], corners[0][1]);
+      for (const [x, y] of corners.slice(1)) ctx.lineTo(x, y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawEntry() {
+      const [x, y] = mapPoint(loc.entryPos[0], loc.entryPos[1]);
+      ctx.save();
+      ctx.fillStyle = 'rgba(60, 255, 80, 0.95)';
+      ctx.strokeStyle = '#072b09';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '12px Arial, sans-serif';
+      ctx.fillText('entry', x + 10, y - 8);
+      ctx.restore();
+    }
+
+    function drawDoors() {
+      ctx.save();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255, 240, 80, 0.95)';
+      ctx.fillStyle = 'rgba(255, 240, 80, 0.95)';
+      ctx.font = '11px Arial, sans-serif';
+      for (const door of doors) {
+        const [x1, y1] = mapPoint(door.x1, door.z1);
+        const [x2, y2] = mapPoint(door.x2, door.z2);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(x1, y1, 5, 0, Math.PI * 2);
+        ctx.arc(x2, y2, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillText(`door ${door.id}->${door.toLoc}`, (x1 + x2) / 2 + 4, (y1 + y2) / 2 - 4);
+      }
+      ctx.restore();
+    }
+
+    function drawObjects() {
+      ctx.save();
+      ctx.fillStyle = 'rgba(60, 220, 255, 0.95)';
+      ctx.strokeStyle = '#03232a';
+      ctx.font = '10px Arial, sans-serif';
+      for (const object of objects) {
+        const [x, y] = mapPoint(object.x, object.z);
+        ctx.fillRect(x - 4, y - 4, 8, 8);
+        ctx.strokeRect(x - 4, y - 4, 8, 8);
+        ctx.fillText(object.name, x + 6, y + 4);
+      }
+      ctx.restore();
+    }
+
+    function drawInteractives() {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 150, 40, 0.95)';
+      ctx.lineWidth = 2;
+      ctx.font = '10px Arial, sans-serif';
+      ctx.fillStyle = 'rgba(255, 150, 40, 0.95)';
+      for (const interactive of interactives) {
+        const [x, z, w, h] = interactive.actRect;
+        const [x1, y1] = mapPoint(x, z);
+        const [x2, y2] = mapPoint(x + w, z + h);
+        const rectX = Math.min(x1, x2);
+        const rectY = Math.min(y1, y2);
+        const rectW = Math.abs(x2 - x1);
+        const rectH = Math.abs(y2 - y1);
+        ctx.strokeRect(rectX, rectY, rectW, rectH);
+        ctx.fillText(interactive.path, rectX + 4, rectY - 4);
+      }
+      ctx.restore();
+    }
+
+    function drawHudText() {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.65)';
+      ctx.fillRect(8, 8, 236, 58);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.font = '12px Consolas, Monaco, monospace';
+      ctx.fillText('RumsCove locID 129 / FixedCam', 16, 26);
+      ctx.fillText('weevilScale: 0.18', 16, 42);
+      ctx.fillText('overlay: approximate debug only', 16, 58);
+      ctx.restore();
+    }
+  </script>
+</body>
+</html>
