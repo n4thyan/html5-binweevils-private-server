@@ -95,7 +95,8 @@
     <strong>Important caveat</strong>
     <div class="path-list">This is not final room integration.
 The room image is a frame preview, not separated runtime layers.
-The weevil is real asset-backed renderer output, but its screen placement is manually calibrated against entryPos for this debug page.
+The entry marker shows the current rough entryPos calibration.
+The weevil is real asset-backed renderer output, but its screen placement is manually offset onto open ground for this debug page.
 Next real pass should create a room scene class and replace this with source-backed projection/layer/depth rules.</div>
   </div>
 
@@ -127,6 +128,7 @@ Next real pass should create a room scene class and replace this with source-bac
     const image = new Image();
     let index = 0;
     const tried = [];
+    let activeImage = null;
 
     const avatar = AvatarState.fromUserVars({
       userId: 1,
@@ -145,11 +147,16 @@ Next real pass should create a room scene class and replace this with source-bac
     const renderer = new WeevilCanvasRenderer({ mode: 'legacy-demo-assets' });
     const renderPlan = avatar.createRenderPlan();
 
-    image.addEventListener('load', () => {
+    image.addEventListener('load', async () => {
+      activeImage = image;
       canvas.width = image.naturalWidth;
       canvas.height = image.naturalHeight;
-      drawProbe(image);
       const cleanPath = image.src.replace(/\?cacheBust=.*/, '');
+      status.innerHTML = 'Loaded room preview. Preloading demo weevil assets...<br /><code>' + cleanPath + '</code>';
+      drawLoadingState(image);
+
+      await renderer.legacyDemoAssetRenderer.preload();
+      drawProbe(image);
       status.innerHTML = '<span class="ok">Loaded Rums Cove + real weevil probe.</span><br /><code>' + cleanPath + '</code><br />natural size: ' + image.naturalWidth + 'x' + image.naturalHeight;
     });
 
@@ -179,24 +186,40 @@ Next real pass should create a room scene class and replace this with source-bac
       ctx.fillText('Rums preview image not found', 24, 48);
     }
 
-    function drawProbe(img) {
+    function drawLoadingState(img) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      ctx.fillRect(16, 16, 280, 40);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.font = '12px Consolas, Monaco, monospace';
+      ctx.fillText('loading real weevil renderer assets...', 26, 42);
+      ctx.restore();
+    }
+
+    function drawProbe(img = activeImage) {
+      if (!img) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
 
-      // Manual first visual calibration only. This is roughly where entryPos [0,80]
-      // sits visually in the preview and will be replaced by source-backed room
-      // projection/depth mapping in the real scene.
-      const entryScreen = { x: 238, y: 292 };
-      const displayWidth = 76;
-      const displayHeight = 76;
+      // Manual first visual calibration only. The marker shows our current rough
+      // entryPos [0,80]. The actual weevil is offset onto clear ground so we can
+      // inspect renderer scale without hiding it inside the pod/doorway art.
+      const entryMarker = { x: 238, y: 292 };
+      const weevilScreen = { x: 292, y: 314 };
+      const displayWidth = 66;
+      const displayHeight = 66;
 
-      drawEntryMarker(entryScreen.x, entryScreen.y);
-      renderer.render(ctx, renderPlan, entryScreen.x - displayWidth / 2, entryScreen.y - displayHeight + 10, {
+      drawEntryMarker(entryMarker.x, entryMarker.y);
+      drawPlacementLink(entryMarker, weevilScreen);
+      renderer.render(ctx, renderPlan, weevilScreen.x - displayWidth / 2, weevilScreen.y - displayHeight + 10, {
         mode: 'legacy-demo-assets',
         displayWidth,
         displayHeight
       });
-      drawDebugLabel(entryScreen.x, entryScreen.y, displayWidth, displayHeight);
+      drawDebugLabel(weevilScreen.x, weevilScreen.y, displayWidth, displayHeight);
       drawHudText();
     }
 
@@ -211,31 +234,43 @@ Next real pass should create a room scene class and replace this with source-bac
       ctx.stroke();
       ctx.fillStyle = '#ffffff';
       ctx.font = '12px Arial, sans-serif';
-      ctx.fillText('entryPos [0,80]', x + 12, y + 4);
+      ctx.fillText('rough entryPos [0,80]', x + 12, y + 4);
+      ctx.restore();
+    }
+
+    function drawPlacementLink(entry, weevil) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(60, 255, 80, 0.55)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(entry.x, entry.y);
+      ctx.lineTo(weevil.x, weevil.y);
+      ctx.stroke();
       ctx.restore();
     }
 
     function drawDebugLabel(x, y, width, height) {
       ctx.save();
       ctx.fillStyle = 'rgba(0,0,0,0.72)';
-      ctx.fillRect(x - 76, y - height - 44, 172, 36);
+      ctx.fillRect(x - 76, y - height - 44, 190, 36);
       ctx.fillStyle = '#f4e9bd';
       ctx.font = '10px Consolas, Monaco, monospace';
       ctx.fillText('real weevil renderer', x - 68, y - height - 25);
-      ctx.fillText('scale calibration: ' + loc.weevilScale, x - 68, y - height - 10);
+      ctx.fillText('manual visual offset, scale ' + loc.weevilScale, x - 68, y - height - 10);
       ctx.restore();
     }
 
     function drawHudText() {
       ctx.save();
       ctx.fillStyle = 'rgba(0,0,0,0.65)';
-      ctx.fillRect(8, 8, 278, 72);
+      ctx.fillRect(8, 8, 308, 72);
       ctx.fillStyle = '#f4e9bd';
       ctx.font = '12px Consolas, Monaco, monospace';
       ctx.fillText('RumsCove locID 129 / FixedCam', 16, 26);
       ctx.fillText('entryPos: [0,80] / dir 180', 16, 42);
       ctx.fillText('weevilScale: 0.18', 16, 58);
-      ctx.fillText('placement: debug calibrated only', 16, 74);
+      ctx.fillText('placement: manual visual offset', 16, 74);
       ctx.restore();
     }
   </script>
