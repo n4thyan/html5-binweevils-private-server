@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rums Cove Weevil Probe</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #151515;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #151515;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #d2c48b;
+      max-width: 1100px;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    .note,
+    .status,
+    .legend {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      max-width: 1100px;
+    }
+
+    .canvas-wrap {
+      display: inline-block;
+      border: 2px solid #8f7f44;
+      background: #0d0d0d;
+      padding: 12px;
+      max-width: calc(100vw - 72px);
+      overflow: auto;
+    }
+
+    canvas {
+      display: block;
+      background: #252525;
+      image-rendering: auto;
+    }
+
+    .path-list {
+      font: 12px Consolas, Monaco, monospace;
+      color: #d2c48b;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .ok {
+      color: #9fd36b;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rums Cove Weevil Probe</h1>
+  <p>Debug-only room + avatar check. This draws the exported Rums Cove preview and places the proven legacy-demo weevil renderer near the source-backed entry point. Placement/projection is still approximate.</p>
+
+  <div class="note">
+    <strong>Source-backed target:</strong><br />
+    locID 129 / RumsCove / FixedCam / <code>fixedCam/RumsAirport_180321.swf</code><br />
+    entryPos <code>[0, 80]</code> / entryDir <code>180</code> / weevilScale <code>0.18</code><br />
+    renderer: <code>WeevilCanvasRenderer mode="legacy-demo-assets"</code>
+  </div>
+
+  <div id="status" class="status">Trying preview paths...</div>
+
+  <div class="canvas-wrap">
+    <canvas id="canvas" width="614" height="366" aria-label="Rums Cove room and weevil probe"></canvas>
+  </div>
+
+  <div class="legend">
+    <strong>Important caveat</strong>
+    <div class="path-list">This is not final room integration.
+The room image is a frame preview, not separated runtime layers.
+The weevil is real asset-backed renderer output, but its screen placement is manually calibrated against entryPos for this debug page.
+Next real pass should create a room scene class and replace this with source-backed projection/layer/depth rules.</div>
+  </div>
+
+  <script type="module">
+    import { AvatarState } from '/src/avatar/AvatarState.js';
+    import { WeevilCanvasRenderer } from '/src/avatar/WeevilCanvasRenderer.js';
+    import { SAMPLE_WEEVIL_DEF } from '/src/avatar/WeevilDefSamples.js';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const status = document.getElementById('status');
+
+    const loc = {
+      id: 129,
+      name: 'RumsCove',
+      entryPos: [0, 80],
+      entryDir: 180,
+      weevilScale: 0.18
+    };
+
+    const candidatePaths = [
+      '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/reference/decompiled-rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/public/rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png',
+      '/rooms/RumsAirport_dynamAds_videoPodv2_release/frames/1.png'
+    ];
+
+    const image = new Image();
+    let index = 0;
+    const tried = [];
+
+    const avatar = AvatarState.fromUserVars({
+      userId: 1,
+      idx: 1,
+      name: 'debug_weevil',
+      weevilDef: SAMPLE_WEEVIL_DEF,
+      x: loc.entryPos[0],
+      y: 0,
+      z: loc.entryPos[1],
+      r: loc.entryDir,
+      ps: 0,
+      ex: 0,
+      locID: loc.id
+    });
+
+    const renderer = new WeevilCanvasRenderer({ mode: 'legacy-demo-assets' });
+    const renderPlan = avatar.createRenderPlan();
+
+    image.addEventListener('load', () => {
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      drawProbe(image);
+      const cleanPath = image.src.replace(/\?cacheBust=.*/, '');
+      status.innerHTML = '<span class="ok">Loaded Rums Cove + real weevil probe.</span><br /><code>' + cleanPath + '</code><br />natural size: ' + image.naturalWidth + 'x' + image.naturalHeight;
+    });
+
+    image.addEventListener('error', tryNextPath);
+
+    tryNextPath();
+
+    function tryNextPath() {
+      if (index >= candidatePaths.length) {
+        status.innerHTML = '<span class="fail">No preview image found yet.</span><br /><br />Expected one of these paths:<br /><div class="path-list">' + tried.join('\n') + '</div>';
+        drawMissing();
+        return;
+      }
+
+      const path = candidatePaths[index++];
+      tried.push(path);
+      status.innerHTML = 'Trying:<br /><code>' + path + '</code>';
+      image.src = path + '?cacheBust=' + Date.now();
+    }
+
+    function drawMissing() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#252525';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ff8e8e';
+      ctx.font = '18px Arial, sans-serif';
+      ctx.fillText('Rums preview image not found', 24, 48);
+    }
+
+    function drawProbe(img) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+
+      // Manual first visual calibration only. This is roughly where entryPos [0,80]
+      // sits visually in the preview and will be replaced by source-backed room
+      // projection/depth mapping in the real scene.
+      const entryScreen = { x: 238, y: 292 };
+      const displayWidth = 76;
+      const displayHeight = 76;
+
+      drawEntryMarker(entryScreen.x, entryScreen.y);
+      renderer.render(ctx, renderPlan, entryScreen.x - displayWidth / 2, entryScreen.y - displayHeight + 10, {
+        mode: 'legacy-demo-assets',
+        displayWidth,
+        displayHeight
+      });
+      drawDebugLabel(entryScreen.x, entryScreen.y, displayWidth, displayHeight);
+      drawHudText();
+    }
+
+    function drawEntryMarker(x, y) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(60, 255, 80, 0.95)';
+      ctx.strokeStyle = '#072b09';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '12px Arial, sans-serif';
+      ctx.fillText('entryPos [0,80]', x + 12, y + 4);
+      ctx.restore();
+    }
+
+    function drawDebugLabel(x, y, width, height) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      ctx.fillRect(x - 76, y - height - 44, 172, 36);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.font = '10px Consolas, Monaco, monospace';
+      ctx.fillText('real weevil renderer', x - 68, y - height - 25);
+      ctx.fillText('scale calibration: ' + loc.weevilScale, x - 68, y - height - 10);
+      ctx.restore();
+    }
+
+    function drawHudText() {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.65)';
+      ctx.fillRect(8, 8, 278, 72);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.font = '12px Consolas, Monaco, monospace';
+      ctx.fillText('RumsCove locID 129 / FixedCam', 16, 26);
+      ctx.fillText('entryPos: [0,80] / dir 180', 16, 42);
+      ctx.fillText('weevilScale: 0.18', 16, 58);
+      ctx.fillText('placement: debug calibrated only', 16, 74);
+      ctx.restore();
+    }
+  </script>
+</body>
+</html>
