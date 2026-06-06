@@ -11,7 +11,7 @@
 
 export const VIEWPORT_SLIME_FRAME_RULES = Object.freeze({
   system: 'game viewport slime frame / canvas shell',
-  status: 'source-map-target-only',
+  status: 'main-candidates-identified',
   mayUseScreenshotAsLayoutReference: true,
   mayUseScreenshotAsAssetSource: false,
   mayInventPermanentArt: false,
@@ -23,7 +23,7 @@ export const VIEWPORT_SLIME_FRAME_SOURCE_PRIORITY = Object.freeze([
   Object.freeze({
     priority: 1,
     source: 'reference/decompiled-dumpassets/dumpassets/mainDEV661.swf',
-    reason: 'main/root shell is expected to contain the green slime/canvas shell and viewport border assets'
+    reason: 'main/root shell contains the green slime/canvas shell and viewport border assets'
   }),
   Object.freeze({
     priority: 2,
@@ -39,6 +39,37 @@ export const VIEWPORT_SLIME_FRAME_SOURCE_PRIORITY = Object.freeze([
     priority: 4,
     source: 'full client UI screenshot supplied by Nathan',
     reason: 'layout reference only; not an asset source'
+  })
+]);
+
+export const VIEWPORT_SLIME_FRAME_MAIN_CANDIDATES = Object.freeze([
+  Object.freeze({
+    key: 'fullMainAlreadyOpenFrame',
+    path: 'reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png',
+    kind: 'frame-preview',
+    expectedRole: 'full main/root shell preview: background, green slime frame, centre message/splat',
+    verification: 'visually matched JPEXS screenshot supplied by Nathan'
+  }),
+  Object.freeze({
+    key: 'baseViewportPanelShape',
+    path: 'reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg',
+    kind: 'sprite-svg',
+    expectedRole: 'candidate viewport panel/slime shell sub-symbol',
+    verification: 'candidate from uploaded mainDEV661 dump; needs browser probe'
+  }),
+  Object.freeze({
+    key: 'scaledViewportPanelSprite',
+    path: 'reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg',
+    kind: 'sprite-svg',
+    expectedRole: 'candidate scaled viewport panel/slime shell sub-symbol',
+    verification: 'candidate from uploaded mainDEV661 dump; needs browser probe'
+  }),
+  Object.freeze({
+    key: 'fullMainShellSprite',
+    path: 'reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg',
+    kind: 'sprite-svg',
+    expectedRole: 'candidate full main shell composite sprite',
+    verification: 'candidate from uploaded mainDEV661 dump; needs browser probe'
   })
 ]);
 
@@ -64,8 +95,8 @@ export const VIEWPORT_SLIME_FRAME_EXPECTED_PARTS = Object.freeze([
 ]);
 
 export const VIEWPORT_SLIME_FRAME_PORT_ORDER = Object.freeze([
-  'locate-source-symbols-in-main',
-  'prove-main-symbols-load-in-browser',
+  'prove-main-frame-preview-loads-in-browser',
+  'prove-main-symbol-candidates-load-in-browser',
   'create-debug-shell-probe',
   'place-room-preview-behind-frame',
   'place-real-weevil-behind/within-frame',
@@ -88,11 +119,16 @@ export function getViewportSlimeFrameStatus() {
     status: VIEWPORT_SLIME_FRAME_RULES.status,
     expectedParts: VIEWPORT_SLIME_FRAME_EXPECTED_PARTS.length,
     sourcePriorityCount: VIEWPORT_SLIME_FRAME_SOURCE_PRIORITY.length,
+    mainCandidateCount: VIEWPORT_SLIME_FRAME_MAIN_CANDIDATES.length,
     knownNotSourceCount: VIEWPORT_SLIME_FRAME_KNOWN_NOT_SOURCES.length,
     portOrderCount: VIEWPORT_SLIME_FRAME_PORT_ORDER.length,
     nonGoalCount: VIEWPORT_SLIME_FRAME_NON_GOALS_NOW.length,
-    nextAction: 'locate-source-symbols-in-main'
+    nextAction: 'prove-main-frame-preview-loads-in-browser'
   });
+}
+
+export function getViewportSlimeMainCandidatePaths() {
+  return VIEWPORT_SLIME_FRAME_MAIN_CANDIDATES.map((candidate) => candidate.path);
 }
 
 export function assertViewportSlimeFrameSourcePolicy() {
