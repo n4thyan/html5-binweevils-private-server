@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Main Slime Shell Probe</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #151515;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #151515;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #d2c48b;
+      max-width: 1180px;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    .note,
+    .status {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      max-width: 1180px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      max-width: 1280px;
+    }
+
+    .card {
+      border: 1px solid #8f7f44;
+      background: #171717;
+      padding: 12px;
+      min-height: 220px;
+    }
+
+    .card h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      color: #fff2a8;
+    }
+
+    .card .role,
+    .card .path,
+    .card .result {
+      font: 12px Consolas, Monaco, monospace;
+      color: #d2c48b;
+      overflow-wrap: anywhere;
+      margin-bottom: 8px;
+    }
+
+    .preview-box {
+      border: 1px dashed #6c602f;
+      background: #252525;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+    }
+
+    .preview-box img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      image-rendering: auto;
+    }
+
+    .full-frame {
+      grid-column: 1 / -1;
+    }
+
+    .full-frame .preview-box {
+      justify-content: flex-start;
+    }
+
+    .ok {
+      color: #9fd36b;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Main Slime Shell Probe</h1>
+  <p>Debug-only check for the source-backed main/root slime shell candidates. This is separate from playercard icons in core. It does not build the final UI shell yet.</p>
+
+  <div class="note">
+    <strong>Correct source split:</strong><br />
+    <code>mainDEV661.swf</code> = green slime/canvas shell and root background candidates.<br />
+    <code>core5.swf</code> = playercard icons and other gameplay UI pieces. Do not mix these targets.
+  </div>
+
+  <div id="status" class="status">Loading main slime shell candidates...</div>
+  <div id="grid" class="grid"></div>
+
+  <script type="module">
+    const status = document.getElementById('status');
+    const grid = document.getElementById('grid');
+
+    const candidates = [
+      {
+        key: 'fullMainAlreadyOpenFrame',
+        title: 'Full main frame preview',
+        path: '/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png',
+        role: 'Full main/root shell preview: background, green slime frame, centre message/splat.',
+        className: 'full-frame'
+      },
+      {
+        key: 'baseViewportPanelShape',
+        title: 'DefineSprite 4',
+        path: '/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg',
+        role: 'Candidate viewport panel/slime shell sub-symbol.'
+      },
+      {
+        key: 'scaledViewportPanelSprite',
+        title: 'DefineSprite 96',
+        path: '/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg',
+        role: 'Candidate scaled viewport panel/slime shell sub-symbol.'
+      },
+      {
+        key: 'fullMainShellSprite',
+        title: 'DefineSprite 113',
+        path: '/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg',
+        role: 'Candidate full main shell composite sprite.'
+      }
+    ];
+
+    let loaded = 0;
+    let failed = 0;
+
+    for (const candidate of candidates) {
+      const card = document.createElement('section');
+      card.className = 'card ' + (candidate.className || '');
+
+      const title = document.createElement('h2');
+      title.textContent = candidate.title;
+
+      const role = document.createElement('div');
+      role.className = 'role';
+      role.textContent = candidate.role;
+
+      const path = document.createElement('div');
+      path.className = 'path';
+      path.textContent = candidate.path;
+
+      const box = document.createElement('div');
+      box.className = 'preview-box';
+
+      const result = document.createElement('div');
+      result.className = 'result';
+      result.textContent = 'loading...';
+
+      const img = new Image();
+      img.alt = candidate.title;
+      img.addEventListener('load', () => {
+        loaded += 1;
+        result.innerHTML = '<span class="ok">loaded</span> natural size: ' + img.naturalWidth + 'x' + img.naturalHeight;
+        updateStatus();
+      });
+      img.addEventListener('error', () => {
+        failed += 1;
+        result.innerHTML = '<span class="fail">not found</span> - check local dump path';
+        updateStatus();
+      });
+      img.src = candidate.path + '?cacheBust=' + Date.now();
+
+      box.appendChild(img);
+      card.appendChild(title);
+      card.appendChild(role);
+      card.appendChild(path);
+      card.appendChild(result);
+      card.appendChild(box);
+      grid.appendChild(card);
+    }
+
+    function updateStatus() {
+      const pending = candidates.length - loaded - failed;
+      status.innerHTML = 'Loaded: <span class="ok">' + loaded + '</span> / Failed: <span class="fail">' + failed + '</span> / Pending: ' + pending + '<br />Next proof target: identify which main symbol should become the actual source-backed viewport shell.';
+    }
+  </script>
+</body>
+</html>
