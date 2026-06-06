@@ -98,10 +98,15 @@ The central message/splat from the source frame is covered by the Rums room view
 The clipping rectangle is manually calibrated from the loaded main frame preview.
 The final client should replace this with exact main symbols/layers and a real source-backed viewport mask.
 
+This revised probe maps the proven standalone Rums weevil calibration into the shell viewport:
+standalone Rums room = 614x366
+standalone weevil calibration point = 292,314
+standalone weevil display = 66x66
+
 Layer order in this probe:
 1. main shell frame preview
-2. clipped Rums Cove room preview inside the slime viewport
-3. real weevil renderer at source-backed scale proof
+2. clipped/scaled Rums Cove room preview inside the slime viewport
+3. real weevil renderer scaled with the room preview
 4. debug labels</div>
   </div>
 
@@ -127,6 +132,15 @@ Layer order in this probe:
       weevilScale: 0.18
     };
 
+    const rumsStandaloneCalibration = {
+      sourceWidth: 614,
+      sourceHeight: 366,
+      weevilScreenX: 292,
+      weevilScreenY: 314,
+      weevilDisplayWidth: 66,
+      weevilDisplayHeight: 66
+    };
+
     const avatar = AvatarState.fromUserVars({
       userId: 1,
       idx: 1,
@@ -150,7 +164,7 @@ Layer order in this probe:
       renderer.legacyDemoAssetRenderer.preload()
     ]).then(([shell, room]) => {
       drawComposite(shell, room);
-      status.innerHTML = '<span class="ok">Loaded main shell + Rums Cove + real weevil probe.</span><br />' +
+      status.innerHTML = '<span class="ok">Loaded improved main shell + Rums Cove + real weevil probe.</span><br />' +
         '<code>' + paths.shell + '</code><br />' +
         '<code>' + paths.room + '</code><br />' +
         'shell: ' + shell.naturalWidth + 'x' + shell.naturalHeight + ' / room: ' + room.naturalWidth + 'x' + room.naturalHeight;
@@ -175,24 +189,24 @@ Layer order in this probe:
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(shell, 0, 0);
 
-      // Manual first-pass calibration based on mainDEV661.swf/frames/1.png.
-      // This deliberately places the room inside the visible green slime panel,
-      // leaving the source border visible around it.
+      // Manual improved calibration based on the visible mainDEV661 frame.
+      // Larger than the previous probe so the room behaves like a viewport,
+      // not a small image pasted on top of the error panel.
       const viewport = {
-        x: Math.round(canvas.width * 0.205),
-        y: Math.round(canvas.height * 0.145),
-        width: Math.round(canvas.width * 0.59),
-        height: Math.round(canvas.height * 0.63)
+        x: Math.round(canvas.width * 0.095),
+        y: Math.round(canvas.height * 0.080),
+        width: Math.round(canvas.width * 0.805),
+        height: Math.round(canvas.height * 0.745)
       };
 
       ctx.save();
-      roundedClip(viewport.x, viewport.y, viewport.width, viewport.height, 18);
+      roundedClip(viewport.x, viewport.y, viewport.width, viewport.height, 22);
       ctx.clip();
-      drawRoomCover(room, viewport);
-      drawWeevilInViewport(viewport);
+      const roomPlacement = drawRoomCover(room, viewport);
+      drawWeevilMappedFromRumsCalibration(roomPlacement);
       ctx.restore();
 
-      drawViewportDebug(viewport);
+      drawViewportDebug(viewport, room);
       drawHudText(viewport);
     }
 
@@ -203,13 +217,14 @@ Layer order in this probe:
       const x = viewport.x + (viewport.width - width) / 2;
       const y = viewport.y + (viewport.height - height) / 2;
       ctx.drawImage(room, x, y, width, height);
+      return { x, y, width, height, scale };
     }
 
-    function drawWeevilInViewport(viewport) {
-      const displayWidth = 66;
-      const displayHeight = 66;
-      const x = viewport.x + viewport.width * 0.50;
-      const y = viewport.y + viewport.height * 0.78;
+    function drawWeevilMappedFromRumsCalibration(roomPlacement) {
+      const x = roomPlacement.x + rumsStandaloneCalibration.weevilScreenX * roomPlacement.scale;
+      const y = roomPlacement.y + rumsStandaloneCalibration.weevilScreenY * roomPlacement.scale;
+      const displayWidth = Math.round(rumsStandaloneCalibration.weevilDisplayWidth * roomPlacement.scale);
+      const displayHeight = Math.round(rumsStandaloneCalibration.weevilDisplayHeight * roomPlacement.scale);
 
       renderer.render(ctx, renderPlan, x - displayWidth / 2, y - displayHeight + 10, {
         mode: 'legacy-demo-assets',
@@ -219,36 +234,37 @@ Layer order in this probe:
 
       ctx.save();
       ctx.fillStyle = 'rgba(0,0,0,0.72)';
-      ctx.fillRect(x - 68, y - displayHeight - 36, 180, 30);
+      ctx.fillRect(x - 76, y - displayHeight - 38, 228, 32);
       ctx.fillStyle = '#f4e9bd';
       ctx.font = '10px Consolas, Monaco, monospace';
-      ctx.fillText('real weevil renderer', x - 60, y - displayHeight - 18);
-      ctx.fillText('scale proof: ' + loc.weevilScale, x - 60, y - displayHeight - 5);
+      ctx.fillText('real weevil renderer mapped from Rums probe', x - 68, y - displayHeight - 20);
+      ctx.fillText('source scale proof: ' + loc.weevilScale + ' / visual scale ' + roomPlacement.scale.toFixed(2), x - 68, y - displayHeight - 7);
       ctx.restore();
     }
 
-    function drawViewportDebug(viewport) {
+    function drawViewportDebug(viewport, room) {
       ctx.save();
       ctx.strokeStyle = 'rgba(255, 240, 80, 0.9)';
       ctx.lineWidth = 2;
       ctx.setLineDash([8, 5]);
       ctx.strokeRect(viewport.x, viewport.y, viewport.width, viewport.height);
       ctx.fillStyle = 'rgba(0,0,0,0.65)';
-      ctx.fillRect(viewport.x + 8, viewport.y + 8, 260, 42);
+      ctx.fillRect(viewport.x + 8, viewport.y + 8, 318, 56);
       ctx.fillStyle = '#f4e9bd';
       ctx.font = '12px Consolas, Monaco, monospace';
-      ctx.fillText('manual viewport mask proof', viewport.x + 16, viewport.y + 26);
-      ctx.fillText('RumsCove behind main slime shell', viewport.x + 16, viewport.y + 42);
+      ctx.fillText('manual larger viewport mask proof', viewport.x + 16, viewport.y + 26);
+      ctx.fillText('RumsCove fills shell viewport, not tiny paste-in', viewport.x + 16, viewport.y + 42);
+      ctx.fillText('room source: ' + room.naturalWidth + 'x' + room.naturalHeight, viewport.x + 16, viewport.y + 58);
       ctx.restore();
     }
 
     function drawHudText(viewport) {
       ctx.save();
       ctx.fillStyle = 'rgba(0,0,0,0.72)';
-      ctx.fillRect(16, 16, 430, 72);
+      ctx.fillRect(16, 16, 450, 72);
       ctx.fillStyle = '#f4e9bd';
       ctx.font = '12px Consolas, Monaco, monospace';
-      ctx.fillText('Main shell + RumsCove debug composition', 28, 36);
+      ctx.fillText('Main shell + RumsCove improved debug composition', 28, 36);
       ctx.fillText('shell: mainDEV661 frame preview', 28, 52);
       ctx.fillText('room: RumsCove locID 129 / weevilScale 0.18', 28, 68);
       ctx.fillText('viewport: ' + viewport.x + ',' + viewport.y + ' ' + viewport.width + 'x' + viewport.height, 28, 84);
