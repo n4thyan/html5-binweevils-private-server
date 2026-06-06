@@ -6,7 +6,7 @@ The goal is not to make a loose remake, a reimagining, or a generic Bin Weevils-
 
 ## Current confirmed state
 
-The project is currently in the source-backed foundation and first-room audit phase.
+The project is currently in the source-backed foundation, first-room proof and UI-shell source mapping phase.
 
 Confirmed working:
 
@@ -27,6 +27,12 @@ standalone core UI asset probe page loads real core5.swf exported SVGs in the br
 FixedCamera room source model is mapped from LocFactory/Loc/LocFixedCam
 FixedCamera location XML parser/candidate scorer exists and is tested
 RumsCove locID 129 has been identified as the first strict FixedCamera room candidate
+RumsCove source-backed manifest is tested
+RumsCove preview frame loads in-browser from the decompiled/exported room family
+RumsCove + real weevil debug probe works in-browser
+RumsCove weevilScale 0.18 has been visually confirmed as plausible in the room preview
+mainDEV661.swf green slime/canvas shell target has been separated from core/playercard UI work
+mainDEV661.swf slime shell candidate paths are recorded for browser probing
 videoPod1_10_05_12 has been audited as a simple VOD/external scene candidate
 ```
 
@@ -34,7 +40,8 @@ Not implemented yet:
 
 ```text
 final UI shell
-real room rendering in the main canvas
+real room rendering in the main client scene
+source-backed FixedCam projection/depth
 click-to-move
 room-to-room navigation
 chat
@@ -45,7 +52,7 @@ backend/session bridge
 multiplayer sync
 ```
 
-The visible debug scene is not intended to be the final client screen. It is a verification surface for renderer, boot-flow, source-map, asset-path and first-room audit work.
+The visible debug scenes/probes are not intended to be the final client screen. They are verification surfaces for renderer, boot-flow, source-map, asset-path and first-room audit work.
 
 ## First room direction
 
@@ -57,9 +64,25 @@ name: RumsCove
 type: 2 / FixedCam
 roomBG from XML: fixedCam/RumsAirport_180321.swf
 uploaded room-family export: RumsAirport_dynamAds_videoPodv2_release.zip
+boundary: -240,60,680,90
+camPos: 0,190,-330
+camAim: 0,90,260
+entryPos: 0,80
+entryDir: 180
+weevilScale: 0.18
 ```
 
 The uploaded Rums export appears to be a Rums Cove video-pod release variant. The XML references `RumsAirport_180321.swf`, so the relationship between those exact files must stay documented until equivalence is proven.
+
+Current Rums proof pages:
+
+```text
+/probes/rums-cove-preview.html
+/probes/rums-cove-canvas.html
+/probes/rums-cove-weevil.html
+```
+
+The Rums weevil probe is still debug-only. It uses manual visual placement, but it proves the actual room preview, source manifest and real weevil renderer can coexist in the browser with the source `weevilScale` value.
 
 A second related scene has also been audited:
 
@@ -68,6 +91,21 @@ videoPod1_10_05_12
 ```
 
 That scene is useful for later VOD/interior work, but it is not currently treated as the first strict `LocFixedCam` room because its exact `locationDefinitions.xml` entry was not found.
+
+## UI shell direction
+
+The green slime/canvas shell belongs to `mainDEV661.swf`, not the core/playercard UI asset track.
+
+Current slime shell candidate paths:
+
+```text
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg
+```
+
+Playercard icons/assets are a separate core/playercard target. Recent playercard icon screenshots should not be used as slime-frame sources.
 
 ## Source-of-truth order
 
@@ -163,6 +201,8 @@ npm run test:ui-main-source-map
 npm run test:cam-ui-source-map
 npm run test:fixed-cam-room-source-map
 npm run test:fixed-cam-loc-definition
+npm run test:rums-cove-manifest
+npm run test:rums-cove-preview-calibration
 npm run test:core-symbol-locator
 npm run test:core-ui-asset-probe-plan
 npm run test:core-ui-asset-files
@@ -174,6 +214,10 @@ Useful debug pages:
 
 ```text
 /probes/core-ui-assets.html
+/probes/rums-cove-preview.html
+/probes/rums-cove-canvas.html
+/probes/rums-cove-weevil.html
+/probes/main-slime-shell.html
 ```
 
 ## Current roadmap snapshot
@@ -183,8 +227,8 @@ Milestone 001: client foundation - mostly complete
 Milestone 002: weevil renderer baseline - confirmed visually working
 Milestone 003: main/core source mapping - strong progress
 Milestone 004: real core UI asset probe - debug page working
-Milestone 005: source-backed UI shell from core5.swf/mainDEV661.swf assets - next UI target
-Milestone 006: first FixedCamera room audit - active, RumsCove selected
+Milestone 005: source-backed UI shell from mainDEV661.swf/core5.swf assets - active source mapping
+Milestone 006: first FixedCamera room audit - active, RumsCove selected and tested
 Milestone 007: first room render - next room target
 Milestone 008: source-backed local movement/depth
 Milestone 009: local chat and speech bubbles
