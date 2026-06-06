@@ -9,6 +9,7 @@ Do not invent permanent assets, UI, room layouts, or behaviour.
 Use source/decompiled files first.
 Use the old HTML5 demo only for already-proven renderer knowledge.
 Mark all debug probes and placeholders clearly.
+Do not confuse main/root shell assets with core/playercard assets.
 ```
 
 ## Current status snapshot
@@ -20,11 +21,22 @@ Decompiled main/core dump: committed
 mainDEV661.swf boot order: mapped and tested
 core5.swf Bin.as init order: mapped and tested
 core5.swf UImain.as structure: mapped and tested
+core5.swf CamUI.as structure/behaviour: mapped and tested for later 3D-camera rooms
 core5.swf UI symbol paths: corrected to real FFDec DefineSprite paths and tested
-Real exported UI SVG existence: tested
-Final UI shell: not started
-Rooms: not started
-Movement: not started
+Real exported core UI SVG existence: tested
+Core UI asset probe page: working
+FixedCamera source model: mapped and tested
+FixedCamera loc XML parser/scorer: mapped and tested
+RumsCove locID 129: selected as first strict FixedCamera candidate
+RumsCove manifest: added and tested
+RumsCove room preview: loads in browser
+RumsCove + real weevil probe: working after renderer preload fix
+RumsCove weevilScale 0.18: visually confirmed plausible
+mainDEV661 green slime/canvas shell: source candidates identified
+main slime shell probe page: added
+Final UI shell: not implemented
+Real main-client room scene: not implemented
+Movement: not implemented
 Backend: not started
 ```
 
@@ -75,6 +87,7 @@ real extracted weevil assets load
 main weevil renders correctly
 baseline sample definitions render
 render plan tests pass
+RumsCove probe confirms the renderer can be drawn over a real room preview
 ```
 
 Rule:
@@ -86,7 +99,7 @@ Use it as the visual baseline while porting rooms and UI.
 
 ## Milestone 003: main/core source mapping
 
-Status: in progress, strong progress.
+Status: strong progress.
 
 Purpose:
 
@@ -99,9 +112,10 @@ Done:
 ```text
 mainDEV661.swf Main.as boot flow mapped
 mainDEV661.swf STAGE.as noted
+mainDEV661.swf slime/canvas shell candidates recorded
 core5.swf Bin.as constructor/init flow mapped
 core5.swf UImain.as child structure mapped
-core5.swf CamUI.as child names documented
+core5.swf CamUI.as child names and velocity/button behaviours mapped
 core5.swf symbolClass IDs mapped for important UI symbols
 FFDec DefineSprite path format corrected
 real UI SVG file existence confirmed
@@ -110,16 +124,16 @@ real UI SVG file existence confirmed
 Next:
 
 ```text
-wire new tests into normal npm test flow
-map Main.as loader visuals more deeply
-map UImain setupCamUI and control button behaviours
+prove mainDEV661 slime shell candidates load in browser
+map exact main shell symbol composition
 map ChatLog and chatbar source paths
 map action/emote/phrase source paths
+map playercard icons separately from slime shell work
 ```
 
 ## Milestone 004: real core UI asset probe
 
-Status: next immediate coding target.
+Status: working as standalone debug page.
 
 Purpose:
 
@@ -127,18 +141,13 @@ Purpose:
 Load and display real exported core5.swf UI SVGs in a debug-only probe panel.
 ```
 
-Scope:
+Done:
 
 ```text
-weevilProfile
-controlTab
-alertBox
-dialogueBox
-sidebtnsflipout
-actionsBtn
-actionIcons
-mouthIcons
-petProfile
+/probes/core-ui-assets.html added
+weevilProfile/controlTab/alert/dialogue/actions/mouth/pet symbols visually load
+raw exported frame caveats documented
+side-buttons/pet-profile/weevil-profile notes documented
 ```
 
 Rules:
@@ -150,19 +159,16 @@ Only display actual exported source assets.
 Clearly label it debug-only.
 ```
 
-Completion criteria:
+Remaining optional cleanup:
 
 ```text
-browser loads all probe SVGs
-probe reports loaded/error state
-assets are visibly drawn in a debug panel
-file existence tests remain green
-no invented UI shell is added
+move probe rendering into canvas only when useful
+do not block room/UI progress on this debug page
 ```
 
 ## Milestone 005: source-backed UI shell
 
-Status: not started.
+Status: active source mapping.
 
 Purpose:
 
@@ -170,42 +176,55 @@ Purpose:
 Build the real client UI shell from mainDEV661.swf and core5.swf assets/classes.
 ```
 
-Source files:
+Current split:
 
 ```text
-mainDEV661.swf/scripts/com/binweevils/Main.as
-mainDEV661.swf/scripts/com/binweevils/STAGE.as
-core5.swf/scripts/com/binweevils/UImain.as
-core5.swf/scripts/com/binweevils/CamUI.as
-core5.swf/symbolClass/symbols.csv
+mainDEV661.swf = green slime/canvas shell, root background, already-open frame/panel
+core5.swf = gameplay UI pieces such as playercard icons, controls, alerts, dialogue, action UI
+screenshots = layout/reference notes only, not asset sources
+```
+
+Main slime shell candidates:
+
+```text
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg
+```
+
+Current debug page:
+
+```text
+/probes/main-slime-shell.html
 ```
 
 Expected pieces:
 
 ```text
 contentHolderU_spr/contentHolderL_spr equivalent layers
-loader handoff model
-control tab
-side buttons
+main slime/canvas shell behind/around room viewport
+room content clipped behind frame
+lower controls/chat/action strip above correct layer
 profile panel holder
 chat holder
-camera UI holder
 alert/dialogue/invite overlay layers
+rough composition matching later Bin Weevils layout reference
 ```
 
-Not included yet:
+Deferred pieces:
 
 ```text
-final room rendering
-real server login
-multiplayer
-inventory functionality
-shops
+pet profile internals
+shops/inventory
+full buddy tablet internals
+3D camera CamUI activation for FixedCamera rooms
+backend/session state
 ```
 
 ## Milestone 006: first FixedCamera room audit
 
-Status: not started.
+Status: active, strong progress.
 
 Purpose:
 
@@ -218,25 +237,62 @@ Rules:
 ```text
 Do not use the old custom The Peel room.
 Start with an original FixedCamera room.
-Pick the room based on available source/assets, not preference.
+Pick the room based on available source/assets, not preference alone.
+Record filename/version mismatches instead of hiding them.
 ```
 
-Audit needs:
+Done:
 
 ```text
-room SWF/source path
-background/floor/object layers
-entry/spawn coordinates
-camera parameters
-walkable area/floor click data
-foreground/depth layers
-object interaction stubs
-known missing dependencies
+FixedCam LocFactory/Loc/LocFixedCam source model mapped
+FixedCam loc XML parser/candidate scorer added
+videoPod1_10_05_12 audited as related VOD/external scene
+locationDefinitions.xml checked
+RumsCove locID 129 found and selected as first strict FixedCam candidate
+RumsAirport_dynamAds_videoPodv2_release export audited
+RumsCove manifest added and tested
+RumsCove preview image loaded in browser
+RumsCove source manifest consumed by canvas overlay probe
+RumsCove + real weevil probe working
+RumsCove preview calibration added and tested
+```
+
+Current selected room candidate:
+
+```text
+locID: 129
+name: RumsCove
+type: 2
+roomBG from XML: fixedCam/RumsAirport_180321.swf
+uploaded export: RumsAirport_dynamAds_videoPodv2_release
+boundary: -240,60,680,90
+camPos: 0,190,-330
+camAim: 0,90,260
+entryPos: 0,80
+entryDir: 180
+weevilScale: 0.18
+```
+
+Caution:
+
+```text
+XML references RumsAirport_180321.swf.
+Uploaded export is RumsAirport_dynamAds_videoPodv2_release.
+Treat as same room family/variant until exact equivalence is proven.
+```
+
+Next:
+
+```text
+verify main slime shell probe
+create a reusable RumsCove/FixedCam scene module from the successful probe logic
+move room preview + weevil render out of throwaway HTML into source modules
+add debug boundary/entry/door options to the scene module
 ```
 
 ## Milestone 007: first room render
 
-Status: not started.
+Status: next room target.
 
 Purpose:
 
@@ -244,15 +300,22 @@ Purpose:
 Render one real source-backed FixedCamera room locally.
 ```
 
+First target:
+
+```text
+RumsCove locID 129
+```
+
 Completion criteria:
 
 ```text
 room background/layers visible
 coordinate system documented
-one weevil placed in room
-depth debug overlay present
+one real weevil placed with source-backed weevilScale
+boundary debug overlay present
+door graph available in debug output
 no invented room art
-room manifest created
+room manifest consumed from src/rooms/RumsCoveManifest.js
 ```
 
 ## Milestone 008: local movement and depth
@@ -271,6 +334,8 @@ Source areas:
 core5.swf/scripts/com/binweevils/Bin.as
 core5.swf/scripts/com/binweevils/engine3D/
 core5.swf/scripts/com/binweevils/engine3D/visuals/
+core5.swf/scripts/com/binweevils/engine3D/visuals/Loc.as
+core5.swf/scripts/com/binweevils/engine3D/visuals/LocFixedCam.as
 core5.swf/scripts/com/binweevils/engine3D/visuals/creatures/weevils/
 core5.swf/scripts/com/binweevils/engine3D/visuals/creatures/weevils/behaviours/
 ```
@@ -345,16 +410,18 @@ compatibility notes
 safe local/dev configuration
 ```
 
-## Tonight/tomorrow handoff
+## Current handoff
 
 Current recommended next step:
 
 ```text
 1. Pull latest main.
-2. Run npm test.
-3. Wire CoreUiAssetProbeRenderer into BootScene with a small safe patch.
-4. Visually confirm real core5.swf UI SVGs load in browser.
-5. Then begin source-backed UI shell planning from UImain.as and Main.as.
+2. Run npm.cmd test.
+3. Open /probes/main-slime-shell.html.
+4. Verify which mainDEV661 slime shell candidates visibly load.
+5. Record the confirmed main shell symbol(s).
+6. Create a reusable FixedCam/RumsCove scene module from the room + weevil proof.
+7. Put RumsCove behind the source-backed main slime shell in a debug UI-shell probe.
 ```
 
-Do not jump to movement, rooms, backend, or custom UI until Milestone 004 is visually confirmed.
+Do not jump to backend, multiplayer, dynamic ads, plane/firework animations, guessed playercard UI, or hand-drawn slime borders yet.
