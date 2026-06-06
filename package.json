@@ -16,12 +16,13 @@
     "test:fixed-cam-loc-definition": "node tests/fixed-cam-loc-definition-smoke.mjs",
     "test:rums-cove-manifest": "node tests/rums-cove-manifest-smoke.mjs",
     "test:rums-cove-preview-calibration": "node tests/rums-cove-preview-calibration-smoke.mjs",
+    "test:main-shell-rums-cove-composition": "node tests/main-shell-rums-cove-composition-smoke.mjs",
     "test:core-symbol-locator": "node tests/core-symbol-locator-smoke.mjs",
     "test:core-ui-asset-probe-plan": "node tests/core-ui-asset-probe-plan-smoke.mjs",
     "test:core-ui-asset-files": "node tests/core-ui-asset-files-smoke.mjs",
     "test:render-plan": "node tests/render-plan-smoke.mjs",
     "test:prototype-renderer": "node tests/prototype-renderer-smoke.mjs",
-    "test": "npm run test:boot-flow && npm run test:core-init-flow && npm run test:ui-main-source-map && npm run test:cam-ui-source-map && npm run test:fixed-cam-room-source-map && npm run test:fixed-cam-loc-definition && npm run test:rums-cove-manifest && npm run test:rums-cove-preview-calibration && npm run test:core-symbol-locator && npm run test:core-ui-asset-probe-plan && npm run test:core-ui-asset-files && npm run test:render-plan && npm run test:prototype-renderer"
+    "test": "npm run test:boot-flow && npm run test:core-init-flow && npm run test:ui-main-source-map && npm run test:cam-ui-source-map && npm run test:fixed-cam-room-source-map && npm run test:fixed-cam-loc-definition && npm run test:rums-cove-manifest && npm run test:rums-cove-preview-calibration && npm run test:main-shell-rums-cove-composition && npm run test:core-symbol-locator && npm run test:core-ui-asset-probe-plan && npm run test:core-ui-asset-files && npm run test:render-plan && npm run test:prototype-renderer"
   },
   "dependencies": {
     "@vitejs/plugin-legacy": "latest",
