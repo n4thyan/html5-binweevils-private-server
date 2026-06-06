@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Main Shell + Rums Cove Probe</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #151515;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #151515;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #d2c48b;
+      max-width: 1180px;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    .note,
+    .status,
+    .legend {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      max-width: 1180px;
+    }
+
+    .canvas-wrap {
+      display: inline-block;
+      border: 2px solid #8f7f44;
+      background: #0d0d0d;
+      padding: 12px;
+      max-width: calc(100vw - 72px);
+      overflow: auto;
+    }
+
+    canvas {
+      display: block;
+      background: #252525;
+      image-rendering: auto;
+    }
+
+    .path-list {
+      font: 12px Consolas, Monaco, monospace;
+      color: #d2c48b;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .ok {
+      color: #9fd36b;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Main Shell + Rums Cove Probe</h1>
+  <p>Debug-only composition: source-backed main slime shell preview, Rums Cove room preview clipped into the central viewport, and the proven real weevil renderer. This is not the final UI shell or final FixedCam projection.</p>
+
+  <div class="note">
+    <strong>Source-backed split:</strong><br />
+    <code>mainDEV661.swf/frames/1.png</code> supplies the temporary full-shell preview for this proof.<br />
+    <code>RumsAirport_dynamAds_videoPodv2_release/frames/1.png</code> supplies the room preview.<br />
+    <code>WeevilCanvasRenderer mode="legacy-demo-assets"</code> supplies the avatar.
+  </div>
+
+  <div id="status" class="status">Loading assets...</div>
+
+  <div class="canvas-wrap">
+    <canvas id="canvas" width="946" height="653" aria-label="Main slime shell with Rums Cove room probe"></canvas>
+  </div>
+
+  <div class="legend">
+    <strong>Important caveat</strong>
+    <div class="path-list">This page deliberately uses the full main frame preview as a temporary shell proof.
+The central message/splat from the source frame is covered by the Rums room viewport.
+The clipping rectangle is manually calibrated from the loaded main frame preview.
+The final client should replace this with exact main symbols/layers and a real source-backed viewport mask.
+
+Layer order in this probe:
+1. main shell frame preview
+2. clipped Rums Cove room preview inside the slime viewport
+3. real weevil renderer at source-backed scale proof
+4. debug labels</div>
+  </div>
+
+  <script type="module">
+    import { AvatarState } from '/src/avatar/AvatarState.js';
+    import { WeevilCanvasRenderer } from '/src/avatar/WeevilCanvasRenderer.js';
+    import { SAMPLE_WEEVIL_DEF } from '/src/avatar/WeevilDefSamples.js';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const status = document.getElementById('status');
+
+    const paths = {
+      shell: '/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png',
+      room: '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/frames/1.png'
+    };
+
+    const loc = {
+      id: 129,
+      name: 'RumsCove',
+      entryPos: [0, 80],
+      entryDir: 180,
+      weevilScale: 0.18
+    };
+
+    const avatar = AvatarState.fromUserVars({
+      userId: 1,
+      idx: 1,
+      name: 'debug_weevil',
+      weevilDef: SAMPLE_WEEVIL_DEF,
+      x: loc.entryPos[0],
+      y: 0,
+      z: loc.entryPos[1],
+      r: loc.entryDir,
+      ps: 0,
+      ex: 0,
+      locID: loc.id
+    });
+
+    const renderer = new WeevilCanvasRenderer({ mode: 'legacy-demo-assets' });
+    const renderPlan = avatar.createRenderPlan();
+
+    Promise.all([
+      loadImage(paths.shell),
+      loadImage(paths.room),
+      renderer.legacyDemoAssetRenderer.preload()
+    ]).then(([shell, room]) => {
+      drawComposite(shell, room);
+      status.innerHTML = '<span class="ok">Loaded main shell + Rums Cove + real weevil probe.</span><br />' +
+        '<code>' + paths.shell + '</code><br />' +
+        '<code>' + paths.room + '</code><br />' +
+        'shell: ' + shell.naturalWidth + 'x' + shell.naturalHeight + ' / room: ' + room.naturalWidth + 'x' + room.naturalHeight;
+    }).catch((error) => {
+      drawError(error);
+      status.innerHTML = '<span class="fail">Failed to load probe asset.</span><br /><code>' + String(error.message || error) + '</code>';
+    });
+
+    function loadImage(path) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.addEventListener('load', () => resolve(image));
+        image.addEventListener('error', () => reject(new Error('missing image: ' + path)));
+        image.src = path + '?cacheBust=' + Date.now();
+      });
+    }
+
+    function drawComposite(shell, room) {
+      canvas.width = shell.naturalWidth;
+      canvas.height = shell.naturalHeight;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(shell, 0, 0);
+
+      // Manual first-pass calibration based on mainDEV661.swf/frames/1.png.
+      // This deliberately places the room inside the visible green slime panel,
+      // leaving the source border visible around it.
+      const viewport = {
+        x: Math.round(canvas.width * 0.205),
+        y: Math.round(canvas.height * 0.145),
+        width: Math.round(canvas.width * 0.59),
+        height: Math.round(canvas.height * 0.63)
+      };
+
+      ctx.save();
+      roundedClip(viewport.x, viewport.y, viewport.width, viewport.height, 18);
+      ctx.clip();
+      drawRoomCover(room, viewport);
+      drawWeevilInViewport(viewport);
+      ctx.restore();
+
+      drawViewportDebug(viewport);
+      drawHudText(viewport);
+    }
+
+    function drawRoomCover(room, viewport) {
+      const scale = Math.max(viewport.width / room.naturalWidth, viewport.height / room.naturalHeight);
+      const width = room.naturalWidth * scale;
+      const height = room.naturalHeight * scale;
+      const x = viewport.x + (viewport.width - width) / 2;
+      const y = viewport.y + (viewport.height - height) / 2;
+      ctx.drawImage(room, x, y, width, height);
+    }
+
+    function drawWeevilInViewport(viewport) {
+      const displayWidth = 66;
+      const displayHeight = 66;
+      const x = viewport.x + viewport.width * 0.50;
+      const y = viewport.y + viewport.height * 0.78;
+
+      renderer.render(ctx, renderPlan, x - displayWidth / 2, y - displayHeight + 10, {
+        mode: 'legacy-demo-assets',
+        displayWidth,
+        displayHeight
+      });
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      ctx.fillRect(x - 68, y - displayHeight - 36, 180, 30);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.font = '10px Consolas, Monaco, monospace';
+      ctx.fillText('real weevil renderer', x - 60, y - displayHeight - 18);
+      ctx.fillText('scale proof: ' + loc.weevilScale, x - 60, y - displayHeight - 5);
+      ctx.restore();
+    }
+
+    function drawViewportDebug(viewport) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 240, 80, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 5]);
+      ctx.strokeRect(viewport.x, viewport.y, viewport.width, viewport.height);
+      ctx.fillStyle = 'rgba(0,0,0,0.65)';
+      ctx.fillRect(viewport.x + 8, viewport.y + 8, 260, 42);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.font = '12px Consolas, Monaco, monospace';
+      ctx.fillText('manual viewport mask proof', viewport.x + 16, viewport.y + 26);
+      ctx.fillText('RumsCove behind main slime shell', viewport.x + 16, viewport.y + 42);
+      ctx.restore();
+    }
+
+    function drawHudText(viewport) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      ctx.fillRect(16, 16, 430, 72);
+      ctx.fillStyle = '#f4e9bd';
+      ctx.font = '12px Consolas, Monaco, monospace';
+      ctx.fillText('Main shell + RumsCove debug composition', 28, 36);
+      ctx.fillText('shell: mainDEV661 frame preview', 28, 52);
+      ctx.fillText('room: RumsCove locID 129 / weevilScale 0.18', 28, 68);
+      ctx.fillText('viewport: ' + viewport.x + ',' + viewport.y + ' ' + viewport.width + 'x' + viewport.height, 28, 84);
+      ctx.restore();
+    }
+
+    function roundedClip(x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function drawError(error) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#252525';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ff8e8e';
+      ctx.font = '18px Arial, sans-serif';
+      ctx.fillText('Probe failed: ' + String(error.message || error), 24, 48);
+    }
+  </script>
+</body>
+</html>
