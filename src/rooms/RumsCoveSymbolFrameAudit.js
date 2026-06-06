@@ -6,7 +6,8 @@ export const RUMS_COVE_SYMBOL_AUDIT_LIMITS = Object.freeze({
   topScripts: 50,
   topButtons: 20,
   topImages: 20,
-  keywordMatches: 80
+  keywordMatches: 80,
+  focusedKeywordMatches: 40
 });
 
 export const RUMS_COVE_SYMBOL_AUDIT_KEYWORDS = Object.freeze([
@@ -25,6 +26,25 @@ export const RUMS_COVE_SYMBOL_AUDIT_KEYWORDS = Object.freeze([
   'screen',
   'ad',
   'dynam'
+]);
+
+export const RUMS_COVE_FOCUSED_ROOM_KEYWORDS = Object.freeze([
+  'Door_',
+  'door1',
+  'door3',
+  'door4',
+  'door6',
+  'Door_animated',
+  'cafedooropenanim',
+  'airport_',
+  'buildings_',
+  'overlay_',
+  'remoteBack_',
+  'remoteOverlay_',
+  'podText_',
+  'plane_runway',
+  'plane_takeoff',
+  'pipes_'
 ]);
 
 export function normaliseAuditPath(path) {
@@ -46,6 +66,7 @@ export function createRumsCoveSymbolFrameAudit(fileEntries) {
   const symbolClass = entries.filter((entry) => entry.path.startsWith('symbolClass/'));
 
   const keywordMatches = findKeywordMatches(entries, RUMS_COVE_SYMBOL_AUDIT_KEYWORDS);
+  const focusedKeywordMatches = findKeywordMatches(entries, RUMS_COVE_FOCUSED_ROOM_KEYWORDS);
 
   return Object.freeze({
     exportRoot: RUMS_COVE_EXPORT_ROOT,
@@ -68,7 +89,8 @@ export function createRumsCoveSymbolFrameAudit(fileEntries) {
     frameFiles: Object.freeze(frames.map((entry) => entry.path).sort()),
     symbolClassFiles: Object.freeze(symbolClass.map((entry) => entry.path).sort()),
     keywordMatches: Object.freeze(keywordMatches.slice(0, RUMS_COVE_SYMBOL_AUDIT_LIMITS.keywordMatches)),
-    recommendedNextStep: chooseRecommendedNextStep({ sprites, shapes, scripts, symbolClass, keywordMatches })
+    focusedKeywordMatches: Object.freeze(focusedKeywordMatches.slice(0, RUMS_COVE_SYMBOL_AUDIT_LIMITS.focusedKeywordMatches)),
+    recommendedNextStep: chooseRecommendedNextStep({ sprites, shapes, scripts, symbolClass, keywordMatches, focusedKeywordMatches })
   });
 }
 
@@ -81,6 +103,11 @@ export function normaliseFileEntry(entry) {
     path: normaliseAuditPath(entry?.path),
     size: Number.isFinite(entry?.size) ? entry.size : 0
   });
+}
+
+export function getTopLevelExportFolder(path) {
+  const normalised = normaliseAuditPath(path);
+  return normalised.split('/').filter(Boolean)[0] || '';
 }
 
 export function topBySize(entries, limit) {
@@ -99,7 +126,11 @@ export function findKeywordMatches(entries, keywords) {
     .map((entry) => Object.freeze({ path: entry.path, size: entry.size }));
 }
 
-export function chooseRecommendedNextStep({ sprites, shapes, scripts, symbolClass, keywordMatches }) {
+export function chooseRecommendedNextStep({ sprites, shapes, scripts, symbolClass, keywordMatches, focusedKeywordMatches = [] }) {
+  if (symbolClass.length > 0 && scripts.length > 0 && focusedKeywordMatches.length > 0) {
+    return 'inspect-focused-room-scripts-and-symbols';
+  }
+
   if (symbolClass.length > 0 && scripts.length > 0 && keywordMatches.length > 0) {
     return 'inspect-symbolClass-and-room-related-scripts';
   }
@@ -133,6 +164,7 @@ export function formatRumsCoveSymbolFrameAudit(audit) {
   appendSection(lines, 'topImagesBySize', audit.topImagesBySize, formatPathSize);
   appendSection(lines, 'topButtonsBySize', audit.topButtonsBySize, formatPathSize);
   appendSection(lines, 'topScriptsBySize', audit.topScriptsBySize, formatPathSize);
+  appendSection(lines, 'focusedKeywordMatches', audit.focusedKeywordMatches, formatPathSize);
   appendSection(lines, 'keywordMatches', audit.keywordMatches, formatPathSize);
 
   lines.push(`recommendedNextStep: ${audit.recommendedNextStep}`);
