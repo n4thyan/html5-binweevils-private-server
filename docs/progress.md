@@ -1,10 +1,10 @@
 # Current progress handoff
 
-Date: 2026-06-05
+Date: 2026-06-06
 
 ## Current state
 
-The project is now in a strong source-backed foundation state.
+The project is now in a strong source-backed foundation state with the first real room and first main-shell UI candidates visually proven.
 
 Confirmed:
 
@@ -22,7 +22,14 @@ FixedCamera LocFactory/Loc/LocFixedCam source model mapped and tested
 FixedCamera loc XML parser/candidate scorer added and tested
 locationDefinitions.xml checked
 RumsCove locID 129 selected as first strict FixedCamera room target
-videoPod1_10_05_12 audited as a related simple VOD/external scene candidate
+RumsCove manifest added and tested
+Rums Cove room preview loads in-browser from exported room-family assets
+Rums Cove canvas overlay probe consumes source-backed manifest data
+Rums Cove + real weevil probe works after renderer preload fix
+Rums Cove weevilScale 0.18 visually looks correct in the room preview
+Rums Cove preview calibration constants added and tested
+mainDEV661.swf green slime/canvas shell separated from core/playercard UI work
+mainDEV661.swf slime shell candidates identified for browser probing
 ```
 
 ## Current first-room decision
@@ -52,6 +59,45 @@ uploaded export is RumsAirport_dynamAds_videoPodv2_release.zip
 
 Treat these as the same room family for planning, but do not claim exact equivalence until checked.
 
+## Current Rums proof pages
+
+```text
+/probes/rums-cove-preview.html
+/probes/rums-cove-canvas.html
+/probes/rums-cove-weevil.html
+```
+
+Status:
+
+```text
+preview image loads
+manifest data can be overlaid
+real weevil renderer appears after preload
+scale 0.18 looks correct for this room
+placement is still manually calibrated and debug-only
+```
+
+## Current UI shell direction
+
+The green slime/canvas shell is a `mainDEV661.swf` target.
+
+The playercard icons/assets are a separate `core5.swf` playercard target and must not be mixed into the slime-frame work.
+
+Current main slime shell candidates:
+
+```text
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg
+reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg
+```
+
+Current slime shell probe:
+
+```text
+/probes/main-slime-shell.html
+```
+
 ## Related scene
 
 `videoPod1_10_05_12` is useful, but it is not the first strict FixedCam room target.
@@ -80,6 +126,8 @@ UImain source map
 CamUI source map
 FixedCam room source map
 FixedCam loc definition parser
+RumsCove manifest
+RumsCove preview calibration
 core symbol locator
 core UI asset probe plan
 core UI asset file existence
@@ -87,16 +135,24 @@ render plan
 prototype renderer
 ```
 
-## Tomorrow recommended order
+Individual useful new checks:
+
+```text
+node tests/rums-cove-manifest-smoke.mjs
+node tests/rums-cove-preview-calibration-smoke.mjs
+node tests/viewport-slime-frame-source-map-smoke.mjs
+```
+
+## Next recommended order
 
 ```text
 1. Pull latest main.
 2. Run npm.cmd test.
-3. Put the Rums export into a stable reference folder if not already committed.
-4. Create a RumsCove room manifest from locID 129 plus the Rums symbol map.
-5. Add a debug-only Rums room preview page using frames/1.png.
-6. Start the first real FixedCamera room render after the preview is verified.
-7. Continue source-backed UI shell mapping in parallel.
+3. Open /probes/main-slime-shell.html and verify mainDEV661 slime shell candidates load.
+4. If the main shell probe looks correct, record which candidate(s) are the real shell pieces.
+5. Begin a reusable FixedCam/RumsCove scene module from the successful room + weevil probe.
+6. Add a source-backed UI shell probe that puts RumsCove behind the main slime frame.
+7. Only after that, begin projection/depth/movement work.
 ```
 
 ## Do not do yet
@@ -108,4 +164,6 @@ do not guess missing room data as final
 do not prioritise 3D camera CamUI rooms before the first FixedCamera milestone
 do not implement dynamic room extras before the static room render works
 do not replace the proven weevil renderer
+do not treat playercard icon screenshots as slime-frame assets
+do not hand-draw a permanent slime border
 ```
