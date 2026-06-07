@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rums Cove Layer Toggle Probe</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; background:#151515; color:#f4e9bd; }
+    body { margin:0; padding:24px; background:#151515; }
+    h1 { margin:0 0 8px; font-size:26px; }
+    p { margin:0 0 14px; color:#d2c48b; max-width:1180px; }
+    code { color:#fff2a8; }
+    .note,.status,.controls { border:1px solid #8f7f44; background:#211f16; padding:12px 14px; margin-bottom:18px; max-width:1180px; }
+    .controls { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+    label { font:13px Consolas, Monaco, monospace; color:#f4e9bd; }
+    button { background:#332b13; border:1px solid #8f7f44; color:#f4e9bd; padding:6px 10px; cursor:pointer; }
+    .stage-wrap { display:inline-block; border:2px solid #8f7f44; background:#0d0d0d; padding:12px; max-width:calc(100vw - 72px); overflow:auto; }
+    .stage { position:relative; width:900px; height:560px; background:#242424; overflow:hidden; }
+    .stage img.layer { position:absolute; left:0; top:0; transform-origin:0 0; max-width:none; image-rendering:auto; }
+    .stage img.compare { position:absolute; left:0; top:0; width:900px; height:auto; opacity:.25; pointer-events:none; }
+    .hud { position:absolute; left:10px; top:10px; background:rgba(0,0,0,.72); color:#f4e9bd; padding:8px; font:12px Consolas, Monaco, monospace; z-index:999; }
+    .ok { color:#9fd36b; } .fail { color:#ff8e8e; }
+  </style>
+</head>
+<body>
+  <h1>Rums Cove Layer Toggle Probe</h1>
+  <p>Debug-only composition check for RumsCove source sprites. This is not final: all transforms are temporary visual calibration until the SWF placement data is extracted.</p>
+
+  <div class="note">
+    <strong>Rule:</strong> <code>frames/1.png</code> is comparison only. The real target is layered source sprites, then exact SWF transforms, then a proper FixedCam scene.
+  </div>
+
+  <div id="status" class="status">Loading layer candidates...</div>
+
+  <div class="controls" id="controls"></div>
+
+  <div class="stage-wrap">
+    <div id="stage" class="stage">
+      <div class="hud">RumsCove source layer toggle<br />temporary transforms only</div>
+    </div>
+  </div>
+
+  <script type="module">
+    const root = '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/';
+    const stage = document.getElementById('stage');
+    const controls = document.getElementById('controls');
+    const status = document.getElementById('status');
+
+    const layers = [
+      { key:'compare', label:'frames/1.png comparison', z:0, checked:true, compare:true, x:0, y:0, scale:1.466, path:root+'frames/1.png' },
+      { key:'buildings', label:'buildings_12', z:10, checked:true, x:0, y:0, scale:1, path:root+'sprites/DefineSprite_361_RumsAirport_dynamAds_videoPodv2_fla.buildings_12/1.svg' },
+      { key:'airport', label:'airport_23', z:20, checked:false, x:0, y:0, scale:1, path:root+'sprites/DefineSprite_293_RumsAirport_dynamAds_videoPodv2_fla.airport_23/1.svg' },
+      { key:'yoghurtpotTums', label:'yoghurtpot_tums_13', z:30, checked:true, x:0, y:0, scale:1, path:root+'sprites/DefineSprite_358_RumsAirport_dynamAds_videoPodv2_fla.yoghurtpot_tums_13/1.svg' },
+      { key:'remoteBack', label:'remoteBack_31', z:40, checked:true, x:0, y:0, scale:1, path:root+'sprites/DefineSprite_265_RumsAirport_dynamAds_videoPodv2_fla.remoteBack_31/1.svg' },
+      { key:'overlay', label:'overlay_70', z:50, checked:true, x:0, y:0, scale:1, path:root+'sprites/DefineSprite_266_RumsAirport_dynamAds_videoPodv2_fla.overlay_70/1.svg' }
+    ];
+
+    const images = new Map();
+    let loaded = 0;
+    let failed = 0;
+
+    for (const layer of layers) {
+      addControl(layer);
+      const img = new Image();
+      img.className = 'layer' + (layer.compare ? ' compare' : '');
+      img.dataset.key = layer.key;
+      img.style.zIndex = String(layer.z);
+      img.style.left = layer.x + 'px';
+      img.style.top = layer.y + 'px';
+      img.style.transform = 'scale(' + layer.scale + ')';
+      img.style.display = layer.checked ? 'block' : 'none';
+      img.addEventListener('load', () => { loaded++; updateStatus(); });
+      img.addEventListener('error', () => { failed++; updateStatus(); });
+      img.src = layer.path + '?cacheBust=' + Date.now();
+      images.set(layer.key, img);
+      stage.appendChild(img);
+    }
+
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'all on';
+    allBtn.onclick = () => setAll(true);
+    controls.appendChild(allBtn);
+
+    const noneBtn = document.createElement('button');
+    noneBtn.textContent = 'all off';
+    noneBtn.onclick = () => setAll(false);
+    controls.appendChild(noneBtn);
+
+    function addControl(layer) {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = layer.checked;
+      input.addEventListener('change', () => {
+        images.get(layer.key).style.display = input.checked ? 'block' : 'none';
+      });
+      label.appendChild(input);
+      label.append(' ' + layer.label);
+      controls.appendChild(label);
+    }
+
+    function setAll(value) {
+      for (const input of controls.querySelectorAll('input[type="checkbox"]')) {
+        input.checked = value;
+        input.dispatchEvent(new Event('change'));
+      }
+    }
+
+    function updateStatus() {
+      const pending = layers.length - loaded - failed;
+      status.innerHTML = 'Loaded: <span class="ok">' + loaded + '</span> / Failed: <span class="fail">' + failed + '</span> / Pending: ' + pending + '<br />Next: extract exact SWF placement transforms instead of temporary x/y/scale.';
+    }
+  </script>
+</body>
+</html>
