@@ -7,7 +7,6 @@ import {
   createRumsCoveSymbolFrameAudit,
   findKeywordMatches,
   formatRumsCoveSymbolFrameAudit,
-  getTopLevelExportFolder,
   normaliseAuditPath,
   normaliseFileEntry,
   topBySize
