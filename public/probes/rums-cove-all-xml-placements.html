@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rums Cove All XML Placements Probe</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; background:#151515; color:#f4e9bd; }
+    body { margin:0; padding:24px; background:#151515; }
+    h1 { margin:0 0 8px; font-size:26px; }
+    p { margin:0 0 14px; color:#d2c48b; max-width:1180px; }
+    code { color:#fff2a8; }
+    .note,.status,.controls,.legend { border:1px solid #8f7f44; background:#211f16; padding:12px 14px; margin-bottom:18px; max-width:1180px; }
+    .controls { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
+    label { font:12px Consolas, Monaco, monospace; }
+    input[type="range"] { width:150px; }
+    .stage-wrap { display:inline-block; border:2px solid #8f7f44; background:#0d0d0d; padding:12px; max-width:calc(100vw - 72px); overflow:auto; }
+    .stage { position:relative; width:614px; height:366px; background:#63c7ee; overflow:hidden; }
+    .stage img.layer { position:absolute; left:0; top:0; transform-origin:0 0; max-width:none; image-rendering:auto; }
+    .comparison { position:absolute; left:0; top:0; width:614px; height:366px; opacity:.22; z-index:0; pointer-events:none; display:none; }
+    .hud { position:absolute; left:8px; top:8px; z-index:9999; background:rgba(0,0,0,.68); color:#f4e9bd; padding:7px; font:11px Consolas, Monaco, monospace; pointer-events:none; }
+    .legend { font:12px Consolas, Monaco, monospace; color:#d2c48b; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .ok { color:#9fd36b; } .fail { color:#ff8e8e; } .warn { color:#ffd36b; }
+  </style>
+</head>
+<body>
+  <h1>Rums Cove All XML Placements Probe</h1>
+  <p>Debug page for finding missing sky/floor/backdrop pieces. Build the generated JSON first, then this renders every XML PlaceObject that maps to an exported source SVG.</p>
+
+  <div class="note">
+    <strong>Run first:</strong><br />
+    <code>node scripts/build-rums-cove-xml-scene-json.mjs .\xml\RumsAirport_dynamAds_videoPodv2.xml</code><br />
+    This page does not use manual calibration. It renders mapped XML placements by source depth.
+  </div>
+
+  <div id="status" class="status">Loading generated XML scene JSON...</div>
+
+  <div class="controls">
+    <label><input type="checkbox" id="comparisonToggle"> comparison frame</label>
+    <label><input type="checkbox" id="namedOnlyToggle"> named only</label>
+    <label><input type="checkbox" id="unnamedOnlyToggle"> unnamed only</label>
+    <label>max depth <input type="range" id="depthRange" min="0" max="700" value="700"> <span id="depthValue">700</span></label>
+  </div>
+
+  <div class="stage-wrap">
+    <div id="stage" class="stage">
+      <img id="comparison" class="comparison" alt="comparison frame" src="/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/frames/1.png" />
+      <div id="hud" class="hud">loading...</div>
+    </div>
+  </div>
+
+  <div id="legend" class="legend"></div>
+
+  <script type="module">
+    const stage = document.getElementById('stage');
+    const status = document.getElementById('status');
+    const legend = document.getElementById('legend');
+    const hud = document.getElementById('hud');
+    const comparison = document.getElementById('comparison');
+    const comparisonToggle = document.getElementById('comparisonToggle');
+    const namedOnlyToggle = document.getElementById('namedOnlyToggle');
+    const unnamedOnlyToggle = document.getElementById('unnamedOnlyToggle');
+    const depthRange = document.getElementById('depthRange');
+    const depthValue = document.getElementById('depthValue');
+
+    const generatedPath = '/generated/rums-cove-xml-scene.json';
+    const rendered = [];
+    let loaded = 0;
+    let failed = 0;
+    let payload = null;
+
+    comparisonToggle.addEventListener('change', applyFilters);
+    namedOnlyToggle.addEventListener('change', () => { if (namedOnlyToggle.checked) unnamedOnlyToggle.checked = false; applyFilters(); });
+    unnamedOnlyToggle.addEventListener('change', () => { if (unnamedOnlyToggle.checked) namedOnlyToggle.checked = false; applyFilters(); });
+    depthRange.addEventListener('input', applyFilters);
+
+    try {
+      const response = await fetch(generatedPath + '?cacheBust=' + Date.now());
+      if (!response.ok) throw new Error('missing generated JSON: ' + generatedPath);
+      payload = await response.json();
+      buildLayers(payload);
+      applyFilters();
+      status.innerHTML = '<span class="ok">Loaded all XML placement probe.</span><br />' +
+        'mapped: ' + payload.stats.mappedPlacementCount + ' / unmapped: ' + payload.stats.unmappedPlacementCount + '<br />' +
+        '<code>' + generatedPath + '</code>';
+    } catch (error) {
+      status.innerHTML = '<span class="fail">Could not load generated scene JSON.</span><br /><code>' + String(error.message || error) + '</code>';
+      hud.textContent = 'run the build script first';
+    }
+
+    function buildLayers(data) {
+      const mapped = data.placements.filter((placement) => placement.mapped && placement.spritePath);
+      for (const placement of mapped) {
+        const image = new Image();
+        image.className = 'layer';
+        image.alt = placement.name || 'unnamed-' + placement.characterId;
+        image.dataset.depth = String(placement.depth);
+        image.dataset.name = placement.name || '';
+        image.dataset.characterId = String(placement.characterId);
+        image.dataset.className = placement.className || '';
+        image.title = `depth=${placement.depth} cid=${placement.characterId} name=${placement.name || '(unnamed)'}`;
+        image.style.zIndex = String(placement.depth);
+        image.style.transform = toCssMatrix(placement.matrix);
+        image.addEventListener('load', () => { loaded += 1; updateHud(); });
+        image.addEventListener('error', () => { failed += 1; updateHud(); });
+        image.src = '/' + placement.spritePath + '?cacheBust=' + Date.now();
+        stage.appendChild(image);
+        rendered.push({ placement, image });
+      }
+    }
+
+    function applyFilters() {
+      const maxDepth = Number(depthRange.value);
+      depthValue.textContent = String(maxDepth);
+      comparison.style.display = comparisonToggle.checked ? 'block' : 'none';
+
+      for (const item of rendered) {
+        const hasName = Boolean(item.placement.name);
+        const visible = item.placement.depth <= maxDepth &&
+          (!namedOnlyToggle.checked || hasName) &&
+          (!unnamedOnlyToggle.checked || !hasName);
+        item.image.style.display = visible ? 'block' : 'none';
+      }
+      updateHud();
+      updateLegend();
+    }
+
+    function updateHud() {
+      if (!payload) return;
+      const visible = rendered.filter((item) => item.image.style.display !== 'none').length;
+      hud.innerHTML = [
+        'all XML placements',
+        'rendered: ' + rendered.length,
+        'visible: ' + visible,
+        'loaded: ' + loaded,
+        'failed: ' + failed,
+        'max depth: ' + depthRange.value
+      ].join('<br />');
+    }
+
+    function updateLegend() {
+      if (!payload) return;
+      const visibleItems = rendered
+        .filter((item) => item.image.style.display !== 'none')
+        .slice(0, 120)
+        .map((item) => {
+          const p = item.placement;
+          return `depth=${p.depth} cid=${p.characterId} name=${p.name || '(unnamed)'} class=${p.className || '(unmapped class)'} path=${p.spritePath}`;
+        });
+      legend.textContent = [
+        'Visible mapped placements, first 120:',
+        ...visibleItems,
+        '',
+        'Tip: turn on unnamed-only and drag max depth down/up to find sky/floor/backdrop candidates.'
+      ].join('\n');
+    }
+
+    function toCssMatrix(matrix) {
+      return `matrix(${matrix.scaleX}, ${matrix.rotateSkew0}, ${matrix.rotateSkew1}, ${matrix.scaleY}, ${matrix.x}, ${matrix.y})`;
+    }
+  </script>
+</body>
+</html>
