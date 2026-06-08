@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rums Cove XML Placement Probe</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; background:#151515; color:#f4e9bd; }
+    body { margin:0; padding:24px; background:#151515; }
+    h1 { margin:0 0 8px; font-size:26px; }
+    p { margin:0 0 14px; color:#d2c48b; max-width:1180px; }
+    code { color:#fff2a8; }
+    .note,.status,.controls { border:1px solid #8f7f44; background:#211f16; padding:12px 14px; margin-bottom:18px; max-width:1180px; }
+    .controls { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
+    label { font:12px Consolas, Monaco, monospace; }
+    button { background:#332b13; border:1px solid #8f7f44; color:#f4e9bd; padding:6px 10px; cursor:pointer; }
+    .stage-wrap { display:inline-block; border:2px solid #8f7f44; background:#0d0d0d; padding:12px; max-width:calc(100vw - 72px); overflow:auto; }
+    .stage { position:relative; width:614px; height:366px; background:#242424; overflow:hidden; }
+    .stage img.layer { position:absolute; left:0; top:0; transform-origin:0 0; max-width:none; image-rendering:auto; }
+    .compare { position:absolute; left:0; top:0; width:614px; height:366px; opacity:.28; z-index:0; pointer-events:none; }
+    .hud { position:absolute; left:8px; top:8px; background:rgba(0,0,0,.72); color:#f4e9bd; padding:7px; font:11px Consolas, Monaco, monospace; z-index:9999; }
+    .legend { margin-top:14px; max-width:1180px; font:12px Consolas, Monaco, monospace; color:#d2c48b; white-space:pre-wrap; }
+    .ok { color:#9fd36b; } .fail { color:#ff8e8e; } .warn { color:#ffd36b; }
+  </style>
+</head>
+<body>
+  <h1>Rums Cove XML Placement Probe</h1>
+  <p>Source-backed render probe using JPEXS XML placement values. The low opacity baked frame is comparison only.</p>
+
+  <div class="note">
+    <strong>Port rule:</strong> this page uses the XML placement map for root-level transforms. <code>frames/1.png</code> is only a comparison overlay.
+  </div>
+
+  <div id="status" class="status">Loading XML placed source sprites...</div>
+  <div id="controls" class="controls"></div>
+
+  <div class="stage-wrap">
+    <div id="stage" class="stage">
+      <img class="compare" id="compare" alt="comparison frame" src="/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/frames/1.png" />
+      <div class="hud">RumsCove XML placement<br />source sprites + comparison frame</div>
+    </div>
+  </div>
+
+  <div id="legend" class="legend"></div>
+
+  <script type="module">
+    import {
+      RUMS_COVE_XML_SCENE_LAYER_ORDER,
+      RUMS_COVE_XML_PLACEMENT_SOURCE,
+      toCssMatrix
+    } from '/src/rooms/RumsCoveXmlPlacementMap.js';
+
+    const root = '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/';
+    const stage = document.getElementById('stage');
+    const controls = document.getElementById('controls');
+    const status = document.getElementById('status');
+    const legend = document.getElementById('legend');
+    const compare = document.getElementById('compare');
+
+    const spriteByClass = {
+      'RumsAirport_dynamAds_videoPodv2_fla.plane_takeoff_3': 'sprites/DefineSprite_373_RumsAirport_dynamAds_videoPodv2_fla.plane_takeoff_3/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.plane_runway_anim_5': 'sprites/DefineSprite_370_RumsAirport_dynamAds_videoPodv2_fla.plane_runway_anim_5/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.buildings_12': 'sprites/DefineSprite_361_RumsAirport_dynamAds_videoPodv2_fla.buildings_12/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.remoteBack_31': 'sprites/DefineSprite_265_RumsAirport_dynamAds_videoPodv2_fla.remoteBack_31/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.Door_002_71': 'sprites/DefineSprite_179_RumsAirport_dynamAds_videoPodv2_fla.Door_002_71/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door1_76': 'sprites/DefineSprite_149_RumsAirport_dynamAds_videoPodv2_fla.door1_76/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door3_78': 'sprites/DefineSprite_144_RumsAirport_dynamAds_videoPodv2_fla.door3_78/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door4_80': 'sprites/DefineSprite_142_RumsAirport_dynamAds_videoPodv2_fla.door4_80/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door6_82': 'sprites/DefineSprite_139_RumsAirport_dynamAds_videoPodv2_fla.door6_82/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.pipes_86': 'sprites/DefineSprite_313_RumsAirport_dynamAds_videoPodv2_fla.pipes_86/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.remoteOverlay_74': 'sprites/DefineSprite_283_RumsAirport_dynamAds_videoPodv2_fla.remoteOverlay_74/1.svg'
+    };
+
+    const rendered = [];
+    const skipped = [];
+    let loaded = 0;
+    let failed = 0;
+
+    addComparisonControl();
+
+    for (const placement of RUMS_COVE_XML_SCENE_LAYER_ORDER) {
+      const relativePath = spriteByClass[placement.className];
+      if (!relativePath) {
+        skipped.push(placement);
+        continue;
+      }
+
+      const img = new Image();
+      img.className = 'layer';
+      img.alt = placement.name;
+      img.dataset.name = placement.name;
+      img.style.zIndex = String(placement.depth);
+      img.style.transform = toCssMatrix(placement);
+      img.addEventListener('load', () => { loaded += 1; updateStatus(); });
+      img.addEventListener('error', () => { failed += 1; updateStatus(); });
+      img.src = root + relativePath + '?cacheBust=' + Date.now();
+      stage.appendChild(img);
+      rendered.push({ placement, img, relativePath });
+      addLayerControl(placement, img);
+    }
+
+    updateStatus();
+    updateLegend();
+
+    function addComparisonControl() {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = true;
+      input.addEventListener('change', () => { compare.style.display = input.checked ? 'block' : 'none'; });
+      label.appendChild(input);
+      label.append(' comparison frame');
+      controls.appendChild(label);
+    }
+
+    function addLayerControl(placement, img) {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = true;
+      input.addEventListener('change', () => { img.style.display = input.checked ? 'block' : 'none'; });
+      label.appendChild(input);
+      label.append(' ' + placement.name + ' d' + placement.depth);
+      controls.appendChild(label);
+    }
+
+    function updateStatus() {
+      const pending = rendered.length - loaded - failed;
+      status.innerHTML = [
+        'XML source: ' + RUMS_COVE_XML_PLACEMENT_SOURCE.generator,
+        'placements: ' + RUMS_COVE_XML_PLACEMENT_SOURCE.placementCount + ' / named: ' + RUMS_COVE_XML_PLACEMENT_SOURCE.namedPlacementCount,
+        'rendered mapped sprites: <span class="ok">' + rendered.length + '</span>',
+        'loaded: <span class="ok">' + loaded + '</span>',
+        'failed: <span class="fail">' + failed + '</span>',
+        'pending: ' + pending,
+        'skipped unmapped source objects: <span class="warn">' + skipped.length + '</span>'
+      ].join('<br />');
+    }
+
+    function updateLegend() {
+      const lines = [];
+      lines.push('Rendered using XML transforms:');
+      for (const item of rendered) {
+        const p = item.placement;
+        lines.push(`  depth=${p.depth} name=${p.name} class=${p.className} matrix=${toCssMatrix(p)}`);
+      }
+      lines.push('');
+      lines.push('Skipped until source sprite mapping is confirmed:');
+      for (const p of skipped) {
+        lines.push(`  depth=${p.depth} name=${p.name} cid=${p.characterId} class=${p.className || '(unmapped)'}`);
+      }
+      legend.textContent = lines.join('\n');
+    }
+  </script>
+</body>
+</html>
