@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rums Cove Playable Shell Probe</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #151515;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #151515;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #d2c48b;
+      max-width: 1180px;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    .note,
+    .status,
+    .controls {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      padding: 12px 14px;
+      margin-bottom: 18px;
+      max-width: 1180px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      background: #332b13;
+      border: 1px solid #8f7f44;
+      color: #f4e9bd;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4b3f1b;
+    }
+
+    .shell-wrap {
+      display: inline-block;
+      border: 2px solid #8f7f44;
+      background: #0d0d0d;
+      padding: 12px;
+      max-width: calc(100vw - 72px);
+      overflow: auto;
+    }
+
+    .shell {
+      position: relative;
+      width: 946px;
+      height: 653px;
+      overflow: hidden;
+      background: #65ca28;
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+
+    .shell-source {
+      position: absolute;
+      inset: 0;
+      width: 946px;
+      height: 638px;
+      object-fit: fill;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .viewport {
+      position: absolute;
+      left: 90px;
+      top: 52px;
+      width: 762px;
+      height: 486px;
+      overflow: hidden;
+      border-radius: 20px;
+      z-index: 4;
+      background: #63c7ee;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.3);
+    }
+
+    .room-scale {
+      position: absolute;
+      left: -28px;
+      top: 16px;
+      width: 614px;
+      height: 366px;
+      transform: scale(1.33);
+      transform-origin: 0 0;
+    }
+
+    .room-scene {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 614px;
+      height: 366px;
+      overflow: hidden;
+      background: #63c7ee;
+    }
+
+    .room-scene img.layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+      max-width: none;
+      image-rendering: auto;
+      pointer-events: none;
+    }
+
+    .video-pod-scene {
+      position: absolute;
+      inset: 0;
+      display: none;
+      background: radial-gradient(circle at 50% 30%, #5b5430 0%, #252525 52%, #111 100%);
+      overflow: hidden;
+    }
+
+    .video-pod-scene img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-pod-stub {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #f4e9bd;
+      font: 18px Arial, Helvetica, sans-serif;
+      background: linear-gradient(160deg, #211f16, #333, #111);
+    }
+
+    .video-screen {
+      width: 420px;
+      height: 240px;
+      border: 10px solid #6a4f28;
+      background: #111;
+      box-shadow: 0 12px 40px rgba(0,0,0,.55), inset 0 0 32px rgba(90,255,120,.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+    }
+
+    .pod-exit {
+      position: absolute;
+      left: 24px;
+      bottom: 28px;
+      width: 120px;
+      height: 44px;
+      border-radius: 22px;
+      border: 2px dashed rgba(255,235,80,.95);
+      background: rgba(0,0,0,.25);
+      color: #fff2a8;
+      font: 12px Consolas, Monaco, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    #weevilCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 12;
+      pointer-events: none;
+    }
+
+    .hit-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 18;
+      cursor: pointer;
+    }
+
+    .hotspot {
+      position: absolute;
+      border: 2px dashed rgba(255,235,80,.9);
+      background: rgba(255,235,80,.12);
+      pointer-events: none;
+      display: none;
+    }
+
+    .hotspot.visible {
+      display: block;
+    }
+
+    .hud {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      z-index: 30;
+      background: rgba(0,0,0,.68);
+      color: #f4e9bd;
+      padding: 8px 10px;
+      font: 11px Consolas, Monaco, monospace;
+      pointer-events: none;
+    }
+
+    .room-label {
+      position: absolute;
+      right: 18px;
+      top: 14px;
+      z-index: 30;
+      background: rgba(0,0,0,.68);
+      color: #f4e9bd;
+      padding: 8px 10px;
+      font: 11px Consolas, Monaco, monospace;
+      pointer-events: none;
+    }
+
+    .ok { color: #9fd36b; }
+    .warn { color: #ffd36b; }
+    .fail { color: #ff8e8e; }
+  </style>
+</head>
+<body>
+  <h1>Rums Cove Playable Shell Probe</h1>
+  <p>First playable milestone probe: source slime shell sprite, XML-placed Rums Cove source sprites, local weevil, simple click-to-move and a pod-door scene switch.</p>
+
+  <div class="note">
+    <strong>Scope:</strong> this is still a probe, but it avoids baked room screenshots for the Rums exterior. Rums is rendered from source SVG sprites with XML placement. The slime shell uses the decompiled main source sprite, not the full frame PNG.
+  </div>
+
+  <div id="status" class="status">Loading playable shell...</div>
+
+  <div class="controls">
+    <button id="resetRoom">Back to Rums Cove</button>
+    <button id="showHotspots">Toggle hit areas</button>
+  </div>
+
+  <div class="shell-wrap">
+    <div id="shell" class="shell">
+      <img class="shell-source" alt="source slime shell" src="/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg" />
+
+      <div id="viewport" class="viewport">
+        <div id="rumsScene" class="room-scale">
+          <div id="roomScene" class="room-scene"></div>
+        </div>
+
+        <div id="videoPodScene" class="video-pod-scene">
+          <div class="video-pod-stub">
+            <div class="video-screen">
+              <div>
+                <strong>Video Pod</strong><br />
+                traversal stub<br />
+                <small>VOD/media comes later</small>
+              </div>
+            </div>
+          </div>
+          <div id="podExit" class="pod-exit">exit to Rums</div>
+        </div>
+
+        <canvas id="weevilCanvas" width="762" height="486"></canvas>
+        <div id="hitLayer" class="hit-layer"></div>
+        <div id="podHotspot" class="hotspot"></div>
+        <div id="hud" class="hud">loading...</div>
+        <div id="roomLabel" class="room-label">Rums Cove</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { AvatarState } from '/src/avatar/AvatarState.js';
+    import { WeevilCanvasRenderer } from '/src/avatar/WeevilCanvasRenderer.js';
+    import { SAMPLE_WEEVIL_DEF } from '/src/avatar/WeevilDefSamples.js';
+    import { RUMS_COVE_BASE_ROOM_PLACEMENTS } from '/src/rooms/RumsCoveBaseRoomRenderPlan.js';
+    import { RUMS_COVE_XML_PLACEMENTS_BY_NAME, toCssMatrix } from '/src/rooms/RumsCoveXmlPlacementMap.js';
+
+    const status = document.getElementById('status');
+    const roomScene = document.getElementById('roomScene');
+    const rumsScene = document.getElementById('rumsScene');
+    const videoPodScene = document.getElementById('videoPodScene');
+    const weevilCanvas = document.getElementById('weevilCanvas');
+    const ctx = weevilCanvas.getContext('2d');
+    const hitLayer = document.getElementById('hitLayer');
+    const podHotspot = document.getElementById('podHotspot');
+    const hud = document.getElementById('hud');
+    const roomLabel = document.getElementById('roomLabel');
+    const resetRoomButton = document.getElementById('resetRoom');
+    const showHotspotsButton = document.getElementById('showHotspots');
+    const podExit = document.getElementById('podExit');
+
+    const root = '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/';
+    const roomScale = 1.33;
+    const roomOffset = { x: -28, y: 16 };
+    const scene = {
+      current: 'rums',
+      hotspotsVisible: false
+    };
+
+    const spriteByClass = {
+      'RumsAirport_dynamAds_videoPodv2_fla.buildings_12': 'sprites/DefineSprite_361_RumsAirport_dynamAds_videoPodv2_fla.buildings_12/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.remoteBack_31': 'sprites/DefineSprite_265_RumsAirport_dynamAds_videoPodv2_fla.remoteBack_31/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.Door_002_71': 'sprites/DefineSprite_179_RumsAirport_dynamAds_videoPodv2_fla.Door_002_71/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.remoteOverlay_74': 'sprites/DefineSprite_283_RumsAirport_dynamAds_videoPodv2_fla.remoteOverlay_74/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door1_76': 'sprites/DefineSprite_149_RumsAirport_dynamAds_videoPodv2_fla.door1_76/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door3_78': 'sprites/DefineSprite_144_RumsAirport_dynamAds_videoPodv2_fla.door3_78/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door4_80': 'sprites/DefineSprite_142_RumsAirport_dynamAds_videoPodv2_fla.door4_80/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.door6_82': 'sprites/DefineSprite_139_RumsAirport_dynamAds_videoPodv2_fla.door6_82/1.svg',
+      'RumsAirport_dynamAds_videoPodv2_fla.pipes_86': 'sprites/DefineSprite_313_RumsAirport_dynamAds_videoPodv2_fla.pipes_86/1.svg'
+    };
+
+    const avatar = AvatarState.fromUserVars({
+      userId: 1,
+      idx: 1,
+      name: 'debug_weevil',
+      weevilDef: SAMPLE_WEEVIL_DEF,
+      x: 292,
+      y: 314,
+      z: 0,
+      r: 180,
+      ps: 0,
+      ex: 0,
+      locID: 129
+    });
+
+    const weevil = {
+      x: 292,
+      y: 314,
+      targetX: 292,
+      targetY: 314,
+      displayWidth: 66,
+      displayHeight: 66,
+      speed: 180
+    };
+
+    const renderer = new WeevilCanvasRenderer({ mode: 'legacy-demo-assets' });
+
+    let loadedLayers = 0;
+    let failedLayers = 0;
+    let lastTime = performance.now();
+
+    initialise().catch((error) => {
+      status.innerHTML = '<span class="fail">Playable shell failed.</span><br /><code>' + String(error.message || error) + '</code>';
+      console.error(error);
+    });
+
+    async function initialise() {
+      buildRumsRoomLayers();
+      layoutPodHotspot();
+      await renderer.legacyDemoAssetRenderer.preload();
+      attachEvents();
+      status.innerHTML = '<span class="ok">Playable shell loaded.</span><br />Rums exterior uses source SVG layers + XML placement. Click the room to move. Click the pod door to switch scene.';
+      requestAnimationFrame(tick);
+    }
+
+    function buildRumsRoomLayers() {
+      for (const placement of RUMS_COVE_BASE_ROOM_PLACEMENTS) {
+        const relativePath = spriteByClass[placement.className];
+        if (!relativePath) continue;
+
+        const image = new Image();
+        image.className = 'layer';
+        image.alt = placement.name;
+        image.dataset.name = placement.name;
+        image.style.zIndex = String(placement.depth);
+        image.style.transform = toCssMatrix(placement);
+        image.addEventListener('load', () => { loadedLayers += 1; updateHud(); });
+        image.addEventListener('error', () => { failedLayers += 1; updateHud(); });
+        image.src = root + relativePath + '?cacheBust=' + Date.now();
+        roomScene.appendChild(image);
+      }
+    }
+
+    function attachEvents() {
+      hitLayer.addEventListener('click', onViewportClick);
+      resetRoomButton.addEventListener('click', () => switchScene('rums'));
+      podExit.addEventListener('click', (event) => {
+        event.stopPropagation();
+        switchScene('rums');
+      });
+      showHotspotsButton.addEventListener('click', () => {
+        scene.hotspotsVisible = !scene.hotspotsVisible;
+        podHotspot.classList.toggle('visible', scene.hotspotsVisible);
+      });
+    }
+
+    function onViewportClick(event) {
+      const rect = hitLayer.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      if (scene.current === 'videoPod') {
+        moveWeevilTo(clamp(x, 90, 690), clamp(y, 120, 420));
+        return;
+      }
+
+      if (pointInElementBox(x, y, podHotspot)) {
+        moveWeevilTo(292, 314);
+        setTimeout(() => switchScene('videoPod'), 260);
+        return;
+      }
+
+      moveWeevilTo(clamp(x, 70, 710), clamp(y, 260, 430));
+    }
+
+    function moveWeevilTo(x, y) {
+      const angle = Math.atan2(y - weevil.y, x - weevil.x) * 180 / Math.PI;
+      avatar.updatePosition({ r: angleToWeevilRotation(angle) });
+      weevil.targetX = x;
+      weevil.targetY = y;
+      updateHud();
+    }
+
+    function tick(now) {
+      const dt = Math.min(0.05, (now - lastTime) / 1000);
+      lastTime = now;
+      updateMovement(dt);
+      drawWeevil();
+      requestAnimationFrame(tick);
+    }
+
+    function updateMovement(dt) {
+      const dx = weevil.targetX - weevil.x;
+      const dy = weevil.targetY - weevil.y;
+      const distance = Math.hypot(dx, dy);
+      if (distance < 1) return;
+
+      const step = Math.min(distance, weevil.speed * dt);
+      weevil.x += dx / distance * step;
+      weevil.y += dy / distance * step;
+    }
+
+    function drawWeevil() {
+      ctx.clearRect(0, 0, weevilCanvas.width, weevilCanvas.height);
+      const renderPlan = avatar.createRenderPlan();
+      renderer.render(ctx, renderPlan, weevil.x - weevil.displayWidth / 2, weevil.y - weevil.displayHeight + 10, {
+        mode: 'legacy-demo-assets',
+        displayWidth: weevil.displayWidth,
+        displayHeight: weevil.displayHeight
+      });
+    }
+
+    function switchScene(nextScene) {
+      scene.current = nextScene;
+      if (nextScene === 'videoPod') {
+        rumsScene.style.display = 'none';
+        videoPodScene.style.display = 'block';
+        roomLabel.textContent = 'Video Pod';
+        moveWeevilTo(150, 405);
+      } else {
+        rumsScene.style.display = 'block';
+        videoPodScene.style.display = 'none';
+        roomLabel.textContent = 'Rums Cove';
+        moveWeevilTo(292, 314);
+      }
+      updateHud();
+    }
+
+    function layoutPodHotspot() {
+      const door7 = RUMS_COVE_XML_PLACEMENTS_BY_NAME.door7_mc?.[0];
+      if (!door7) return;
+
+      // First pass hit box around the XML-placed pod door. This is a simple demo
+      // hotspot, not the final shape mask.
+      const x = roomOffset.x + door7.x * roomScale - 20;
+      const y = roomOffset.y + door7.y * roomScale - 70;
+      const width = 104;
+      const height = 120;
+      podHotspot.style.left = x + 'px';
+      podHotspot.style.top = y + 'px';
+      podHotspot.style.width = width + 'px';
+      podHotspot.style.height = height + 'px';
+    }
+
+    function pointInElementBox(x, y, element) {
+      const bounds = element.getBoundingClientRect();
+      const parentBounds = hitLayer.getBoundingClientRect();
+      const left = bounds.left - parentBounds.left;
+      const top = bounds.top - parentBounds.top;
+      return x >= left && x <= left + bounds.width && y >= top && y <= top + bounds.height;
+    }
+
+    function updateHud() {
+      hud.innerHTML = [
+        'scene: ' + scene.current,
+        'source room layers loaded: ' + loadedLayers,
+        'failed layers: ' + failedLayers,
+        'weevil: ' + Math.round(weevil.x) + ',' + Math.round(weevil.y),
+        'target: ' + Math.round(weevil.targetX) + ',' + Math.round(weevil.targetY),
+        'pod door: door7_mc -> videoPod1_10_05_12'
+      ].join('<br />');
+    }
+
+    function angleToWeevilRotation(angle) {
+      // The renderer currently accepts the coarse legacy rotation convention.
+      // Keep this deliberately simple until the proper Walk.as heading port lands.
+      if (angle > -45 && angle <= 45) return 25;
+      if (angle > 45 && angle <= 135) return 0;
+      if (angle <= -45 && angle > -135) return 180;
+      return -25;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+  </script>
+</body>
+</html>
