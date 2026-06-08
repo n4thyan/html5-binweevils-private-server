@@ -14,6 +14,7 @@ export function extractRumsCoveXmlPlacement(xmlText) {
   return Object.freeze({
     generator: extractAttribute(text.match(/<swf\b[^>]*>/)?.[0] || '', '_generator'),
     frameCount: Number(extractAttribute(text.match(/<swf\b[^>]*>/)?.[0] || '', 'frameCount') || 0),
+    rootItemCount: rootItems.length,
     symbolCount: Object.keys(symbolMap).length,
     placementCount: placements.length,
     namedPlacementCount: placements.filter((placement) => placement.name).length,
@@ -26,29 +27,42 @@ export function extractRumsCoveXmlPlacement(xmlText) {
 export function extractRootTagItems(xmlText) {
   const text = String(xmlText || '');
   const tagsStart = text.indexOf('<tags>');
-  if (tagsStart < 0) return [];
+  const tagsEnd = text.lastIndexOf('</tags>');
+  if (tagsStart < 0 || tagsEnd < tagsStart) return [];
 
   const items = [];
   const tokenPattern = /<item\b[^>]*>|<\/item>/g;
-  tokenPattern.lastIndex = tagsStart;
+  tokenPattern.lastIndex = tagsStart + '<tags>'.length;
 
   let depth = 0;
   let itemStart = -1;
   let match;
 
-  while ((match = tokenPattern.exec(text))) {
+  while ((match = tokenPattern.exec(text)) && match.index < tagsEnd) {
     const token = match[0];
-    if (token.startsWith('<item')) {
+    const isOpen = token.startsWith('<item');
+    const isSelfClosing = token.endsWith('/>');
+
+    if (isOpen && isSelfClosing) {
+      if (depth === 0) {
+        items.push(token);
+      }
+      continue;
+    }
+
+    if (isOpen) {
       if (depth === 0) itemStart = match.index;
       depth += 1;
-    } else {
-      depth -= 1;
-      if (depth === 0 && itemStart >= 0) {
-        items.push(text.slice(itemStart, tokenPattern.lastIndex));
-        itemStart = -1;
-      }
-      if (depth < 0) break;
+      continue;
     }
+
+    depth -= 1;
+    if (depth === 0 && itemStart >= 0) {
+      items.push(text.slice(itemStart, tokenPattern.lastIndex));
+      itemStart = -1;
+    }
+
+    if (depth < 0) break;
   }
 
   return items;
@@ -123,6 +137,7 @@ export function formatPlacementReport(result) {
   lines.push('RumsCove XML placement extract');
   lines.push(`generator: ${result.generator || '(unknown)'}`);
   lines.push(`frameCount: ${result.frameCount}`);
+  lines.push(`rootItemCount: ${result.rootItemCount}`);
   lines.push(`symbolCount: ${result.symbolCount}`);
   lines.push(`placementCount: ${result.placementCount}`);
   lines.push(`namedPlacementCount: ${result.namedPlacementCount}`);
