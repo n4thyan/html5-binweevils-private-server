@@ -31,3 +31,7 @@ Thumbs.db
 dist/
 build/
 .cache/
+
+# Raw FFDec room exports are kept local only because filenames can be too long for Git
+/reference/rooms/
+
