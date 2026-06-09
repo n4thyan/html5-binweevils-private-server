@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rums Cove Render Basics</title>
+  <style>
+    :root { color-scheme: dark; font-family: Arial, Helvetica, sans-serif; background:#151515; color:#f4e9bd; }
+    body { margin:0; padding:24px; background:#151515; }
+    h1 { margin:0 0 8px; font-size:26px; }
+    p { margin:0 0 14px; color:#d2c48b; max-width:1180px; }
+    code { color:#fff2a8; }
+    .note,.status,.controls,.legend { border:1px solid #8f7f44; background:#211f16; padding:12px 14px; margin-bottom:18px; max-width:1180px; }
+    .controls { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
+    label { font:12px Consolas, Monaco, monospace; }
+    .stage-wrap { display:inline-block; border:2px solid #8f7f44; background:#0d0d0d; padding:12px; max-width:calc(100vw - 72px); overflow:auto; }
+    .stage { position:relative; width:614px; height:366px; background:#63c7ee; overflow:hidden; }
+    .stage img.layer { position:absolute; left:0; top:0; transform-origin:0 0; max-width:none; image-rendering:auto; }
+    .comparison { position:absolute; left:0; top:0; width:614px; height:366px; opacity:.22; z-index:9000; pointer-events:none; display:none; }
+    .hud { position:absolute; left:8px; top:8px; z-index:9999; background:rgba(0,0,0,.68); color:#f4e9bd; padding:7px; font:11px Consolas, Monaco, monospace; pointer-events:none; }
+    .legend { font:12px Consolas, Monaco, monospace; color:#d2c48b; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .ok { color:#9fd36b; } .fail { color:#ff8e8e; } .warn { color:#ffd36b; }
+  </style>
+</head>
+<body>
+  <h1>Rums Cove Render Basics</h1>
+  <p>Standalone room-rendering page. No weevil, no walking, no slime shell. The aim is to get the Rums exterior visually correct from source layers before continuing.</p>
+
+  <div class="note">
+    <strong>Scope:</strong> backdrop/sky/floor, buildings, pod/remote, yellow arrow/door visuals. Comparison frame is optional and only for checking.
+  </div>
+
+  <div id="status" class="status">Loading render basics...</div>
+
+  <div class="controls">
+    <label><input type="checkbox" id="comparisonToggle"> comparison frame</label>
+    <label><input type="checkbox" id="showOverlay" checked> overlay/remote layers</label>
+    <label><input type="checkbox" id="showDoors" checked> doors/arrows</label>
+  </div>
+
+  <div class="stage-wrap">
+    <div id="stage" class="stage">
+      <div id="layerRoot"></div>
+      <img id="comparison" class="comparison" alt="comparison frame" src="/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/frames/1.png" />
+      <div id="hud" class="hud">loading...</div>
+    </div>
+  </div>
+
+  <div id="legend" class="legend"></div>
+
+  <script type="module">
+    import { RUMS_COVE_XML_SCENE_LAYER_ORDER, toCssMatrix } from '/src/rooms/RumsCoveXmlPlacementMap.js';
+
+    const root = '/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/';
+    const stage = document.getElementById('stage');
+    const layerRoot = document.getElementById('layerRoot');
+    const status = document.getElementById('status');
+    const legend = document.getElementById('legend');
+    const hud = document.getElementById('hud');
+    const comparison = document.getElementById('comparison');
+    const comparisonToggle = document.getElementById('comparisonToggle');
+    const showOverlay = document.getElementById('showOverlay');
+    const showDoors = document.getElementById('showDoors');
+
+    // Source-backed visual pieces we currently understand. This page is deliberately
+    // small and boring: make these basics correct before adding movement or shell UI.
+    const sourcePaths = {
+      buildings: 'sprites/DefineSprite_361_RumsAirport_dynamAds_videoPodv2_fla.buildings_12/1.svg',
+      remoteBack: 'sprites/DefineSprite_265_RumsAirport_dynamAds_videoPodv2_fla.remoteBack_31/1.svg',
+      remoteOverlay: 'sprites/DefineSprite_283_RumsAirport_dynamAds_videoPodv2_fla.remoteOverlay_74/1.svg',
+      door7: 'sprites/DefineSprite_179_RumsAirport_dynamAds_videoPodv2_fla.Door_002_71/1.svg',
+      door1: 'sprites/DefineSprite_149_RumsAirport_dynamAds_videoPodv2_fla.door1_76/1.svg',
+      door3: 'sprites/DefineSprite_144_RumsAirport_dynamAds_videoPodv2_fla.door3_78/1.svg',
+      door4: 'sprites/DefineSprite_142_RumsAirport_dynamAds_videoPodv2_fla.door4_80/1.svg',
+      door6: 'sprites/DefineSprite_139_RumsAirport_dynamAds_videoPodv2_fla.door6_82/1.svg',
+      pipes: 'sprites/DefineSprite_313_RumsAirport_dynamAds_videoPodv2_fla.pipes_86/1.svg'
+    };
+
+    const renderList = [
+      { key:'buildings', placementName:'buildings', className:'RumsAirport_dynamAds_videoPodv2_fla.buildings_12', path:sourcePaths.buildings, group:'base' },
+      { key:'remoteBack', placementName:'remoteBack', className:'RumsAirport_dynamAds_videoPodv2_fla.remoteBack_31', path:sourcePaths.remoteBack, group:'overlay' },
+      { key:'door7_mc', placementName:'door7_mc', className:'RumsAirport_dynamAds_videoPodv2_fla.Door_002_71', path:sourcePaths.door7, group:'doors' },
+      { key:'remoteDoorOverlay', placementName:'remoteDoorOverlay', className:'RumsAirport_dynamAds_videoPodv2_fla.remoteOverlay_74', path:sourcePaths.remoteOverlay, group:'overlay' },
+      { key:'door1_mc', placementName:'door1_mc', className:'RumsAirport_dynamAds_videoPodv2_fla.door1_76', path:sourcePaths.door1, group:'doors' },
+      { key:'door2_mc', placementName:'door2_mc', className:'RumsAirport_dynamAds_videoPodv2_fla.door1_76', path:sourcePaths.door1, group:'doors' },
+      { key:'door3_mc', placementName:'door3_mc', className:'RumsAirport_dynamAds_videoPodv2_fla.door3_78', path:sourcePaths.door3, group:'doors' },
+      { key:'door4_mc', placementName:'door4_mc', className:'RumsAirport_dynamAds_videoPodv2_fla.door4_80', path:sourcePaths.door4, group:'doors' },
+      { key:'door6_mc', placementName:'door6_mc', className:'RumsAirport_dynamAds_videoPodv2_fla.door6_82', path:sourcePaths.door6, group:'doors' },
+      { key:'door5_mc', placementName:'door5_mc', className:'RumsAirport_dynamAds_videoPodv2_fla.pipes_86', path:sourcePaths.pipes, group:'doors' }
+    ];
+
+    const layers = [];
+    let loaded = 0;
+    let failed = 0;
+
+    comparisonToggle.addEventListener('change', applyVisibility);
+    showOverlay.addEventListener('change', applyVisibility);
+    showDoors.addEventListener('change', applyVisibility);
+
+    buildLayers();
+    applyVisibility();
+    updateHud();
+    updateLegend();
+
+    function buildLayers() {
+      for (const item of renderList) {
+        const placement = resolvePlacement(item);
+        if (!placement) {
+          layers.push({ ...item, placement:null, image:null, status:'missing-placement' });
+          continue;
+        }
+
+        const image = new Image();
+        image.className = 'layer';
+        image.alt = item.key;
+        image.dataset.group = item.group;
+        image.title = `${item.key} / depth ${placement.depth}`;
+        image.style.zIndex = String(placement.depth);
+        image.style.transform = toCssMatrix(placement);
+        image.addEventListener('load', () => { loaded += 1; updateHud(); });
+        image.addEventListener('error', () => { failed += 1; updateHud(); });
+        image.src = root + item.path + '?cacheBust=' + Date.now();
+        layerRoot.appendChild(image);
+        layers.push({ ...item, placement, image, status:'mapped' });
+      }
+    }
+
+    function resolvePlacement(item) {
+      const candidates = RUMS_COVE_XML_SCENE_LAYER_ORDER.filter((placement) => {
+        if (placement.name !== item.placementName) return false;
+        if (item.className && placement.className !== item.className) return false;
+        return true;
+      });
+      return candidates[0] || RUMS_COVE_XML_SCENE_LAYER_ORDER.find((placement) => placement.name === item.placementName) || null;
+    }
+
+    function applyVisibility() {
+      comparison.style.display = comparisonToggle.checked ? 'block' : 'none';
+      for (const layer of layers) {
+        if (!layer.image) continue;
+        const visible = layer.group === 'base' ||
+          (layer.group === 'overlay' && showOverlay.checked) ||
+          (layer.group === 'doors' && showDoors.checked);
+        layer.image.style.display = visible ? 'block' : 'none';
+      }
+    }
+
+    function updateHud() {
+      const visible = layers.filter((layer) => layer.image && layer.image.style.display !== 'none').length;
+      hud.innerHTML = [
+        'Rums render basics',
+        'mapped layers: ' + layers.filter((layer) => layer.status === 'mapped').length,
+        'visible: ' + visible,
+        'loaded: ' + loaded,
+        'failed: ' + failed,
+        'next: backdrop/floor source identity'
+      ].join('<br />');
+
+      status.innerHTML = '<span class="ok">Loaded render basics probe.</span><br />This is the safe standalone room target. Fix backdrop/floor here before returning to walking or slime shell.';
+    }
+
+    function updateLegend() {
+      const lines = [];
+      lines.push('Mapped basics:');
+      for (const layer of layers) {
+        if (!layer.placement) {
+          lines.push(`  ${layer.key}: missing placement`);
+          continue;
+        }
+        lines.push(`  ${layer.key}: depth=${layer.placement.depth} name=${layer.placement.name} class=${layer.placement.className} path=${layer.path}`);
+      }
+      lines.push('');
+      lines.push('Known remaining issue: sky/floor/backdrop are not confirmed as separate source objects yet. Do not add movement until those are identified.');
+      legend.textContent = lines.join('\n');
+    }
+  </script>
+</body>
+</html>
