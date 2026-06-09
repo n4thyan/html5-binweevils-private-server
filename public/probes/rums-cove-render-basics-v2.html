@@ -21,11 +21,12 @@
   <div id="status" class="box">Loading...</div>
   <div class="box controls">
     <label><input id="comparisonToggle" type="checkbox"> comparison frame</label>
-    <label><input data-group="environment" type="checkbox" checked> environment/backdrop</label>
-    <label><input data-group="floor" type="checkbox" checked> floor/click shape</label>
+    <label><input data-group="environment" type="checkbox" checked> bitmap base/backdrop</label>
+    <label><input data-group="environment-detail" type="checkbox" checked> source detail layers</label>
     <label><input data-group="base" type="checkbox" checked> buildings/base</label>
     <label><input data-group="overlay" type="checkbox" checked> pod/remote overlay</label>
     <label><input data-group="doors" type="checkbox" checked> doors/arrows</label>
+    <label><input data-group="debug-collision" type="checkbox"> debug collision/click shape</label>
   </div>
   <div class="wrap"><div id="stage"><img id="comparison" class="comparison" src="/reference/rooms/RumsAirport_dynamAds_videoPodv2_release/RumsAirport_dynamAds_videoPodv2_release/frames/1.png" alt="comparison"><div id="hud" class="hud">loading</div></div></div>
   <div id="legend" class="box legend"></div>
@@ -54,7 +55,7 @@ try {
   const scene = await res.json();
   build(scene.placements || []);
   applyVisibility();
-  status.innerHTML = '<span class="ok">Loaded render-basics v2.</span><br>Using source-backed XML placements and numeric shape SVGs.';
+  status.innerHTML = '<span class="ok">Loaded render-basics v2.</span><br>Using the XML cid 2 bitmap base layer plus source-backed room overlays.';
 } catch (error) {
   status.innerHTML = '<span class="fail">Failed.</span><br><code>' + String(error.message || error) + '</code>';
 }
@@ -101,15 +102,22 @@ function applyVisibility() {
 }
 
 function updateHud() {
-  const visible = layers.filter(l => l.image && l.image.style.display !== 'none').length;
-  hud.innerHTML = ['Rums render basics v2', 'mapped: ' + layers.filter(l => l.status === 'mapped').length, 'visible: ' + visible, 'loaded: ' + loaded, 'failed: ' + failed].join('<br>');
+  const visible = layers.filter(l => l.image && layerVisible(l)).length;
+  const mapped = layers.filter(l => l.status === 'mapped').length;
+  const missing = layers.filter(l => l.status === 'missing-placement').length;
+  hud.innerHTML = ['Rums render basics v2', 'mapped: ' + mapped, 'visible: ' + visible, 'missing placement: ' + missing, 'loaded: ' + loaded, 'failed: ' + failed].join('<br>');
+}
+
+function layerVisible(layer) {
+  return layer.image && layer.image.style.display !== 'none';
 }
 
 function updateLegend() {
   const lines = ['Layer plan:'];
   for (const layer of layers) {
     const p = layer.placement;
-    lines.push(p ? `${layer.item.key}: depth=${p.depth} cid=${p.characterId} group=${layer.item.group} path=${layer.item.path}` : `${layer.item.key}: missing placement`);
+    const debug = layer.item.group === 'debug-collision' ? ' debug-only' : '';
+    lines.push(p ? `${layer.item.key}: depth=${p.depth} cid=${p.characterId} group=${layer.item.group}${debug} path=${layer.item.path}` : `${layer.item.key}: missing placement path=${layer.item.path}`);
   }
   lines.push('', 'This is the checkpoint page for room rendering. Do not continue to walking/slime shell until this looks right.');
   legend.textContent = lines.join('\n');
