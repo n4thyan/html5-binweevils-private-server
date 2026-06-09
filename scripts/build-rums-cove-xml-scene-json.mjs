@@ -40,7 +40,8 @@ const payload = {
     'className tail -> exported sprite folder',
     'full className slug -> exported sprite folder',
     'characterId -> exported sprite folder',
-    'characterId -> exported shape SVG file'
+    'characterId -> numeric exported shape SVG file',
+    'characterId -> DefineShape-style exported shape SVG file'
   ],
   stats: {
     rootItemCount: result.rootItemCount,
@@ -154,11 +155,15 @@ async function listShapeAssets(shapesRoot) {
   for (const entry of entries) {
     if (!entry.isFile()) continue;
     if (!entry.name.endsWith('.svg')) continue;
-    const match = entry.name.match(/^DefineShape\w*_(\d+)\.svg$/);
-    if (!match) continue;
+
+    const numericMatch = entry.name.match(/^(\d+)\.svg$/);
+    const defineShapeMatch = entry.name.match(/^DefineShape\w*_(\d+)\.svg$/);
+    const id = Number(numericMatch?.[1] || defineShapeMatch?.[1] || 0);
+    if (!id) continue;
+
     assets.push({
       kind: 'shape',
-      id: Number(match[1]),
+      id,
       folder: '',
       classSlug: '',
       classTail: '',
