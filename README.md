@@ -6,7 +6,7 @@ The goal is not to make a loose remake, a reimagining, or a generic Bin Weevils-
 
 ## Current confirmed state
 
-The project is currently in the source-backed foundation, first-room proof and UI-shell source mapping phase.
+The project is currently in the source-backed foundation, room-rendering research, movement-coordinate, and first simple room-family planning phase.
 
 Confirmed working:
 
@@ -26,14 +26,14 @@ real exported UI SVG file existence is tested
 standalone core UI asset probe page loads real core5.swf exported SVGs in the browser
 FixedCamera room source model is mapped from LocFactory/Loc/LocFixedCam
 FixedCamera location XML parser/candidate scorer exists and is tested
-RumsCove locID 129 has been identified as the first strict FixedCamera room candidate
+RumsCove locID 129 has been identified and heavily audited
 RumsCove source-backed manifest is tested
-RumsCove preview frame loads in-browser from the decompiled/exported room family
-RumsCove + real weevil debug probe works in-browser
-RumsCove weevilScale 0.18 has been visually confirmed as plausible in the room preview
-mainDEV661.swf green slime/canvas shell target has been separated from core/playercard UI work
-mainDEV661.swf slime shell candidate paths are recorded for browser probing
-videoPod1_10_05_12 has been audited as a simple VOD/external scene candidate
+RumsCove preview/render probes proved XML placement, source sprites, bitmap base layers, and door overlays
+RumsCove/RumsAirport is now treated as a complex research checkpoint, not the first complete room target
+movement source data audit scans real locationDefinitions data
+movement scale baselines separate normal sandbox scale from room-specific scale
+blank movement coordinate sandbox model and smoke test exist
+Nest room export has been inspected and selected as the next simpler room family
 ```
 
 Not implemented yet:
@@ -41,8 +41,8 @@ Not implemented yet:
 ```text
 final UI shell
 real room rendering in the main client scene
-source-backed FixedCam projection/depth
-click-to-move
+source-backed FixedCam projection/depth in production scene
+final Flash-accurate click-to-move
 room-to-room navigation
 chat
 playercards
@@ -52,45 +52,76 @@ backend/session bridge
 multiplayer sync
 ```
 
-The visible debug scenes/probes are not intended to be the final client screen. They are verification surfaces for renderer, boot-flow, source-map, asset-path and first-room audit work.
+The visible debug scenes/probes are not intended to be the final client screen. They are verification surfaces for renderer, boot-flow, source-map, asset-path, room audit, and movement-coordinate work.
 
-## First room direction
+## Current room direction
 
-The current first strict room target is:
+Rums Cove / Rums Airport remains valuable, but it is now parked as a complex research checkpoint.
+
+The new recommended first complete room family is the Nest room set from the uploaded `nest dump.zip`:
 
 ```text
-locID: 129
-name: RumsCove
-type: 2 / FixedCam
-roomBG from XML: fixedCam/RumsAirport_180321.swf
-uploaded room-family export: RumsAirport_dynamAds_videoPodv2_release.zip
-boundary: -240,60,680,90
-camPos: 0,190,-330
-camAim: 0,90,260
-entryPos: 0,80
-entryDir: 180
-weevilScale: 0.18
+nestRoom1.swf
+nestRoom2.swf
+nestRoom3.swf
+nestRoom4.swf
+nestRoom6.swf
+nestRoom7.swf
+nestRoom8.swf
+nestRoom9.swf
+nestHall_03_06_11.swf
+SWF XML/*.xml
 ```
 
-The uploaded Rums export appears to be a Rums Cove video-pod release variant. The XML references `RumsAirport_180321.swf`, so the relationship between those exact files must stay documented until equivalence is proven.
+Reason:
 
-Current Rums proof pages:
+```text
+nestRoom1/nestRoom2 are small and source-backed
+simple rooms expose roomBG_spr, door1_mc and clickArea_btn
+simple rooms have matching SWF XML exports
+simple rooms avoid dynamic ads, planes, video pods and complex one-off Rums layers
+Nest Hall is available but deferred because it is much larger and more complex
+```
+
+Current Nest source manifest / plan:
+
+```text
+src/rooms/NestRoomManifest.js
+docs/rooms/nest-room-port-plan.md
+```
+
+Rums proof pages remain useful research references:
 
 ```text
 /probes/rums-cove-preview.html
 /probes/rums-cove-canvas.html
 /probes/rums-cove-weevil.html
+/probes/rums-cove-render-basics-v2.html
 ```
 
-The Rums weevil probe is still debug-only. It uses manual visual placement, but it proves the actual room preview, source manifest and real weevil renderer can coexist in the browser with the source `weevilScale` value.
+## Movement direction
 
-A second related scene has also been audited:
+Movement is being treated as a source-backed coordinate port, not a fake HTML5 movement system.
+
+Current files:
 
 ```text
-videoPod1_10_05_12
+src/movement/MovementPortPlan.js
+src/movement/MovementScaleBaselines.js
+src/movement/MovementCoordinateSandbox.js
+scripts/audit-movement-source-data.mjs
+tests/movement-coordinate-sandbox-smoke.mjs
+public/probes/movement-coordinate-sandbox.html
 ```
 
-That scene is useful for later VOD/interior work, but it is not currently treated as the first strict `LocFixedCam` room because its exact `locationDefinitions.xml` entry was not found.
+Important rule:
+
+```text
+movement sandbox is allowed
+fake movement system is not
+```
+
+The sandbox uses a normal audited `0.28` movement baseline, while room-specific values such as Rums Cove exterior `0.18` stay attached to their original rooms only.
 
 ## UI shell direction
 
@@ -123,6 +154,7 @@ reference/decompiled-dumpassets/dumpassets/core5.swf/
 reference/demo-html5/BWR_HTML5_the_peel_room_layers_and_auth_fix/
 source/knowyourknot-binweevils/
 source/knowyourknot-binweevils/game-full/binConfig/getFile/7/uk/locationDefinitions.xml
+reference/rooms/nest-dump/  # local extract target for nest dump.zip
 ```
 
 Key decompiled files:
@@ -142,6 +174,7 @@ core5.swf/symbolClass/symbols.csv
 Room audit docs:
 
 ```text
+docs/rooms/nest-room-port-plan.md
 docs/rooms/rums-cove-video-pod-audit.md
 docs/rooms/videoPod1_10_05_12-audit.md
 docs/rooms/videoPod1-locationDefinitions-link.md
@@ -208,6 +241,7 @@ npm run test:core-ui-asset-probe-plan
 npm run test:core-ui-asset-files
 npm run test:render-plan
 npm run test:prototype-renderer
+node tests/movement-coordinate-sandbox-smoke.mjs
 ```
 
 Useful debug pages:
@@ -217,6 +251,8 @@ Useful debug pages:
 /probes/rums-cove-preview.html
 /probes/rums-cove-canvas.html
 /probes/rums-cove-weevil.html
+/probes/rums-cove-render-basics-v2.html
+/probes/movement-coordinate-sandbox.html
 /probes/main-slime-shell.html
 ```
 
@@ -228,8 +264,8 @@ Milestone 002: weevil renderer baseline - confirmed visually working
 Milestone 003: main/core source mapping - strong progress
 Milestone 004: real core UI asset probe - debug page working
 Milestone 005: source-backed UI shell from mainDEV661.swf/core5.swf assets - active source mapping
-Milestone 006: first FixedCamera room audit - active, RumsCove selected and tested
-Milestone 007: first room render - next room target
+Milestone 006: FixedCamera/Rums research checkpoint - strong progress, parked for later
+Milestone 007: Nest simple room render + movement - next target
 Milestone 008: source-backed local movement/depth
 Milestone 009: local chat and speech bubbles
 Milestone 010: backend/session bridge
@@ -258,6 +294,7 @@ docs/milestones.md
 docs/main-core-source-map.md
 docs/decompiled-core-main-audit.md
 docs/renderer-transplant-checklist.md
+docs/rooms/nest-room-port-plan.md
 docs/rooms/rums-cove-video-pod-audit.md
 ```
 
