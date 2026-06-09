@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Movement Coordinate Sandbox</title>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#151515;color:#f4e9bd}
+    body{margin:0;padding:24px;background:#151515}.box{border:1px solid #8f7f44;background:#211f16;padding:12px 14px;margin:0 0 14px;max-width:1180px}
+    h1{margin:0 0 8px;font-size:26px}p{margin:0 0 14px;color:#d2c48b;max-width:1180px}code{color:#fff2a8}
+    .wrap{display:inline-block;border:2px solid #8f7f44;background:#0d0d0d;padding:12px;max-width:calc(100vw - 72px);overflow:auto}
+    #stage{display:block;width:614px;height:366px;background:#27303a;cursor:crosshair;image-rendering:auto}
+    .ok{color:#9fd36b}.warn{color:#ffd36b}.fail{color:#ff8e8e}.readout{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+  </style>
+</head>
+<body>
+  <h1>Movement Coordinate Sandbox</h1>
+  <p>Blank movement/positioning probe only. Uses audited source-style baseline data, stores x/y/z/r state, and deliberately has no room art, no slime shell, and no door transitions.</p>
+  <div class="box"><strong>Status:</strong> <span class="ok">source-backed coordinate sandbox</span><br><code>click inside the canvas to set a target</code></div>
+  <div class="wrap"><canvas id="stage" width="614" height="366"></canvas></div>
+  <div id="readout" class="box readout">loading</div>
+
+<script type="module">
+import { WeevilCanvasRenderer } from '/src/avatar/WeevilCanvasRenderer.js';
+import { AvatarState } from '/src/avatar/AvatarState.js';
+import {
+  MOVEMENT_SANDBOX_RULES,
+  MOVEMENT_SANDBOX_VIEWPORT,
+  createMovementSandboxState,
+  createTargetFromScreenClick,
+  stepMovementSandbox,
+  withTarget,
+  worldToScreen
+} from '/src/movement/MovementCoordinateSandbox.js';
+import { MOVEMENT_SANDBOX_BASELINE } from '/src/movement/MovementScaleBaselines.js';
+
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const readout = document.getElementById('readout');
+const renderer = new WeevilCanvasRenderer({ width: 170, height: 170, mode: 'debug' });
+const avatar = new AvatarState({ name: 'sandbox_weevil', weevilDef: '101102103001040501' });
+let state = createMovementSandboxState();
+let lastTime = performance.now();
+
+canvas.addEventListener('click', (event) => {
+  const rect = canvas.getBoundingClientRect();
+  const target = createTargetFromScreenClick({
+    x: event.clientX - rect.left,
+    y: event.clientY - rect.top
+  }, state);
+  state = withTarget(state, target);
+});
+
+requestAnimationFrame(tick);
+
+function tick(now) {
+  const dt = Math.min(0.05, (now - lastTime) / 1000);
+  lastTime = now;
+  state = stepMovementSandbox(state, dt, 120);
+  draw();
+  requestAnimationFrame(tick);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBackground();
+  drawGrid();
+  drawBoundary();
+  drawMarkers();
+  drawWeevil();
+  updateReadout();
+}
+
+function drawBackground() {
+  ctx.fillStyle = '#263242';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#304151';
+  ctx.fillRect(0, MOVEMENT_SANDBOX_VIEWPORT.originScreenY, canvas.width, canvas.height - MOVEMENT_SANDBOX_VIEWPORT.originScreenY);
+}
+
+function drawGrid() {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(244,233,189,0.13)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= canvas.width; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (let y = 0; y <= canvas.height; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+  ctx.strokeStyle = 'rgba(244,233,189,0.45)';
+  ctx.beginPath();
+  ctx.moveTo(MOVEMENT_SANDBOX_VIEWPORT.originScreenX, 0);
+  ctx.lineTo(MOVEMENT_SANDBOX_VIEWPORT.originScreenX, canvas.height);
+  ctx.moveTo(0, MOVEMENT_SANDBOX_VIEWPORT.originScreenY);
+  ctx.lineTo(canvas.width, MOVEMENT_SANDBOX_VIEWPORT.originScreenY);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawBoundary() {
+  const [minX, minZ, maxX, maxZ] = state.boundary;
+  const topLeft = worldToScreen({ x: minX, z: maxZ });
+  const bottomRight = worldToScreen({ x: maxX, z: minZ });
+  ctx.save();
+  ctx.strokeStyle = '#ffd36b';
+  ctx.setLineDash([6, 4]);
+  ctx.strokeRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255,211,107,0.08)';
+  ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+  ctx.restore();
+}
+
+function drawMarkers() {
+  const entry = worldToScreen({ x: MOVEMENT_SANDBOX_BASELINE.entryPos[0], z: MOVEMENT_SANDBOX_BASELINE.entryPos[1] });
+  const target = worldToScreen(state.target);
+  const pos = worldToScreen(state.position);
+
+  drawMarker(entry.x, entry.y, '#9fd36b', 'entry');
+  drawMarker(target.x, target.y, '#ff8e8e', 'target');
+  drawMarker(pos.x, pos.y, '#fff2a8', 'x/z');
+}
+
+function drawMarker(x, y, colour, label) {
+  ctx.save();
+  ctx.strokeStyle = colour;
+  ctx.fillStyle = colour;
+  ctx.beginPath();
+  ctx.arc(x, y, 5, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.font = '10px Consolas, monospace';
+  ctx.fillText(label, x + 8, y - 8);
+  ctx.restore();
+}
+
+function drawWeevil() {
+  const pos = worldToScreen(state.position);
+  avatar.updatePosition({ x: state.position.x, y: state.position.y, z: state.position.z, r: state.position.r });
+  const plan = avatar.createRenderPlan();
+  const scale = state.scale;
+
+  ctx.save();
+  ctx.translate(pos.x, pos.y);
+  ctx.scale(scale, scale);
+  renderer.render(ctx, plan, -85, -150, { mode: 'debug' });
+  ctx.restore();
+}
+
+function updateReadout() {
+  readout.textContent = [
+    'Movement coordinate sandbox',
+    `rule: ${MOVEMENT_SANDBOX_RULES.physicsStatus}`,
+    `baseline: ${MOVEMENT_SANDBOX_BASELINE.key}`,
+    `scale: ${state.scale}`,
+    `entryPos: ${MOVEMENT_SANDBOX_BASELINE.entryPos.join(',')}`,
+    `boundary: ${state.boundary.join(',')}`,
+    '',
+    `position.x: ${state.position.x.toFixed(2)}`,
+    `position.y: ${state.position.y.toFixed(2)}`,
+    `position.z: ${state.position.z.toFixed(2)}`,
+    `position.r: ${state.position.r}`,
+    '',
+    `target.x: ${state.target.x.toFixed(2)}`,
+    `target.y: ${state.target.y.toFixed(2)}`,
+    `target.z: ${state.target.z.toFixed(2)}`,
+    '',
+    'Note: coarse heading/move step is temporary until original Flash Walk logic is located/ported.'
+  ].join('\n');
+}
+</script>
+</body>
+</html>
