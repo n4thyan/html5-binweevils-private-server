@@ -1,0 +1,185 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>nestRoom9 Render Basics</title>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#151515;color:#f4e9bd}
+    body{margin:0;padding:24px;background:#151515}.box{border:1px solid #8f7f44;background:#211f16;padding:12px 14px;margin:0 0 14px;max-width:1180px}
+    h1{margin:0 0 8px;font-size:26px}p{margin:0 0 14px;color:#d2c48b;max-width:1180px}code{color:#fff2a8}
+    .controls{display:flex;gap:14px;flex-wrap:wrap}.controls label{font:12px Consolas,monospace}
+    .wrap{display:inline-block;border:2px solid #8f7f44;background:#0d0d0d;padding:12px;max-width:calc(100vw - 72px);overflow:auto}
+    #stage{position:relative;width:614px;height:366px;background:#1b211b;overflow:hidden}.layer{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;pointer-events:none}
+    .comparison{position:absolute;left:0;top:0;width:614px;height:366px;opacity:.24;z-index:9000;display:none;pointer-events:none}
+    .hud{position:absolute;left:8px;top:8px;z-index:9999;background:rgba(0,0,0,.68);padding:7px;font:11px Consolas,monospace}.legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
+  </style>
+</head>
+<body>
+  <h1>nestRoom9 Render Basics</h1>
+  <p>Standalone source-backed Nest room rendering. This uses generated SWF XML scene JSON plus the Nest render-basics layer plan. The comparison frame is optional debug only, not the render source.</p>
+  <div class="box"><strong>Run first:</strong><br><code>node scripts/build-nest-room-xml-scene-json.mjs nestRoom9</code></div>
+  <div id="status" class="box">Loading...</div>
+  <div class="box controls">
+    <label><input id="comparisonToggle" type="checkbox"> comparison frame</label>
+    <label><input data-group="base" type="checkbox" checked> base room</label>
+    <label><input data-group="doors" type="checkbox" checked> doors</label>
+    <label><input data-group="debug-collision" type="checkbox"> debug collision/click shape</label>
+  </div>
+  <div class="wrap">
+    <div id="stage">
+      <img id="comparison" class="comparison" src="/reference/rooms/nest-dump/nestRoom9.swf/frames/1.png" alt="comparison">
+      <div id="hud" class="hud">loading</div>
+    </div>
+  </div>
+  <div id="legend" class="box legend"></div>
+
+<script type="module">
+import { NEST_ROOM_9_RENDER_BASICS_LAYER_PLAN } from "/src/rooms/nestRoom9RenderBasicsLayerPlan.js";
+
+const sceneJson = "/generated/nestRoom9-xml-scene.json";
+const stage = document.getElementById("stage");
+const status = document.getElementById("status");
+const hud = document.getElementById("hud");
+const legend = document.getElementById("legend");
+const comparison = document.getElementById("comparison");
+const comparisonToggle = document.getElementById("comparisonToggle");
+const groupInputs = [...document.querySelectorAll("input[data-group]")];
+const layers = [];
+let loaded = 0;
+let failed = 0;
+
+comparisonToggle.addEventListener("change", applyVisibility);
+groupInputs.forEach(input => input.addEventListener("change", applyVisibility));
+
+try {
+  const res = await fetch(sceneJson + "?cacheBust=" + Date.now());
+  if (!res.ok) throw new Error("missing generated JSON; run node scripts/build-nest-room-xml-scene-json.mjs nestRoom9");
+
+  const scene = await res.json();
+  build(scene.placements || []);
+  applyVisibility();
+
+  status.innerHTML = '<span class="ok">Loaded nestRoom9 Render Basics.</span><br>Using source-backed SWF XML placements, exported SVG assets, and Flash registration offsets.';
+} catch (error) {
+  status.innerHTML = '<span class="fail">Failed.</span><br><code>' + String(error.stack || error.message || error) + "</code>";
+}
+
+function build(placements) {
+  for (const item of NEST_ROOM_9_RENDER_BASICS_LAYER_PLAN) {
+    const placement = findPlacement(item, placements);
+
+    if (!placement) {
+      layers.push({ item, placement: null, image: null, status: "missing-placement" });
+      continue;
+    }
+
+    if (!placement.spritePath) {
+      layers.push({ item, placement, image: null, status: "missing-asset" });
+      continue;
+    }
+
+    const img = new Image();
+    img.className = "layer";
+    img.alt = item.key;
+    img.title = `${item.key} depth=${placement.depth} cid=${placement.characterId}`;
+    img.dataset.group = item.group;
+    img.style.zIndex = String(placement.depth);
+    img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
+    img.addEventListener("load", () => { loaded += 1; updateHud(); });
+    img.addEventListener("error", () => { failed += 1; updateHud(); });
+    img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
+    stage.appendChild(img);
+    layers.push({ item, placement, image: img, status: "mapped" });
+  }
+
+  updateLegend();
+}
+
+function findPlacement(item, placements) {
+  return placements.find(p => {
+    if (item.name && p.name !== item.name) return false;
+    if (item.characterId && p.characterId !== item.characterId) return false;
+    return true;
+  }) || placements.find(p => item.characterId && p.characterId === item.characterId) || null;
+}
+
+function applyVisibility() {
+  comparison.style.display = comparisonToggle.checked ? "block" : "none";
+  const enabled = new Set(groupInputs.filter(i => i.checked).map(i => i.dataset.group));
+
+  for (const layer of layers) {
+    if (!layer.image) continue;
+    layer.image.style.display = enabled.has(layer.item.group) ? "block" : "none";
+  }
+
+  updateHud();
+}
+
+function updateHud() {
+  const visible = layers.filter(l => l.image && layerVisible(l)).length;
+  const mapped = layers.filter(l => l.status === "mapped").length;
+  const missingPlacement = layers.filter(l => l.status === "missing-placement").length;
+  const missingAsset = layers.filter(l => l.status === "missing-asset").length;
+
+  hud.innerHTML = [
+    "nestRoom9 Render Basics",
+    "mapped: " + mapped,
+    "visible: " + visible,
+    "missing placement: " + missingPlacement,
+    "missing asset: " + missingAsset,
+    "loaded: " + loaded,
+    "failed: " + failed
+  ].join("<br>");
+}
+
+function layerVisible(layer) {
+  return layer.image && layer.image.style.display !== "none";
+}
+
+function updateLegend() {
+  const lines = ["Layer plan:"];
+
+  for (const layer of layers) {
+    const p = layer.placement;
+    const debug = layer.item.group === "debug-collision" ? " debug-only" : "";
+
+    if (!p) {
+      lines.push(`${layer.item.key}: missing placement`);
+      continue;
+    }
+
+    const reg = layer.item.registration
+      ? ` registration=${layer.item.registration.x},${layer.item.registration.y}`
+      : " registration=none";
+
+    lines.push(
+      `${layer.item.key}: depth=${p.depth} cid=${p.characterId} group=${layer.item.group}${debug} mapped=${p.mapped} asset=${p.spritePath || "missing"}${reg}`
+    );
+  }
+
+  lines.push("", "This is the checkpoint page for Nest room rendering. Do not continue to walking/navigation until this looks right.");
+  legend.textContent = lines.join("\n");
+}
+
+function cssMatrixWithRegistration(m, registration) {
+  const scaleX = m.scaleX ?? 1;
+  const rotateSkew0 = m.rotateSkew0 ?? 0;
+  const rotateSkew1 = m.rotateSkew1 ?? 0;
+  const scaleY = m.scaleY ?? 1;
+  const x = m.x ?? m.translateXPixels ?? ((m.translateX ?? 0) / 20);
+  const y = m.y ?? m.translateYPixels ?? ((m.translateY ?? 0) / 20);
+
+  const regX = registration?.x ?? 0;
+  const regY = registration?.y ?? 0;
+
+  const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
+  const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
+
+  return `matrix(${scaleX}, ${rotateSkew0}, ${rotateSkew1}, ${scaleY}, ${correctedX}, ${correctedY})`;
+}
+</script>
+</body>
+</html>
+
