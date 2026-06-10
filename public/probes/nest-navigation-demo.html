@@ -1,0 +1,304 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nest Navigation Demo</title>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#151515;color:#f4e9bd}
+    body{margin:0;padding:24px;background:#151515}
+    h1{margin:0 0 8px;font-size:26px}
+    p{margin:0 0 14px;color:#d2c48b;max-width:1180px}
+    code{color:#fff2a8}
+    button{border:1px solid #8f7f44;background:#3a321d;color:#fff2a8;border-radius:6px;padding:7px 10px;cursor:pointer}
+    button:hover{background:#574823}
+    .layout{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .box{border:1px solid #8f7f44;background:#211f16;padding:12px 14px;margin:0 0 14px;max-width:1180px}
+    .panel{width:330px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+    .wrap{display:inline-block;border:2px solid #8f7f44;background:#0d0d0d;padding:12px;max-width:calc(100vw - 72px);overflow:auto}
+    #stage{position:relative;width:614px;height:366px;background:#1b211b;overflow:hidden}
+    #renderRoot{position:absolute;left:0;top:0;transform-origin:0 0}
+    .layer{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;pointer-events:none}
+    .layer.clickable{pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 0 rgba(255,255,255,0))}
+    .layer.clickable:hover{filter:drop-shadow(0 0 8px rgba(255,230,120,.9))}
+    .hud{position:absolute;left:8px;top:8px;z-index:9999;background:rgba(0,0,0,.68);padding:7px;font:11px Consolas,monospace}
+    .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
+  </style>
+</head>
+<body>
+  <h1>Nest Navigation Demo</h1>
+  <p>Source-backed first traversal demo. Hall and rooms render from SWF XML scene JSON plus layer plans. Door clicks use <code>NestNavigationManifest.js</code>.</p>
+
+  <div class="layout">
+    <div>
+      <div id="status" class="box">Loading...</div>
+      <div class="wrap">
+        <div id="stage">
+          <div id="renderRoot"></div>
+          <div id="hud" class="hud">loading</div>
+        </div>
+      </div>
+      <div id="legend" class="box legend"></div>
+    </div>
+
+    <div class="box panel">
+      <strong>Locations</strong>
+      <div id="locationButtons" class="row"></div>
+      <hr>
+      <strong>Doors in current room</strong>
+      <div id="doorButtons" class="row"></div>
+      <hr>
+      <div id="notes" class="legend"></div>
+    </div>
+  </div>
+
+<script type="module">
+import {
+  NEST_LOCATIONS,
+  NEST_HALL_DOOR_TO_LAYER_KEY,
+  getNestDoorTarget,
+  getNestLocation
+} from "/src/rooms/NestNavigationManifest.js";
+
+import {
+  NEST_RENDERABLE_LOCATIONS,
+  getNestRenderableLocation
+} from "/src/rooms/NestRenderRegistry.js";
+
+const stage = document.getElementById("stage");
+const renderRoot = document.getElementById("renderRoot");
+const status = document.getElementById("status");
+const hud = document.getElementById("hud");
+const legend = document.getElementById("legend");
+const notes = document.getElementById("notes");
+const locationButtons = document.getElementById("locationButtons");
+const doorButtons = document.getElementById("doorButtons");
+
+let currentLocationId = 5;
+let currentLayers = [];
+let loaded = 0;
+let failed = 0;
+
+window.addEventListener("error", (event) => showFatal(event.error || event.message));
+window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
+
+buildLocationButtons();
+await loadLocation(5);
+
+function buildLocationButtons() {
+  const order = [5, 1, 2, 3, 4, 6, 7, 8, 9];
+
+  for (const locationId of order) {
+    const location = getNestLocation(locationId);
+    const button = document.createElement("button");
+    button.textContent = location.label;
+    button.addEventListener("click", () => loadLocation(locationId));
+    locationButtons.appendChild(button);
+  }
+}
+
+async function loadLocation(locationId, arrivalDoorId = null) {
+  const config = getNestRenderableLocation(locationId);
+  const location = getNestLocation(locationId);
+
+  if (!config || !location) {
+    const fallback = getNestLocation(locationId);
+    setStatus(`Deferred target: ${fallback?.label || "Unknown loc " + locationId}. Not in this first render set yet.`, "warn");
+    return;
+  }
+
+  currentLocationId = locationId;
+  currentLayers = [];
+  loaded = 0;
+  failed = 0;
+  renderRoot.innerHTML = "";
+
+  renderRoot.style.width = `${config.renderWidth}px`;
+  renderRoot.style.height = `${config.renderHeight}px`;
+  renderRoot.style.transform = `scale(${config.scaleX}, ${config.scaleY})`;
+
+  setStatus(`Loading ${location.label}...`, "warn");
+
+  const res = await fetch(config.sceneJson + "?cacheBust=" + Date.now());
+  if (!res.ok) {
+    throw new Error(`Missing generated JSON for ${location.label}: ${config.sceneJson}`);
+  }
+
+  const scene = await res.json();
+  buildScene(config, scene.placements || []);
+  buildDoorButtons(location);
+  updateHud();
+  updateLegend(config, location, arrivalDoorId);
+
+  setStatus(`Loaded ${location.label}. Click a visible door or use the side buttons.`, "ok");
+}
+
+function buildScene(config, placements) {
+  for (const item of config.layerPlan) {
+    const placement = findPlacement(item, placements);
+
+    if (!placement || !placement.spritePath) {
+      currentLayers.push({ item, placement, image: null, status: placement ? "missing-asset" : "missing-placement" });
+      continue;
+    }
+
+    const doorId = getDoorIdForLayer(config.locationId, item.key);
+    const img = new Image();
+
+    img.className = doorId ? "layer clickable" : "layer";
+    img.alt = item.key;
+    img.title = doorId ? `${item.key} -> door ${doorId}` : item.key;
+    img.style.zIndex = String(placement.depth);
+    img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
+
+    if (doorId) {
+      img.addEventListener("click", () => followDoor(config.locationId, doorId));
+    }
+
+    img.addEventListener("load", () => { loaded += 1; updateHud(); });
+    img.addEventListener("error", () => { failed += 1; updateHud(); });
+    img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
+    renderRoot.appendChild(img);
+    currentLayers.push({ item, placement, image: img, doorId, status: "mapped" });
+  }
+}
+
+function buildDoorButtons(location) {
+  doorButtons.innerHTML = "";
+
+  for (const door of location.doors || []) {
+    const target = getNestDoorTarget(location.id, door.id);
+    const label = target?.targetLocation?.label || `loc ${door.toLoc}`;
+    const button = document.createElement("button");
+
+    button.textContent = `door ${door.id} -> ${label}`;
+    button.addEventListener("click", () => followDoor(location.id, door.id));
+    doorButtons.appendChild(button);
+  }
+}
+
+function followDoor(locationId, doorId) {
+  const target = getNestDoorTarget(locationId, doorId);
+
+  if (!target) {
+    setStatus(`No manifest target for loc ${locationId} door ${doorId}`, "fail");
+    return;
+  }
+
+  const targetLocation = target.targetLocation;
+
+  if (!getNestRenderableLocation(target.toLoc)) {
+    setStatus(`${targetLocation?.label || "Target"} is mapped but deferred in this demo. loc ${target.toLoc}, door ${target.toDoor}`, "warn");
+    return;
+  }
+
+  loadLocation(target.toLoc, target.toDoor);
+}
+
+function getDoorIdForLayer(locationId, layerKey) {
+  if (locationId === 5) {
+    for (const [doorId, key] of Object.entries(NEST_HALL_DOOR_TO_LAYER_KEY)) {
+      if (key === layerKey) return Number(doorId);
+    }
+  }
+
+  const match = /^door(\d+)_mc$/.exec(layerKey);
+  return match ? Number(match[1]) : null;
+}
+
+function findPlacement(item, placements) {
+  return placements.find(p => {
+    if (item.name && p.name !== item.name) return false;
+    if (item.characterId && p.characterId !== item.characterId) return false;
+    return true;
+  }) || placements.find(p => item.characterId && p.characterId === item.characterId) || null;
+}
+
+function updateHud() {
+  const mapped = currentLayers.filter(l => l.status === "mapped").length;
+  const clickable = currentLayers.filter(l => l.doorId).length;
+  const missingPlacement = currentLayers.filter(l => l.status === "missing-placement").length;
+  const missingAsset = currentLayers.filter(l => l.status === "missing-asset").length;
+
+  hud.innerHTML = [
+    getNestLocation(currentLocationId)?.label || `loc ${currentLocationId}`,
+    "mapped: " + mapped,
+    "clickable doors: " + clickable,
+    "missing placement: " + missingPlacement,
+    "missing asset: " + missingAsset,
+    "loaded: " + loaded,
+    "failed: " + failed
+  ].join("<br>");
+}
+
+function updateLegend(config, location, arrivalDoorId) {
+  const lines = [];
+
+  lines.push(`${location.label} / loc ${location.id}`);
+  lines.push(`scene: ${config.sceneJson}`);
+  lines.push(`arrival door: ${arrivalDoorId ?? "direct"}`);
+  lines.push("");
+
+  for (const door of location.doors || []) {
+    const target = getNestDoorTarget(location.id, door.id);
+    lines.push(`door ${door.id}: loc ${location.id} -> loc ${door.toLoc} (${target?.targetLocation?.label || "unknown"})`);
+  }
+
+  lines.push("");
+  lines.push("Clickable SVG layers:");
+  for (const layer of currentLayers.filter(layer => layer.doorId)) {
+    lines.push(`${layer.item.key}: door ${layer.doorId}`);
+  }
+
+  legend.textContent = lines.join("\n");
+
+  notes.textContent = [
+    "Current rule:",
+    "No walking yet.",
+    "Door click immediately swaps rooms using nestLocDefs mapping.",
+    "",
+    "Deferred:",
+    "loc 10 Home Cinema",
+    "loc 20 Garden"
+  ].join("\n");
+}
+
+function cssMatrixWithRegistration(m, registration) {
+  const scaleX = m?.scaleX ?? 1;
+  const rotateSkew0 = m?.rotateSkew0 ?? 0;
+  const rotateSkew1 = m?.rotateSkew1 ?? 0;
+  const scaleY = m?.scaleY ?? 1;
+  const x = m?.x ?? m?.translateXPixels ?? ((m?.translateX ?? 0) / 20);
+  const y = m?.y ?? m?.translateYPixels ?? ((m?.translateY ?? 0) / 20);
+
+  const regX = registration?.x ?? 0;
+  const regY = registration?.y ?? 0;
+
+  const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
+  const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
+
+  return `matrix(${scaleX}, ${rotateSkew0}, ${rotateSkew1}, ${scaleY}, ${correctedX}, ${correctedY})`;
+}
+
+function setStatus(message, type = "ok") {
+  status.innerHTML = `<span class="${type}">${escapeHtml(message)}</span>`;
+}
+
+function showFatal(error) {
+  console.error(error);
+  status.innerHTML = '<span class="fail">Failed.</span><br><code>' + escapeHtml(String(error?.stack || error?.message || error)) + "</code>";
+  hud.innerHTML = "failed";
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+</script>
+</body>
+</html>
