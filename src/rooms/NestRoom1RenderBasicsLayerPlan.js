@@ -20,9 +20,9 @@
     depth: 11,
     group: "doors",
     registration: Object.freeze({
-      x: -97,
+      x: -79,
       y: 0,
-      source: "temporary source-backed horizontal centre correction from exported 194px door asset width; verify against nested bounds next"
+      source: "calibrated Flash registration correction for door1_mc against SWF comparison frame; replace with automated nested bounds extraction later"
     }),
     note: "side door visual / future traversal hotspot"
   }),
@@ -51,3 +51,4 @@ export function getNestRoom1RenderBasicsLayerSummary() {
     nextAction: "verify-nest-room1-render-basics-before-navigation"
   });
 }
+
