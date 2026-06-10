@@ -23,6 +23,9 @@
     .layer.clickable{pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 0 rgba(255,255,255,0))}
     .layer.clickable:hover{filter:drop-shadow(0 0 8px rgba(255,230,120,.9))}
     .hud{position:absolute;left:8px;top:8px;z-index:9999;background:rgba(0,0,0,.68);padding:7px;font:11px Consolas,monospace}
+    .doorTag{position:absolute;z-index:9998;background:rgba(0,0,0,.72);border:1px solid rgba(255,230,120,.8);color:#fff2a8;border-radius:5px;padding:2px 5px;font:10px Consolas,monospace;pointer-events:none;transform:translate(-50%,-50%);white-space:nowrap}
+    #weevilMarker{position:absolute;z-index:9997;left:292px;top:300px;width:24px;height:24px;border-radius:50%;background:#c8842b;border:2px solid #fff2a8;box-shadow:0 3px 8px rgba(0,0,0,.55);transition:left .42s ease, top .42s ease;pointer-events:none}
+    #weevilMarker::after{content:"";position:absolute;left:6px;top:6px;width:4px;height:4px;border-radius:50%;background:#151515;box-shadow:8px 0 0 #151515}
     .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
     .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
   </style>
@@ -37,6 +40,7 @@
       <div class="wrap">
         <div id="stage">
           <div id="renderRoot"></div>
+          <div id="weevilMarker" title="temporary demo weevil"></div>
           <div id="hud" class="hud">loading</div>
         </div>
       </div>
@@ -71,6 +75,7 @@ const stage = document.getElementById("stage");
 const renderRoot = document.getElementById("renderRoot");
 const status = document.getElementById("status");
 const hud = document.getElementById("hud");
+const weevilMarker = document.getElementById("weevilMarker");
 const legend = document.getElementById("legend");
 const notes = document.getElementById("notes");
 const locationButtons = document.getElementById("locationButtons");
@@ -114,6 +119,8 @@ async function loadLocation(locationId, arrivalDoorId = null) {
   loaded = 0;
   failed = 0;
   renderRoot.innerHTML = "";
+  clearDoorTags();
+  resetWeevilMarker();
 
   renderRoot.style.width = `${config.renderWidth}px`;
   renderRoot.style.height = `${config.renderHeight}px`;
@@ -157,7 +164,7 @@ function buildScene(config, placements) {
       img.addEventListener("click", () => followDoor(config.locationId, doorId));
     }
 
-    img.addEventListener("load", () => { loaded += 1; updateHud(); });
+    img.addEventListener("load", () => { loaded += 1; updateHud(); if (doorId) labelDoorLayer(img, item, doorId, config.locationId); });
     img.addEventListener("error", () => { failed += 1; updateHud(); });
     img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
 
@@ -195,7 +202,57 @@ function followDoor(locationId, doorId) {
     return;
   }
 
-  loadLocation(target.toLoc, target.toDoor);
+  walkToDoor(locationId, doorId, () => loadLocation(target.toLoc, target.toDoor));
+}
+
+function walkToDoor(locationId, doorId, done) {
+  const layer = currentLayers.find((entry) => entry.doorId === doorId && entry.image);
+
+  if (!layer) {
+    done();
+    return;
+  }
+
+  const stageRect = stage.getBoundingClientRect();
+  const layerRect = layer.image.getBoundingClientRect();
+
+  const targetX = Math.round(layerRect.left - stageRect.left + layerRect.width / 2 - 12);
+  const targetY = Math.round(layerRect.top - stageRect.top + layerRect.height - 18);
+
+  weevilMarker.style.left = targetX + "px";
+  weevilMarker.style.top = targetY + "px";
+
+  setStatus(`Walking to loc ${locationId} door ${doorId}...`, "warn");
+
+  window.setTimeout(done, 460);
+}
+
+function labelDoorLayer(img, item, doorId, locationId) {
+  const target = getNestDoorTarget(locationId, doorId);
+  const targetLabel = target?.targetLocation?.label || `loc ${target?.toLoc ?? "?"}`;
+  const isDeferred = target && !getNestRenderableLocation(target.toLoc);
+
+  const stageRect = stage.getBoundingClientRect();
+  const imgRect = img.getBoundingClientRect();
+
+  const tag = document.createElement("div");
+  tag.className = "doorTag";
+  tag.textContent = `door ${doorId} -> ${targetLabel}${isDeferred ? " (later)" : ""}`;
+  tag.style.left = Math.round(imgRect.left - stageRect.left + imgRect.width / 2) + "px";
+  tag.style.top = Math.round(imgRect.top - stageRect.top + imgRect.height / 2) + "px";
+  tag.dataset.locationId = String(locationId);
+  tag.dataset.doorId = String(doorId);
+
+  stage.appendChild(tag);
+}
+
+function clearDoorTags() {
+  stage.querySelectorAll(".doorTag").forEach((tag) => tag.remove());
+}
+
+function resetWeevilMarker() {
+  weevilMarker.style.left = "292px";
+  weevilMarker.style.top = "300px";
 }
 
 function getDoorIdForLayer(locationId, layerKey) {
