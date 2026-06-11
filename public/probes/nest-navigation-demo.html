@@ -114,11 +114,14 @@ let weevilAvatar = null;
 let weevilRenderer = null;
 let weevilRendererReady = false;
 let lastWeevilStagePoint = { x: 292, y: 300 };
+let lastClickedStagePoint = null;
+let lastWeevilMoveMode = "spawn";
 
 window.addEventListener("error", (event) => showFatal(event.error || event.message));
 window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
 
 buildLocationButtons();
+stage.addEventListener("click", handleStageClickToMove);
 await initWeevilRenderer();
 await loadLocation(5);
 
@@ -229,6 +232,7 @@ function drawWeevilOverlay(rotation = weevilAvatar?.r ?? 0) {
 
 function setWeevilVisualPosition(stageX, stageY, options = {}) {
   lastWeevilStagePoint = { x: stageX, y: stageY };
+  lastWeevilMoveMode = options.moveMode || lastWeevilMoveMode;
 
   weevilMarker.style.left = Math.round(stageX - WEEVIL_FOOT_X) + "px";
   weevilMarker.style.top = Math.round(stageY - WEEVIL_FOOT_Y) + "px";
@@ -246,6 +250,39 @@ function setWeevilVisualPosition(stageX, stageY, options = {}) {
   }
 
   drawWeevilOverlay(options.rotation ?? weevilAvatar?.r ?? 0);
+
+  if (options.updateHud !== false) {
+    updateHud();
+  }
+}
+
+function getStagePointFromEvent(event) {
+  const rect = stage.getBoundingClientRect();
+
+  return {
+    x: Math.round(event.clientX - rect.left),
+    y: Math.round(event.clientY - rect.top)
+  };
+}
+
+function handleStageClickToMove(event) {
+  const target = event.target;
+
+  if (target?.closest?.(".doorHitbox, button, .layer.clickable")) {
+    return;
+  }
+
+  const point = getStagePointFromEvent(event);
+
+  lastClickedStagePoint = point;
+
+  setWeevilVisualPosition(point.x, point.y, {
+    moveMode: "floor-click",
+    sourceX: weevilAvatar?.x,
+    sourceZ: weevilAvatar?.z
+  });
+
+  setStatus(`Visual click-to-move: stage ${point.x}/${point.y}. Door clicks still navigate rooms.`, "warn");
 }
 
 function getDefaultWeevilStagePoint(locationId, arrivalDoorId = null) {
@@ -320,7 +357,10 @@ function buildScene(config, placements) {
     img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
 
     if (doorId) {
-      img.addEventListener("click", () => followDoor(config.locationId, doorId));
+      img.addEventListener("click", (event) => {
+        event.stopPropagation();
+        followDoor(config.locationId, doorId);
+      });
     }
 
     img.addEventListener("load", () => { loaded += 1; updateHud(); if (doorId && config.locationId !== 5) labelDoorLayer(img, item, doorId, config.locationId); });
@@ -388,7 +428,10 @@ function buildVisualHitboxes(config, location) {
     box.style.width = hitbox.width + "px";
     box.style.height = hitbox.height + "px";
     box.setAttribute("aria-label", box.title);
-    box.addEventListener("click", () => followDoor(location.id, door.id));
+    box.addEventListener("click", (event) => {
+      event.stopPropagation();
+      followDoor(location.id, door.id);
+    });
 
     stage.appendChild(box);
 
@@ -411,7 +454,8 @@ function walkToDoor(locationId, doorId, done) {
   if (visualTarget) {
     setWeevilVisualPosition(visualTarget.stage.x, visualTarget.stage.y, {
       sourceX: visualTarget.source.x,
-      sourceZ: visualTarget.source.z
+      sourceZ: visualTarget.source.z,
+      moveMode: "door"
     });
 
     setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
@@ -424,7 +468,8 @@ function walkToDoor(locationId, doorId, done) {
   if (visualHitbox) {
     setWeevilVisualPosition(
       Math.round(visualHitbox.x + visualHitbox.width / 2),
-      Math.round(visualHitbox.y + visualHitbox.height - 10)
+      Math.round(visualHitbox.y + visualHitbox.height - 10),
+      { moveMode: "door-hitbox-fallback" }
     );
 
     setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
@@ -445,7 +490,7 @@ function walkToDoor(locationId, doorId, done) {
   const targetX = Math.round(layerRect.left - stageRect.left + layerRect.width / 2);
   const targetY = Math.round(layerRect.top - stageRect.top + layerRect.height - 10);
 
-  setWeevilVisualPosition(targetX, targetY);
+  setWeevilVisualPosition(targetX, targetY, { moveMode: "door-layer-fallback" });
 
   setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
 
@@ -479,7 +524,8 @@ function resetWeevilMarker(locationId = currentLocationId, arrivalDoorId = null)
   const point = getDefaultWeevilStagePoint(locationId, arrivalDoorId);
   setWeevilVisualPosition(point.x, point.y, {
     sourceX: point.sourceX,
-    sourceZ: point.sourceZ
+    sourceZ: point.sourceZ,
+    moveMode: "spawn"
   });
 }
 
@@ -518,7 +564,10 @@ function updateHud() {
     "failed: " + failed,
     "weevilScale: " + getNestWeevilScale(currentLocationId),
     "display: " + getCurrentWeevilDisplaySize().width + "x" + getCurrentWeevilDisplaySize().height,
-    "spawn: " + getNestWeevilSpawnProfile(currentLocationId).x + "/" + getNestWeevilSpawnProfile(currentLocationId).y
+    "spawn: " + getNestWeevilSpawnProfile(currentLocationId).x + "/" + getNestWeevilSpawnProfile(currentLocationId).y,
+    "weevil pos: " + Math.round(lastWeevilStagePoint.x) + "/" + Math.round(lastWeevilStagePoint.y),
+    "last move: " + lastWeevilMoveMode,
+    "last click: " + (lastClickedStagePoint ? lastClickedStagePoint.x + "/" + lastClickedStagePoint.y : "none")
   ].join("<br>");
 }
 
@@ -546,7 +595,9 @@ function updateLegend(config, location, arrivalDoorId) {
   notes.textContent = [
     "Current rule:",
     "Real weevil renderer overlay is active.",
+    "Click empty floor to visually move the rendered weevil.",
     "Door click visually moves the rendered weevil, then swaps rooms using nestLocDefs mapping.",
+    "This is visual stage x/y movement only. Core5 frame movement comes next.",
     "",
     "Deferred:",
     "loc 10 Home Cinema",
