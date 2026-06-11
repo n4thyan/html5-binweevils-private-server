@@ -134,6 +134,8 @@ let core5MovementModel = null;
 let core5MovementAnimationFrame = null;
 let core5MovementTargetStagePoint = null;
 let core5MovementLastResult = null;
+let core5MovementOnArrived = null;
+let core5MovementArrivedStatus = null;
 
 window.addEventListener("error", (event) => showFatal(event.error || event.message));
 window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
@@ -446,13 +448,15 @@ function stopCore5Movement(reason = "stop") {
 
   core5MovementModel = null;
   core5MovementTargetStagePoint = null;
+  core5MovementOnArrived = null;
+  core5MovementArrivedStatus = null;
 
   if (reason !== "silent") {
     updateHud();
   }
 }
 
-function startCore5StageMovement(stagePoint) {
+function startCore5StageMovement(stagePoint, options = {}) {
   stopCore5Movement("silent");
 
   const startX = Number.isFinite(lastWeevilStagePoint?.x) ? lastWeevilStagePoint.x : stagePoint.x;
@@ -470,15 +474,17 @@ function startCore5StageMovement(stagePoint) {
   });
 
   core5MovementTargetStagePoint = { x: stagePoint.x, y: stagePoint.y };
+  core5MovementOnArrived = typeof options.onArrived === "function" ? options.onArrived : null;
+  core5MovementArrivedStatus = options.arrivedStatus || null;
 
   core5MovementLastResult = core5MovementModel.moveMyWeevil(stagePoint.x, stagePoint.y, {
-    direction: 999
+    direction: options.direction ?? 999
   });
 
   setWeevilVisualPosition(startX, startZ, {
     sourceX: startX,
     sourceZ: startZ,
-    moveMode: "core5-start",
+    moveMode: options.startMoveMode || "core5-start",
     updateHud: false
   });
 
@@ -513,8 +519,29 @@ function tickCore5StageMovement() {
   }
 
   core5MovementAnimationFrame = null;
-  setStatus(`Core5 arrived at stage ${Math.round(stageX)}/${Math.round(stageY)}.`, "ok");
+
+  const arrivedCallback = core5MovementOnArrived;
+  const arrivedStatus = core5MovementArrivedStatus;
+
+  core5MovementOnArrived = null;
+  core5MovementArrivedStatus = null;
+
+  if (arrivedStatus) {
+    setStatus(arrivedStatus, "ok");
+  } else {
+    setStatus(`Core5 arrived at stage ${Math.round(stageX)}/${Math.round(stageY)}.`, "ok");
+  }
+
   updateHud();
+
+  if (arrivedCallback) {
+    arrivedCallback({
+      x: Math.round(stageX),
+      y: Math.round(stageY),
+      sourceX: core5MovementModel?.weevil?.x,
+      sourceZ: core5MovementModel?.weevil?.z
+    });
+  }
 }
 
 function getDefaultWeevilStagePoint(locationId, arrivalDoorId = null) {
@@ -685,52 +712,70 @@ function clearDoorHitboxes() {
 function walkToDoor(locationId, doorId, done) {
   stopCore5Movement("silent");
 
+  const doorStagePoint = getDoorStagePoint(locationId, doorId);
+
+  if (!doorStagePoint) {
+    done();
+    return;
+  }
+
+  setStatus(`Core5 walking to loc ${locationId} door ${doorId}...`, "warn");
+
+  startCore5StageMovement(
+    { x: doorStagePoint.x, y: doorStagePoint.y },
+    {
+      startMoveMode: doorStagePoint.moveMode + "-start",
+      onArrived: done,
+      arrivedStatus: `Core5 reached loc ${locationId} door ${doorId}. Loading room...`
+    }
+  );
+}
+
+function getDoorStagePoint(locationId, doorId) {
   const visualTarget = getNestDoorVisualTarget(locationId, doorId);
 
   if (visualTarget) {
-    setWeevilVisualPosition(visualTarget.stage.x, visualTarget.stage.y, {
+    return {
+      x: visualTarget.stage.x,
+      y: visualTarget.stage.y,
       sourceX: visualTarget.source.x,
       sourceZ: visualTarget.source.z,
       moveMode: "door"
-    });
-
-    setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
-    window.setTimeout(done, 460);
-    return;
+    };
   }
 
   const visualHitbox = locationId === 5 ? NEST_HALL_2011_VISUAL_HITBOXES[doorId] : null;
 
   if (visualHitbox) {
-    setWeevilVisualPosition(
-      Math.round(visualHitbox.x + visualHitbox.width / 2),
-      Math.round(visualHitbox.y + visualHitbox.height - 10),
-      { moveMode: "door-hitbox-fallback" }
-    );
-
-    setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
-    window.setTimeout(done, 460);
-    return;
+    return {
+      x: Math.round(visualHitbox.x + visualHitbox.width / 2),
+      y: Math.round(visualHitbox.y + visualHitbox.height - 10),
+      sourceX: null,
+      sourceZ: null,
+      moveMode: "door-hitbox-fallback"
+    };
   }
 
   const layer = currentLayers.find((entry) => entry.doorId === doorId && entry.image);
 
   if (!layer) {
-    done();
-    return;
+    return null;
   }
 
   const stageRect = stage.getBoundingClientRect();
   const layerRect = layer.image.getBoundingClientRect();
+  const baseWidth = Math.max(1, stage.offsetWidth || stageRect.width);
+  const baseHeight = Math.max(1, stage.offsetHeight || stageRect.height);
+  const scaleX = stageRect.width / baseWidth;
+  const scaleY = stageRect.height / baseHeight;
 
-  const targetX = Math.round(layerRect.left - stageRect.left + layerRect.width / 2);
-  const targetY = Math.round(layerRect.top - stageRect.top + layerRect.height - 10);
-
-  setWeevilVisualPosition(targetX, targetY, { moveMode: "door-layer-fallback" });
-
-  setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
-
-  window.setTimeout(done, 460);
+  return {
+    x: Math.round((layerRect.left - stageRect.left + layerRect.width / 2) / Math.max(0.0001, scaleX)),
+    y: Math.round((layerRect.top - stageRect.top + layerRect.height - 10) / Math.max(0.0001, scaleY)),
+    sourceX: null,
+    sourceZ: null,
+    moveMode: "door-layer-fallback"
+  };
 }
 
 function labelDoorLayer(img, item, doorId, locationId) {
@@ -839,7 +884,7 @@ function updateLegend(config, location, arrivalDoorId) {
     "Click empty floor to visually move the rendered weevil.",
     "Use viewport presets to test on modern display sizes.",
     "Door click visually moves the rendered weevil, then swaps rooms using nestLocDefs mapping.",
-    "Floor clicks now use Core5 Walk.as frame movement with temporary stage x/y -> x/z mapping.",
+    "Floor and door clicks now use Core5 Walk.as frame movement with temporary stage x/y -> x/z mapping.",
     "",
     "Deferred:",
     "loc 10 Home Cinema",
