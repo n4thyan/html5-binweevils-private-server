@@ -30,6 +30,7 @@
     .dot.spawn{background:#55ddff}
     .dot.click{background:#ff6969}
     .dot.default{background:#ffffff}
+    .dot.auto{background:#b277ff}
     .markerLabel{position:absolute;left:12px;top:-3px;background:rgba(0,0,0,.78);border:1px solid rgba(255,230,120,.7);border-radius:4px;padding:2px 4px;white-space:nowrap;font:10px Consolas,monospace;color:#fff2a8}
     .hitbox{position:absolute;z-index:9997;border:1px dashed rgba(255,255,255,.35);background:rgba(255,255,255,.04);pointer-events:none}
     .gridLine{position:absolute;background:rgba(255,255,255,.12);pointer-events:none}
@@ -101,6 +102,10 @@ import {
 } from "/src/rooms/NestRenderRegistry.js";
 
 import { NEST_HALL_2011_VISUAL_HITBOXES } from "/src/rooms/NestHall2011VisualHitboxes.js";
+
+import {
+  getNestLocationDoorVisualTargets
+} from "/src/rooms/NestDoorVisualTargets.js";
 
 const stage = document.getElementById("stage");
 const renderRoot = document.getElementById("renderRoot");
@@ -284,6 +289,7 @@ function rebuildCoordinateOverlay() {
   buildGrid();
   buildHallVisualHitboxes();
   buildDoorApproachMarkers();
+  buildAutoDoorVisualTargets();
   buildArrivalSpawnMarkers();
   buildClickedMarker();
   updateHud();
@@ -350,6 +356,19 @@ function buildDoorApproachMarkers() {
   }
 }
 
+function buildAutoDoorVisualTargets() {
+  const targets = getNestLocationDoorVisualTargets(currentLocationId);
+
+  for (const target of targets) {
+    addStageMarker(
+      target.stage.x,
+      target.stage.y,
+      "auto",
+      `AUTO door ${target.doorId} visual ${target.stage.x}/${target.stage.y}`
+    );
+  }
+}
+
 function buildArrivalSpawnMarkers() {
   for (const location of Object.values(NEST_LOCATIONS)) {
     for (const door of location.doors || []) {
@@ -368,6 +387,28 @@ function buildArrivalSpawnMarkers() {
 
 function buildClickedMarker() {
   addMarker(clickedSourcePoint.x, clickedSourcePoint.z, "click", `clicked ${Math.round(clickedSourcePoint.x)}/${Math.round(clickedSourcePoint.z)}`);
+}
+
+function addStageMarker(x, y, kind, label) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    return;
+  }
+
+  const marker = document.createElement("div");
+  marker.className = "marker";
+  marker.style.left = x + "px";
+  marker.style.top = y + "px";
+
+  const dot = document.createElement("div");
+  dot.className = `dot ${kind}`;
+  marker.appendChild(dot);
+
+  const text = document.createElement("div");
+  text.className = "markerLabel";
+  text.textContent = label;
+  marker.appendChild(text);
+
+  overlayRoot.appendChild(marker);
 }
 
 function addMarker(x, z, kind, label) {
@@ -520,8 +561,15 @@ function updateLegend() {
   lines.push("Blue = spawn/entry x2/z2 from doors that target this room");
   lines.push("Red = last clicked source point");
   lines.push("White = default test point");
+  lines.push("Purple = auto visual door target used for screen movement");
   lines.push("");
 
+  lines.push("Auto visual door targets:");
+  for (const target of getNestLocationDoorVisualTargets(location.id)) {
+    lines.push(`door ${target.doorId}: stage ${target.stage.x}/${target.stage.y} from ${target.stage.method}`);
+  }
+
+  lines.push("");
   lines.push("Door approach points:");
   for (const door of location.doors || []) {
     const target = getNestDoorTarget(location.id, door.id);
