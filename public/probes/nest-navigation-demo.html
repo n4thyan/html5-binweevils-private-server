@@ -88,6 +88,8 @@ import { AvatarState } from "/src/avatar/AvatarState.js";
 import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
 import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
 
+import { Core5MovementModel } from "/src/movement/Core5MovementModel.js";
+
 const stage = document.getElementById("stage");
 const renderRoot = document.getElementById("renderRoot");
 const status = document.getElementById("status");
@@ -127,6 +129,11 @@ const VIEWPORT_PRESETS = Object.freeze({
 
 let currentViewportPreset = localStorage.getItem("nestNavigationViewportPreset") || "native";
 let currentViewportScale = 1;
+
+let core5MovementModel = null;
+let core5MovementAnimationFrame = null;
+let core5MovementTargetStagePoint = null;
+let core5MovementLastResult = null;
 
 window.addEventListener("error", (event) => showFatal(event.error || event.message));
 window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
@@ -422,13 +429,92 @@ function handleStageClickToMove(event) {
 
   lastClickedStagePoint = point;
 
-  setWeevilVisualPosition(point.x, point.y, {
-    moveMode: "floor-click",
-    sourceX: weevilAvatar?.x,
-    sourceZ: weevilAvatar?.z
+  startCore5StageMovement(point);
+
+  setStatus(`Core5 walking to stage ${point.x}/${point.y}. Door clicks still navigate rooms.`, "warn");
+}
+
+function stopCore5Movement(reason = "stop") {
+  if (core5MovementAnimationFrame != null) {
+    cancelAnimationFrame(core5MovementAnimationFrame);
+    core5MovementAnimationFrame = null;
+  }
+
+  if (core5MovementModel?.walker && !core5MovementModel.walker.halted) {
+    core5MovementModel.walker.halt();
+  }
+
+  core5MovementModel = null;
+  core5MovementTargetStagePoint = null;
+
+  if (reason !== "silent") {
+    updateHud();
+  }
+}
+
+function startCore5StageMovement(stagePoint) {
+  stopCore5Movement("silent");
+
+  const startX = Number.isFinite(lastWeevilStagePoint?.x) ? lastWeevilStagePoint.x : stagePoint.x;
+  const startZ = Number.isFinite(lastWeevilStagePoint?.y) ? lastWeevilStagePoint.y : stagePoint.y;
+  const weevilScale = getNestWeevilScale(currentLocationId);
+
+  core5MovementModel = new Core5MovementModel({
+    x: startX,
+    y: 0,
+    z: startZ,
+    rotY: weevilAvatar?.r ?? 0,
+    weevilScale,
+    mine: false,
+    broadcastMoves: false
   });
 
-  setStatus(`Visual click-to-move: stage ${point.x}/${point.y}. Door clicks still navigate rooms.`, "warn");
+  core5MovementTargetStagePoint = { x: stagePoint.x, y: stagePoint.y };
+
+  core5MovementLastResult = core5MovementModel.moveMyWeevil(stagePoint.x, stagePoint.y, {
+    direction: 999
+  });
+
+  setWeevilVisualPosition(startX, startZ, {
+    sourceX: startX,
+    sourceZ: startZ,
+    moveMode: "core5-start",
+    updateHud: false
+  });
+
+  core5MovementAnimationFrame = requestAnimationFrame(tickCore5StageMovement);
+  updateHud();
+}
+
+function tickCore5StageMovement() {
+  if (!core5MovementModel) {
+    core5MovementAnimationFrame = null;
+    return;
+  }
+
+  core5MovementModel.update(1);
+
+  const stageX = core5MovementModel.weevil.x;
+  const stageY = core5MovementModel.weevil.z;
+  const stillWalking = core5MovementModel.walker && !core5MovementModel.walker.halted;
+
+  setWeevilVisualPosition(stageX, stageY, {
+    sourceX: core5MovementModel.weevil.x,
+    sourceZ: core5MovementModel.weevil.z,
+    rotation: core5MovementModel.weevil.rotY,
+    moveMode: stillWalking ? "core5-walking" : "core5-arrived",
+    updateHud: false
+  });
+
+  if (stillWalking) {
+    core5MovementAnimationFrame = requestAnimationFrame(tickCore5StageMovement);
+    updateHud();
+    return;
+  }
+
+  core5MovementAnimationFrame = null;
+  setStatus(`Core5 arrived at stage ${Math.round(stageX)}/${Math.round(stageY)}.`, "ok");
+  updateHud();
 }
 
 function getDefaultWeevilStagePoint(locationId, arrivalDoorId = null) {
@@ -453,6 +539,8 @@ async function loadLocation(locationId, arrivalDoorId = null) {
     setStatus(`Deferred target: ${fallback?.label || "Unknown loc " + locationId}. Not in this first render set yet.`, "warn");
     return;
   }
+
+  stopCore5Movement("silent");
 
   currentLocationId = locationId;
   currentLayers = [];
@@ -595,6 +683,8 @@ function clearDoorHitboxes() {
 }
 
 function walkToDoor(locationId, doorId, done) {
+  stopCore5Movement("silent");
+
   const visualTarget = getNestDoorVisualTarget(locationId, doorId);
 
   if (visualTarget) {
@@ -715,7 +805,10 @@ function updateHud() {
     "last move: " + lastWeevilMoveMode,
     "last click: " + (lastClickedStagePoint ? lastClickedStagePoint.x + "/" + lastClickedStagePoint.y : "none"),
     "viewport: " + currentViewportPreset,
-    "viewportScale: " + currentViewportScale
+    "viewportScale: " + currentViewportScale,
+    "core5: " + (core5MovementModel ? (core5MovementModel.walker?.halted ? "arrived" : "walking") : "idle"),
+    "core5 target: " + (core5MovementTargetStagePoint ? core5MovementTargetStagePoint.x + "/" + core5MovementTargetStagePoint.y : "none"),
+    "core5 speed: " + (core5MovementLastResult ? core5MovementLastResult.speed : "none")
   ].join("<br>");
 }
 
@@ -746,7 +839,7 @@ function updateLegend(config, location, arrivalDoorId) {
     "Click empty floor to visually move the rendered weevil.",
     "Use viewport presets to test on modern display sizes.",
     "Door click visually moves the rendered weevil, then swaps rooms using nestLocDefs mapping.",
-    "This is visual stage x/y movement only. Core5 frame movement comes next.",
+    "Floor clicks now use Core5 Walk.as frame movement with temporary stage x/y -> x/z mapping.",
     "",
     "Deferred:",
     "loc 10 Home Cinema",
