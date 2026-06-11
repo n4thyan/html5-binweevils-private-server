@@ -26,8 +26,8 @@
     .doorTag{position:absolute;z-index:9998;background:rgba(0,0,0,.72);border:1px solid rgba(255,230,120,.8);color:#fff2a8;border-radius:5px;padding:2px 5px;font:10px Consolas,monospace;pointer-events:none;transform:translate(-50%,-50%);white-space:nowrap}
     .doorHitbox{position:absolute;z-index:9996;border:2px solid rgba(255,230,120,.45);background:rgba(255,230,120,.08);box-sizing:border-box;cursor:pointer}
     .doorHitbox:hover{border-color:rgba(255,230,120,1);background:rgba(255,230,120,.18)}
-    #weevilMarker{position:absolute;z-index:9997;left:292px;top:300px;width:24px;height:24px;border-radius:50%;background:#c8842b;border:2px solid #fff2a8;box-shadow:0 3px 8px rgba(0,0,0,.55);transition:left .42s ease, top .42s ease;pointer-events:none}
-    #weevilMarker::after{content:"";position:absolute;left:6px;top:6px;width:4px;height:4px;border-radius:50%;background:#151515;box-shadow:8px 0 0 #151515}
+    #weevilMarker{position:absolute;z-index:9997;left:244px;top:214px;width:96px;height:96px;transition:left .42s ease, top .42s ease;pointer-events:none;image-rendering:auto}
+    #weevilMarker.debugFallback{border-radius:50%;background:#c8842b;border:2px solid #fff2a8;box-shadow:0 3px 8px rgba(0,0,0,.55)}
     .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
     .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
   </style>
@@ -42,7 +42,7 @@
       <div class="wrap">
         <div id="stage">
           <div id="renderRoot"></div>
-          <div id="weevilMarker" title="temporary demo weevil"></div>
+          <canvas id="weevilMarker" width="96" height="96" title="real rendered weevil overlay"></canvas>
           <div id="hud" class="hud">loading</div>
         </div>
       </div>
@@ -75,11 +75,18 @@ import {
 
 import { NEST_HALL_2011_VISUAL_HITBOXES } from "/src/rooms/NestHall2011VisualHitboxes.js";
 
+import { getNestDoorVisualTarget } from "/src/rooms/NestDoorVisualTargets.js";
+
+import { AvatarState } from "/src/avatar/AvatarState.js";
+import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
+import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
+
 const stage = document.getElementById("stage");
 const renderRoot = document.getElementById("renderRoot");
 const status = document.getElementById("status");
 const hud = document.getElementById("hud");
 const weevilMarker = document.getElementById("weevilMarker");
+const weevilContext = weevilMarker.getContext("2d");
 const legend = document.getElementById("legend");
 const notes = document.getElementById("notes");
 const locationButtons = document.getElementById("locationButtons");
@@ -90,10 +97,22 @@ let currentLayers = [];
 let loaded = 0;
 let failed = 0;
 
+const WEEVIL_CANVAS_SIZE = 96;
+const WEEVIL_DISPLAY_WIDTH = 66;
+const WEEVIL_DISPLAY_HEIGHT = 66;
+const WEEVIL_FOOT_X = 48;
+const WEEVIL_FOOT_Y = 86;
+
+let weevilAvatar = null;
+let weevilRenderer = null;
+let weevilRendererReady = false;
+let lastWeevilStagePoint = { x: 292, y: 300 };
+
 window.addEventListener("error", (event) => showFatal(event.error || event.message));
 window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
 
 buildLocationButtons();
+await initWeevilRenderer();
 await loadLocation(5);
 
 function buildLocationButtons() {
@@ -106,6 +125,139 @@ function buildLocationButtons() {
     button.addEventListener("click", () => loadLocation(locationId));
     locationButtons.appendChild(button);
   }
+}
+
+async function initWeevilRenderer() {
+  weevilAvatar = AvatarState.fromUserVars({
+    userId: 1,
+    idx: 1,
+    name: "debug_weevil",
+    weevilDef: SAMPLE_WEEVIL_DEF,
+    x: 0,
+    y: 0,
+    z: 0,
+    r: 0,
+    ps: 0,
+    ex: 0,
+    locID: 5
+  });
+
+  weevilRenderer = new WeevilCanvasRenderer({ mode: "legacy-demo-assets" });
+  drawWeevilLoadingState();
+
+  try {
+    await weevilRenderer.legacyDemoAssetRenderer.preload();
+    weevilRendererReady = true;
+    drawWeevilOverlay();
+  } catch (error) {
+    console.error(error);
+    drawWeevilFallback("renderer failed");
+  }
+}
+
+function drawWeevilLoadingState() {
+  weevilContext.clearRect(0, 0, WEEVIL_CANVAS_SIZE, WEEVIL_CANVAS_SIZE);
+  weevilContext.fillStyle = "rgba(0,0,0,.65)";
+  weevilContext.fillRect(18, 35, 60, 22);
+  weevilContext.fillStyle = "#fff2a8";
+  weevilContext.font = "10px Consolas, monospace";
+  weevilContext.fillText("loading", 26, 50);
+}
+
+function drawWeevilFallback(label = "weevil") {
+  weevilContext.clearRect(0, 0, WEEVIL_CANVAS_SIZE, WEEVIL_CANVAS_SIZE);
+  weevilContext.fillStyle = "#c8842b";
+  weevilContext.strokeStyle = "#fff2a8";
+  weevilContext.lineWidth = 2;
+  weevilContext.beginPath();
+  weevilContext.arc(WEEVIL_FOOT_X, WEEVIL_FOOT_Y - 12, 12, 0, Math.PI * 2);
+  weevilContext.fill();
+  weevilContext.stroke();
+  weevilContext.fillStyle = "#151515";
+  weevilContext.beginPath();
+  weevilContext.arc(WEEVIL_FOOT_X - 4, WEEVIL_FOOT_Y - 15, 2, 0, Math.PI * 2);
+  weevilContext.arc(WEEVIL_FOOT_X + 4, WEEVIL_FOOT_Y - 15, 2, 0, Math.PI * 2);
+  weevilContext.fill();
+  weevilContext.fillStyle = "#fff2a8";
+  weevilContext.font = "9px Consolas, monospace";
+  weevilContext.fillText(label, 27, 94);
+}
+
+function drawWeevilOverlay(rotation = weevilAvatar?.r ?? 0) {
+  if (!weevilRendererReady || !weevilAvatar || !weevilRenderer) {
+    drawWeevilLoadingState();
+    return;
+  }
+
+  weevilAvatar.updatePosition({
+    x: weevilAvatar.x,
+    y: weevilAvatar.y,
+    z: weevilAvatar.z,
+    r: rotation
+  });
+
+  const renderPlan = weevilAvatar.createRenderPlan();
+
+  weevilContext.clearRect(0, 0, WEEVIL_CANVAS_SIZE, WEEVIL_CANVAS_SIZE);
+
+  weevilRenderer.render(
+    weevilContext,
+    renderPlan,
+    WEEVIL_FOOT_X - WEEVIL_DISPLAY_WIDTH / 2,
+    WEEVIL_FOOT_Y - WEEVIL_DISPLAY_HEIGHT + 10,
+    {
+      mode: "legacy-demo-assets",
+      displayWidth: WEEVIL_DISPLAY_WIDTH,
+      displayHeight: WEEVIL_DISPLAY_HEIGHT
+    }
+  );
+}
+
+function setWeevilVisualPosition(stageX, stageY, options = {}) {
+  lastWeevilStagePoint = { x: stageX, y: stageY };
+
+  weevilMarker.style.left = Math.round(stageX - WEEVIL_FOOT_X) + "px";
+  weevilMarker.style.top = Math.round(stageY - WEEVIL_FOOT_Y) + "px";
+
+  if (weevilAvatar) {
+    weevilAvatar.locId = currentLocationId;
+    if (Number.isFinite(options.sourceX)) {
+      weevilAvatar.x = options.sourceX;
+    }
+    if (Number.isFinite(options.sourceZ)) {
+      weevilAvatar.z = options.sourceZ;
+    }
+  }
+
+  drawWeevilOverlay(options.rotation ?? weevilAvatar?.r ?? 0);
+}
+
+function getDefaultWeevilStagePoint(locationId, arrivalDoorId = null) {
+  if (arrivalDoorId != null) {
+    const arrivalTarget = getNestDoorVisualTarget(locationId, arrivalDoorId);
+
+    if (arrivalTarget) {
+      return {
+        x: arrivalTarget.stage.x,
+        y: arrivalTarget.stage.y,
+        sourceX: arrivalTarget.arrivalSource.x,
+        sourceZ: arrivalTarget.arrivalSource.z
+      };
+    }
+  }
+
+  const firstTarget = getNestDoorVisualTarget(locationId, 1);
+
+  if (firstTarget) {
+    return {
+      x: firstTarget.stage.x,
+      y: firstTarget.stage.y,
+      sourceX: firstTarget.source.x,
+      sourceZ: firstTarget.source.z
+    };
+  }
+
+  return { x: 292, y: 300, sourceX: 0, sourceZ: 0 };
 }
 
 async function loadLocation(locationId, arrivalDoorId = null) {
@@ -125,7 +277,7 @@ async function loadLocation(locationId, arrivalDoorId = null) {
   renderRoot.innerHTML = "";
   clearDoorTags();
   clearDoorHitboxes();
-  resetWeevilMarker();
+  resetWeevilMarker(locationId, arrivalDoorId);
 
   renderRoot.style.width = `${config.renderWidth}px`;
   renderRoot.style.height = `${config.renderHeight}px`;
@@ -253,12 +405,28 @@ function clearDoorHitboxes() {
 }
 
 function walkToDoor(locationId, doorId, done) {
+  const visualTarget = getNestDoorVisualTarget(locationId, doorId);
+
+  if (visualTarget) {
+    setWeevilVisualPosition(visualTarget.stage.x, visualTarget.stage.y, {
+      sourceX: visualTarget.source.x,
+      sourceZ: visualTarget.source.z
+    });
+
+    setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
+    window.setTimeout(done, 460);
+    return;
+  }
+
   const visualHitbox = locationId === 5 ? NEST_HALL_2011_VISUAL_HITBOXES[doorId] : null;
 
   if (visualHitbox) {
-    weevilMarker.style.left = Math.round(visualHitbox.x + visualHitbox.width / 2 - 12) + "px";
-    weevilMarker.style.top = Math.round(visualHitbox.y + visualHitbox.height - 18) + "px";
-    setStatus(`Walking to loc ${locationId} door ${doorId}...`, "warn");
+    setWeevilVisualPosition(
+      Math.round(visualHitbox.x + visualHitbox.width / 2),
+      Math.round(visualHitbox.y + visualHitbox.height - 10)
+    );
+
+    setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
     window.setTimeout(done, 460);
     return;
   }
@@ -273,13 +441,12 @@ function walkToDoor(locationId, doorId, done) {
   const stageRect = stage.getBoundingClientRect();
   const layerRect = layer.image.getBoundingClientRect();
 
-  const targetX = Math.round(layerRect.left - stageRect.left + layerRect.width / 2 - 12);
-  const targetY = Math.round(layerRect.top - stageRect.top + layerRect.height - 18);
+  const targetX = Math.round(layerRect.left - stageRect.left + layerRect.width / 2);
+  const targetY = Math.round(layerRect.top - stageRect.top + layerRect.height - 10);
 
-  weevilMarker.style.left = targetX + "px";
-  weevilMarker.style.top = targetY + "px";
+  setWeevilVisualPosition(targetX, targetY);
 
-  setStatus(`Walking to loc ${locationId} door ${doorId}...`, "warn");
+  setStatus(`Real weevil moving to loc ${locationId} door ${doorId}...`, "warn");
 
   window.setTimeout(done, 460);
 }
@@ -307,9 +474,12 @@ function clearDoorTags() {
   stage.querySelectorAll(".doorTag").forEach((tag) => tag.remove());
 }
 
-function resetWeevilMarker() {
-  weevilMarker.style.left = "292px";
-  weevilMarker.style.top = "300px";
+function resetWeevilMarker(locationId = currentLocationId, arrivalDoorId = null) {
+  const point = getDefaultWeevilStagePoint(locationId, arrivalDoorId);
+  setWeevilVisualPosition(point.x, point.y, {
+    sourceX: point.sourceX,
+    sourceZ: point.sourceZ
+  });
 }
 
 function getDoorIdForLayer(locationId, layerKey) {
@@ -371,8 +541,8 @@ function updateLegend(config, location, arrivalDoorId) {
 
   notes.textContent = [
     "Current rule:",
-    "No walking yet.",
-    "Door click immediately swaps rooms using nestLocDefs mapping.",
+    "Real weevil renderer overlay is active.",
+    "Door click visually moves the rendered weevil, then swaps rooms using nestLocDefs mapping.",
     "",
     "Deferred:",
     "loc 10 Home Cinema",
