@@ -117,13 +117,31 @@ let lastWeevilStagePoint = { x: 292, y: 300 };
 let lastClickedStagePoint = null;
 let lastWeevilMoveMode = "spawn";
 
+const VIEWPORT_PRESETS = Object.freeze({
+  native: Object.freeze({ label: "Native", targetHeight: null }),
+  "480": Object.freeze({ label: "480", targetHeight: 480 }),
+  "720": Object.freeze({ label: "720", targetHeight: 720 }),
+  "1080": Object.freeze({ label: "1080", targetHeight: 1080 }),
+  fit: Object.freeze({ label: "Fit", targetHeight: null })
+});
+
+let currentViewportPreset = localStorage.getItem("nestNavigationViewportPreset") || "native";
+let currentViewportScale = 1;
+
 window.addEventListener("error", (event) => showFatal(event.error || event.message));
 window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
 
 buildLocationButtons();
+buildViewportControls();
 stage.addEventListener("click", handleStageClickToMove);
+window.addEventListener("resize", () => {
+  if (currentViewportPreset === "fit") {
+    applyViewportPreset("fit");
+  }
+});
 await initWeevilRenderer();
 await loadLocation(5);
+applyViewportPreset(currentViewportPreset);
 
 function buildLocationButtons() {
   const order = [5, 1, 2, 3, 4, 6, 7, 8, 9];
@@ -256,12 +274,140 @@ function setWeevilVisualPosition(stageX, stageY, options = {}) {
   }
 }
 
-function getStagePointFromEvent(event) {
+function getStageBaseSize() {
   const rect = stage.getBoundingClientRect();
 
   return {
-    x: Math.round(event.clientX - rect.left),
-    y: Math.round(event.clientY - rect.top)
+    width: Math.round(stage.offsetWidth || rect.width || 614),
+    height: Math.round(stage.offsetHeight || rect.height || 366)
+  };
+}
+
+function getViewportShell() {
+  let shell = document.getElementById("nestViewportShell");
+
+  if (shell) {
+    return shell;
+  }
+
+  shell = document.createElement("div");
+  shell.id = "nestViewportShell";
+  shell.style.cssText = [
+    "position:relative",
+    "overflow:auto",
+    "max-width:calc(100vw - 48px)",
+    "max-height:calc(100vh - 170px)",
+    "border:1px solid rgba(255,242,168,.35)",
+    "border-radius:8px",
+    "background:#050505",
+    "box-shadow:0 6px 20px rgba(0,0,0,.45)"
+  ].join(";");
+
+  stage.parentNode.insertBefore(shell, stage);
+  shell.appendChild(stage);
+
+  return shell;
+}
+
+function buildViewportControls() {
+  if (document.getElementById("viewportControls")) {
+    return;
+  }
+
+  const controls = document.createElement("div");
+  controls.id = "viewportControls";
+  controls.style.cssText = [
+    "display:flex",
+    "flex-wrap:wrap",
+    "gap:6px",
+    "align-items:center",
+    "margin:8px 0",
+    "font:12px Verdana,Arial,sans-serif"
+  ].join(";");
+
+  const label = document.createElement("strong");
+  label.textContent = "Viewport:";
+  label.style.color = "#fff2a8";
+  controls.appendChild(label);
+
+  for (const [key, preset] of Object.entries(VIEWPORT_PRESETS)) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.viewportPreset = key;
+    button.textContent = preset.label;
+    button.style.cssText = [
+      "background:#2b250d",
+      "color:#fff2a8",
+      "border:1px solid #8e7a26",
+      "border-radius:6px",
+      "padding:5px 8px",
+      "cursor:pointer"
+    ].join(";");
+
+    button.addEventListener("click", () => {
+      applyViewportPreset(key);
+    });
+
+    controls.appendChild(button);
+  }
+
+  stage.parentNode.insertBefore(controls, stage);
+}
+
+function getFitViewportScale(baseSize) {
+  const maxWidth = Math.max(320, window.innerWidth - 440);
+  const maxHeight = Math.max(240, window.innerHeight - 190);
+
+  return Math.max(
+    1,
+    Math.min(maxWidth / baseSize.width, maxHeight / baseSize.height)
+  );
+}
+
+function applyViewportPreset(presetName) {
+  const preset = VIEWPORT_PRESETS[presetName] ? presetName : "native";
+  const baseSize = getStageBaseSize();
+
+  currentViewportPreset = preset;
+  localStorage.setItem("nestNavigationViewportPreset", preset);
+
+  if (preset === "native") {
+    currentViewportScale = 1;
+  } else if (preset === "fit") {
+    currentViewportScale = getFitViewportScale(baseSize);
+  } else {
+    currentViewportScale = VIEWPORT_PRESETS[preset].targetHeight / baseSize.height;
+  }
+
+  currentViewportScale = Math.max(1, Number(currentViewportScale.toFixed(4)));
+
+  const shell = getViewportShell();
+
+  stage.style.transformOrigin = "0 0";
+  stage.style.transform = `scale(${currentViewportScale})`;
+
+  shell.style.width = Math.ceil(baseSize.width * currentViewportScale) + "px";
+  shell.style.height = Math.ceil(baseSize.height * currentViewportScale) + "px";
+
+  document.querySelectorAll("[data-viewport-preset]").forEach((button) => {
+    const active = button.dataset.viewportPreset === preset;
+    button.style.background = active ? "#6b5b16" : "#2b250d";
+    button.style.borderColor = active ? "#fff2a8" : "#8e7a26";
+  });
+
+  updateHud();
+}
+
+function getStagePointFromEvent(event) {
+  const rect = stage.getBoundingClientRect();
+  const baseWidth = Math.max(1, stage.offsetWidth || rect.width);
+  const baseHeight = Math.max(1, stage.offsetHeight || rect.height);
+  const scaleX = rect.width / baseWidth;
+  const scaleY = rect.height / baseHeight;
+
+  return {
+    x: Math.round((event.clientX - rect.left) / Math.max(0.0001, scaleX)),
+    y: Math.round((event.clientY - rect.top) / Math.max(0.0001, scaleY))
   };
 }
 
@@ -567,7 +713,9 @@ function updateHud() {
     "spawn: " + getNestWeevilSpawnProfile(currentLocationId).x + "/" + getNestWeevilSpawnProfile(currentLocationId).y,
     "weevil pos: " + Math.round(lastWeevilStagePoint.x) + "/" + Math.round(lastWeevilStagePoint.y),
     "last move: " + lastWeevilMoveMode,
-    "last click: " + (lastClickedStagePoint ? lastClickedStagePoint.x + "/" + lastClickedStagePoint.y : "none")
+    "last click: " + (lastClickedStagePoint ? lastClickedStagePoint.x + "/" + lastClickedStagePoint.y : "none"),
+    "viewport: " + currentViewportPreset,
+    "viewportScale: " + currentViewportScale
   ].join("<br>");
 }
 
@@ -596,6 +744,7 @@ function updateLegend(config, location, arrivalDoorId) {
     "Current rule:",
     "Real weevil renderer overlay is active.",
     "Click empty floor to visually move the rendered weevil.",
+    "Use viewport presets to test on modern display sizes.",
     "Door click visually moves the rendered weevil, then swaps rooms using nestLocDefs mapping.",
     "This is visual stage x/y movement only. Core5 frame movement comes next.",
     "",
