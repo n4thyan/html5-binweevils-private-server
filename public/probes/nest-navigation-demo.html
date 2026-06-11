@@ -82,6 +82,8 @@ import {
   getNestWeevilScaleDisplaySize
 } from "/src/rooms/NestWeevilScaleProfiles.js";
 
+import { getNestWeevilSpawnProfile } from "/src/rooms/NestWeevilSpawnProfiles.js";
+
 import { AvatarState } from "/src/avatar/AvatarState.js";
 import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
 import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
@@ -247,31 +249,16 @@ function setWeevilVisualPosition(stageX, stageY, options = {}) {
 }
 
 function getDefaultWeevilStagePoint(locationId, arrivalDoorId = null) {
-  if (arrivalDoorId != null) {
-    const arrivalTarget = getNestDoorVisualTarget(locationId, arrivalDoorId);
+  const spawnProfile = getNestWeevilSpawnProfile(locationId);
 
-    if (arrivalTarget) {
-      return {
-        x: arrivalTarget.stage.x,
-        y: arrivalTarget.stage.y,
-        sourceX: arrivalTarget.arrivalSource.x,
-        sourceZ: arrivalTarget.arrivalSource.z
-      };
-    }
-  }
-
-  const firstTarget = getNestDoorVisualTarget(locationId, 1);
-
-  if (firstTarget) {
-    return {
-      x: firstTarget.stage.x,
-      y: firstTarget.stage.y,
-      sourceX: firstTarget.source.x,
-      sourceZ: firstTarget.source.z
-    };
-  }
-
-  return { x: 292, y: 300, sourceX: 0, sourceZ: 0 };
+  return {
+    x: spawnProfile.x,
+    y: spawnProfile.y,
+    sourceX: 0,
+    sourceZ: 0,
+    method: spawnProfile.method,
+    arrivalDoorId
+  };
 }
 
 async function loadLocation(locationId, arrivalDoorId = null) {
@@ -530,7 +517,8 @@ function updateHud() {
     "loaded: " + loaded,
     "failed: " + failed,
     "weevilScale: " + getNestWeevilScale(currentLocationId),
-    "display: " + getCurrentWeevilDisplaySize().width + "x" + getCurrentWeevilDisplaySize().height
+    "display: " + getCurrentWeevilDisplaySize().width + "x" + getCurrentWeevilDisplaySize().height,
+    "spawn: " + getNestWeevilSpawnProfile(currentLocationId).x + "/" + getNestWeevilSpawnProfile(currentLocationId).y
   ].join("<br>");
 }
 
