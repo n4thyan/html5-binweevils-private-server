@@ -26,7 +26,7 @@
     .doorTag{position:absolute;z-index:9998;background:rgba(0,0,0,.72);border:1px solid rgba(255,230,120,.8);color:#fff2a8;border-radius:5px;padding:2px 5px;font:10px Consolas,monospace;pointer-events:none;transform:translate(-50%,-50%);white-space:nowrap}
     .doorHitbox{position:absolute;z-index:9996;border:2px solid rgba(255,230,120,.45);background:rgba(255,230,120,.08);box-sizing:border-box;cursor:pointer}
     .doorHitbox:hover{border-color:rgba(255,230,120,1);background:rgba(255,230,120,.18)}
-    #weevilMarker{position:absolute;z-index:9997;left:244px;top:214px;width:96px;height:96px;transition:left .42s ease, top .42s ease;pointer-events:none;image-rendering:auto}
+    #weevilMarker{position:absolute;z-index:9997;left:222px;top:172px;width:140px;height:140px;transition:left .42s ease, top .42s ease;pointer-events:none;image-rendering:auto}
     #weevilMarker.debugFallback{border-radius:50%;background:#c8842b;border:2px solid #fff2a8;box-shadow:0 3px 8px rgba(0,0,0,.55)}
     .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
     .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
@@ -42,7 +42,7 @@
       <div class="wrap">
         <div id="stage">
           <div id="renderRoot"></div>
-          <canvas id="weevilMarker" width="96" height="96" title="real rendered weevil overlay"></canvas>
+          <canvas id="weevilMarker" width="140" height="140" title="real rendered weevil overlay"></canvas>
           <div id="hud" class="hud">loading</div>
         </div>
       </div>
@@ -77,6 +77,11 @@ import { NEST_HALL_2011_VISUAL_HITBOXES } from "/src/rooms/NestHall2011VisualHit
 
 import { getNestDoorVisualTarget } from "/src/rooms/NestDoorVisualTargets.js";
 
+import {
+  getNestWeevilScale,
+  getNestWeevilScaleDisplaySize
+} from "/src/rooms/NestWeevilScaleProfiles.js";
+
 import { AvatarState } from "/src/avatar/AvatarState.js";
 import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
 import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
@@ -97,11 +102,11 @@ let currentLayers = [];
 let loaded = 0;
 let failed = 0;
 
-const WEEVIL_CANVAS_SIZE = 96;
-const WEEVIL_DISPLAY_WIDTH = 66;
-const WEEVIL_DISPLAY_HEIGHT = 66;
-const WEEVIL_FOOT_X = 48;
-const WEEVIL_FOOT_Y = 86;
+const WEEVIL_CANVAS_SIZE = 140;
+const WEEVIL_BASE_DISPLAY_WIDTH = 132;
+const WEEVIL_BASE_DISPLAY_HEIGHT = 132;
+const WEEVIL_FOOT_X = 70;
+const WEEVIL_FOOT_Y = 128;
 
 let weevilAvatar = null;
 let weevilRenderer = null;
@@ -183,6 +188,13 @@ function drawWeevilFallback(label = "weevil") {
   weevilContext.fillText(label, 27, 94);
 }
 
+function getCurrentWeevilDisplaySize() {
+  return getNestWeevilScaleDisplaySize(currentLocationId, {
+    baseWidth: WEEVIL_BASE_DISPLAY_WIDTH,
+    baseHeight: WEEVIL_BASE_DISPLAY_HEIGHT
+  });
+}
+
 function drawWeevilOverlay(rotation = weevilAvatar?.r ?? 0) {
   if (!weevilRendererReady || !weevilAvatar || !weevilRenderer) {
     drawWeevilLoadingState();
@@ -203,12 +215,12 @@ function drawWeevilOverlay(rotation = weevilAvatar?.r ?? 0) {
   weevilRenderer.render(
     weevilContext,
     renderPlan,
-    WEEVIL_FOOT_X - WEEVIL_DISPLAY_WIDTH / 2,
-    WEEVIL_FOOT_Y - WEEVIL_DISPLAY_HEIGHT + 10,
+    WEEVIL_FOOT_X - getCurrentWeevilDisplaySize().width / 2,
+    WEEVIL_FOOT_Y - getCurrentWeevilDisplaySize().height + 10,
     {
       mode: "legacy-demo-assets",
-      displayWidth: WEEVIL_DISPLAY_WIDTH,
-      displayHeight: WEEVIL_DISPLAY_HEIGHT
+      displayWidth: getCurrentWeevilDisplaySize().width,
+      displayHeight: getCurrentWeevilDisplaySize().height
     }
   );
 }
@@ -227,6 +239,8 @@ function setWeevilVisualPosition(stageX, stageY, options = {}) {
     if (Number.isFinite(options.sourceZ)) {
       weevilAvatar.z = options.sourceZ;
     }
+
+    weevilAvatar.scale = getNestWeevilScale(currentLocationId);
   }
 
   drawWeevilOverlay(options.rotation ?? weevilAvatar?.r ?? 0);
@@ -514,7 +528,9 @@ function updateHud() {
     "missing placement: " + missingPlacement,
     "missing asset: " + missingAsset,
     "loaded: " + loaded,
-    "failed: " + failed
+    "failed: " + failed,
+    "weevilScale: " + getNestWeevilScale(currentLocationId),
+    "display: " + getCurrentWeevilDisplaySize().width + "x" + getCurrentWeevilDisplaySize().height
   ].join("<br>");
 }
 
