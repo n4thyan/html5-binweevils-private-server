@@ -1,0 +1,426 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nest UI Canvas Port</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #111;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 18px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: #fff2a8;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: #d2c48b;
+      max-width: 946px;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    #portCanvas {
+      position: relative;
+      width: 946px;
+      height: 653px;
+      background: #050505;
+      overflow: hidden;
+      border: 2px solid #8f7f44;
+      box-shadow: 0 12px 28px rgba(0,0,0,.55);
+    }
+
+    #viewportSlot {
+      position: absolute;
+      left: 166px;
+      top: 78px;
+      width: 614px;
+      height: 366px;
+      overflow: hidden;
+      background: #1b211b;
+      border: 1px solid rgba(255,242,168,.25);
+    }
+
+    #roomStage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 614px;
+      height: 366px;
+      overflow: hidden;
+      background: #1b211b;
+    }
+
+    #renderRoot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+    }
+
+    .layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+      max-width: none;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #weevilMarker {
+      position: absolute;
+      z-index: 500;
+      left: 230px;
+      top: 175px;
+      width: 140px;
+      height: 140px;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 5px rgba(0,0,0,.38));
+    }
+
+    #minimalHud {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      z-index: 1000;
+      background: rgba(0,0,0,.58);
+      color: #fff2a8;
+      padding: 7px 9px;
+      font: 11px Consolas, Monaco, monospace;
+      border: 1px solid rgba(255,242,168,.35);
+      pointer-events: none;
+    }
+
+    .toolbar {
+      width: 946px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 12px 0 0;
+    }
+
+    button {
+      border: 1px solid #8f7f44;
+      background: #3a321d;
+      color: #fff2a8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #574823;
+    }
+
+    #status {
+      width: 946px;
+      margin-top: 8px;
+      color: #9fd36b;
+      font: 12px Consolas, Monaco, monospace;
+    }
+
+    .warn {
+      color: #ffd36b;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nest UI Canvas Port</h1>
+  <p>
+    Clean 1:1 UI reconstruction canvas. First pass: source-backed Nest room render plus a static real rendered weevil.
+    Full viewport backdrop, slime shell, chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
+  </p>
+
+  <div id="portCanvas">
+    <div id="viewportSlot">
+      <div id="roomStage">
+        <div id="renderRoot"></div>
+        <canvas id="weevilMarker" width="140" height="140"></canvas>
+      </div>
+    </div>
+    <div id="minimalHud">loading</div>
+  </div>
+
+  <div class="toolbar" id="roomButtons"></div>
+  <div id="status">Loading...</div>
+
+  <script type="module">
+    import {
+      getNestRenderableLocation
+    } from "/src/rooms/NestRenderRegistry.js";
+
+    import {
+      getNestLocation
+    } from "/src/rooms/NestNavigationManifest.js";
+
+    import {
+      getNestWeevilScale,
+      getNestWeevilScaleDisplaySize
+    } from "/src/rooms/NestWeevilScaleProfiles.js";
+
+    import {
+      getNestWeevilSpawnProfile
+    } from "/src/rooms/NestWeevilSpawnProfiles.js";
+
+    import { AvatarState } from "/src/avatar/AvatarState.js";
+    import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
+    import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
+
+    const renderRoot = document.getElementById("renderRoot");
+    const weevilMarker = document.getElementById("weevilMarker");
+    const weevilContext = weevilMarker.getContext("2d");
+    const roomButtons = document.getElementById("roomButtons");
+    const statusEl = document.getElementById("status");
+    const minimalHud = document.getElementById("minimalHud");
+
+    let currentLocationId = 5;
+    let currentLayers = [];
+    let loaded = 0;
+    let failed = 0;
+    let weevilAvatar = null;
+    let weevilRenderer = null;
+
+    window.addEventListener("error", (event) => {
+      setStatus(event.error?.message || event.message || "Unknown error", "fail");
+    });
+
+    buildRoomButtons();
+    await initWeevilRenderer();
+    await loadLocation(5);
+
+    function buildRoomButtons() {
+      const order = [5, 1, 2, 3, 4, 6, 7, 8, 9];
+
+      for (const locationId of order) {
+        const location = getNestLocation(locationId);
+        const config = getNestRenderableLocation(locationId);
+
+        if (!location || !config) {
+          continue;
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = location.label;
+        button.addEventListener("click", () => loadLocation(locationId));
+        roomButtons.appendChild(button);
+      }
+    }
+
+    async function initWeevilRenderer() {
+      weevilAvatar = AvatarState.fromUserVars({
+        userId: 1,
+        idx: 1,
+        name: "ui_port_static_weevil",
+        weevilDef: SAMPLE_WEEVIL_DEF,
+        x: 0,
+        y: 0,
+        z: 0,
+        r: 180,
+        ps: 0,
+        ex: 0,
+        locID: currentLocationId
+      });
+
+      weevilRenderer = new WeevilCanvasRenderer({ mode: "legacy-demo-assets" });
+      await weevilRenderer.legacyDemoAssetRenderer.preload();
+    }
+
+    async function loadLocation(locationId) {
+      const config = getNestRenderableLocation(locationId);
+      const location = getNestLocation(locationId);
+
+      if (!config || !location) {
+        setStatus("Location not renderable in UI canvas yet: loc " + locationId, "warn");
+        return;
+      }
+
+      currentLocationId = locationId;
+      currentLayers = [];
+      loaded = 0;
+      failed = 0;
+      renderRoot.innerHTML = "";
+
+      setStatus("Loading " + location.label + "...", "warn");
+
+      renderRoot.style.width = config.renderWidth + "px";
+      renderRoot.style.height = config.renderHeight + "px";
+      renderRoot.style.transform = "scale(" + config.scaleX + ", " + config.scaleY + ")";
+      renderRoot.style.transformOrigin = "0 0";
+
+      const response = await fetch(config.sceneJson + "?cacheBust=" + Date.now());
+
+      if (!response.ok) {
+        throw new Error("Missing generated JSON for " + location.label + ": " + config.sceneJson);
+      }
+
+      const scene = await response.json();
+      buildScene(config, scene.placements || []);
+      drawStaticWeevil(locationId);
+      updateHud(config, location);
+      setStatus("Loaded " + location.label + " in clean UI canvas.", "ok");
+    }
+
+    function buildScene(config, placements) {
+      for (const item of config.layerPlan) {
+        const placement = findPlacement(item, placements);
+
+        if (!placement || !placement.spritePath) {
+          currentLayers.push({
+            item,
+            placement,
+            status: placement ? "missing-asset" : "missing-placement"
+          });
+          continue;
+        }
+
+        const img = new Image();
+        img.className = "layer";
+        img.alt = item.key;
+        img.title = item.key;
+        img.style.zIndex = String(placement.depth);
+        img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
+
+        img.addEventListener("load", () => {
+          loaded += 1;
+          updateHud(config, getNestLocation(currentLocationId));
+        });
+
+        img.addEventListener("error", () => {
+          failed += 1;
+          updateHud(config, getNestLocation(currentLocationId));
+        });
+
+        img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
+        renderRoot.appendChild(img);
+        currentLayers.push({
+          item,
+          placement,
+          image: img,
+          status: "mapped"
+        });
+      }
+    }
+
+    function drawStaticWeevil(locationId) {
+      const spawn = getNestWeevilSpawnProfile(locationId);
+      const displaySize = getNestWeevilScaleDisplaySize(locationId, {
+        baseWidth: 238,
+        baseHeight: 238
+      });
+
+      const displayWidth = displaySize.width;
+      const displayHeight = displaySize.height;
+      const markerWidth = 140;
+      const markerHeight = 140;
+      const footX = Math.round(markerWidth / 2);
+      const footY = Math.round(markerHeight * 0.9);
+
+      weevilMarker.width = markerWidth;
+      weevilMarker.height = markerHeight;
+      weevilMarker.style.width = markerWidth + "px";
+      weevilMarker.style.height = markerHeight + "px";
+      weevilMarker.style.left = Math.round(spawn.x - footX) + "px";
+      weevilMarker.style.top = Math.round(spawn.y - footY) + "px";
+
+      weevilContext.clearRect(0, 0, markerWidth, markerHeight);
+
+      if (!weevilRenderer || !weevilAvatar) {
+        return;
+      }
+
+      weevilAvatar.scale = getNestWeevilScale(locationId);
+      weevilAvatar.locID = locationId;
+      weevilAvatar.r = 180;
+
+      const plan = weevilAvatar.createRenderPlan();
+
+      weevilRenderer.render(
+        weevilContext,
+        plan,
+        Math.round((markerWidth - displayWidth) / 2),
+        Math.round((markerHeight - displayHeight) / 2),
+        {
+          mode: "legacy-demo-assets",
+          displayWidth,
+          displayHeight,
+          pitch: 16
+        }
+      );
+    }
+
+    function findPlacement(item, placements) {
+      return placements.find((placement) => {
+        if (item.name && placement.name !== item.name) return false;
+        if (item.characterId && placement.characterId !== item.characterId) return false;
+        return true;
+      }) || placements.find((placement) => item.characterId && placement.characterId === item.characterId) || null;
+    }
+
+    function cssMatrixWithRegistration(m, registration) {
+      const scaleX = m?.scaleX ?? 1;
+      const rotateSkew0 = m?.rotateSkew0 ?? 0;
+      const rotateSkew1 = m?.rotateSkew1 ?? 0;
+      const scaleY = m?.scaleY ?? 1;
+      const x = m?.x ?? m?.translateXPixels ?? ((m?.translateX ?? 0) / 20);
+      const y = m?.y ?? m?.translateYPixels ?? ((m?.translateY ?? 0) / 20);
+
+      const regX = registration?.x ?? 0;
+      const regY = registration?.y ?? 0;
+
+      const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
+      const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
+
+      return "matrix(" + scaleX + ", " + rotateSkew0 + ", " + rotateSkew1 + ", " + scaleY + ", " + correctedX + ", " + correctedY + ")";
+    }
+
+    function updateHud(config, location) {
+      const mapped = currentLayers.filter((layer) => layer.status === "mapped").length;
+      const missing = currentLayers.length - mapped;
+
+      minimalHud.innerHTML = [
+        location?.label || "loc " + currentLocationId,
+        "source layers: " + mapped + "/" + currentLayers.length,
+        "loaded: " + loaded,
+        "failed: " + failed,
+        "missing: " + missing
+      ].join("<br>");
+    }
+
+    function setStatus(message, type = "ok") {
+      statusEl.className = type;
+      statusEl.textContent = message;
+    }
+  </script>
+</body>
+</html>
