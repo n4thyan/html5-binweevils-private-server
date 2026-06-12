@@ -76,6 +76,18 @@
       z-index: 10;
     }
 
+    #slimeFrameSourceLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 614px;
+      height: 366px;
+      z-index: 20;
+      object-fit: fill;
+      pointer-events: none;
+      user-select: none;
+    }
+
     #roomStage {
       position: absolute;
       left: 0;
@@ -179,7 +191,7 @@
   <h1>Nest UI Canvas Port</h1>
   <p>
     Clean 1:1 UI reconstruction canvas. First pass: source-backed Nest room render plus a static real rendered weevil.
-    Main/root source candidate is now placed as a backdrop layer. Slime shell, chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
+    Main/root source candidate is placed as a backdrop layer. Source slime frame candidates 244, 245 and 246 are now available as real mainDEV661 overlays. Chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
   </p>
 
   <div id="portCanvas">
@@ -190,6 +202,7 @@
         <canvas id="weevilMarker" width="140" height="140"></canvas>
       </div>
     </div>
+    <img id="slimeFrameSourceLayer" alt="mainDEV661 slime frame source sprite" />
     <div id="minimalHud">loading</div>
   </div>
 
@@ -220,6 +233,7 @@
     import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
 
     const mainShellSourceLayer = document.getElementById("mainShellSourceLayer");
+    const slimeFrameSourceLayer = document.getElementById("slimeFrameSourceLayer");
     const viewportSlot = document.getElementById("viewportSlot");
     const renderRoot = document.getElementById("renderRoot");
     const weevilMarker = document.getElementById("weevilMarker");
@@ -249,6 +263,31 @@
       height: 366
     });
 
+    const SLIME_FRAME_SOURCE_CANDIDATES = Object.freeze({
+      244: {
+        key: "DefineSprite_244",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_244/1.svg"
+      },
+      245: {
+        key: "DefineSprite_245",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_245/1.svg"
+      },
+      246: {
+        key: "DefineSprite_246",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_246/1.svg"
+      }
+    });
+
+    const DEFAULT_SLIME_FRAME_SLOT = Object.freeze({
+      candidate: "245",
+      x: 150,
+      y: 68,
+      width: 646,
+      height: 386
+    });
+
+    let slimeFrameSlot = loadSlimeFrameSlot();
+
     let uiViewportSlot = loadViewportSlot();
 
     window.addEventListener("error", (event) => {
@@ -257,8 +296,11 @@
 
     loadMainShellSourceCandidate();
     applyViewportSlot();
+    applySlimeFrameSlot();
+    loadSlimeFrameSourceCandidate();
     buildRoomButtons();
     buildViewportControls();
+    buildSlimeFrameControls();
     await initWeevilRenderer();
     await loadLocation(5);
 
@@ -273,6 +315,82 @@
       mainShellSourceLayer.addEventListener("error", () => {
         setStatus("Main shell source candidate did not load: " + MAIN_SHELL_SOURCE_CANDIDATE.path, "fail");
       });
+    }
+
+    function loadSlimeFrameSlot() {
+      try {
+        const raw = localStorage.getItem("nestUiCanvasSlimeFrameSlot");
+
+        if (!raw) {
+          return { ...DEFAULT_SLIME_FRAME_SLOT };
+        }
+
+        const parsed = JSON.parse(raw);
+
+        return {
+          candidate: SLIME_FRAME_SOURCE_CANDIDATES[String(parsed.candidate)] ? String(parsed.candidate) : DEFAULT_SLIME_FRAME_SLOT.candidate,
+          x: Number.isFinite(parsed.x) ? parsed.x : DEFAULT_SLIME_FRAME_SLOT.x,
+          y: Number.isFinite(parsed.y) ? parsed.y : DEFAULT_SLIME_FRAME_SLOT.y,
+          width: Number.isFinite(parsed.width) ? parsed.width : DEFAULT_SLIME_FRAME_SLOT.width,
+          height: Number.isFinite(parsed.height) ? parsed.height : DEFAULT_SLIME_FRAME_SLOT.height
+        };
+      } catch {
+        return { ...DEFAULT_SLIME_FRAME_SLOT };
+      }
+    }
+
+    function saveSlimeFrameSlot() {
+      localStorage.setItem("nestUiCanvasSlimeFrameSlot", JSON.stringify(slimeFrameSlot));
+    }
+
+    function loadSlimeFrameSourceCandidate() {
+      const candidate = SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate];
+      slimeFrameSourceLayer.src = candidate.path + "?cacheBust=" + Date.now();
+      slimeFrameSourceLayer.title = candidate.key + " - mainDEV661 source slime/frame candidate";
+    }
+
+    function applySlimeFrameSlot() {
+      slimeFrameSourceLayer.style.left = Math.round(slimeFrameSlot.x) + "px";
+      slimeFrameSourceLayer.style.top = Math.round(slimeFrameSlot.y) + "px";
+      slimeFrameSourceLayer.style.width = Math.round(slimeFrameSlot.width) + "px";
+      slimeFrameSourceLayer.style.height = Math.round(slimeFrameSlot.height) + "px";
+
+      const readout = document.getElementById("slimeFrameSlotReadout");
+      if (readout) {
+        readout.textContent = "slime " + SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate].key
+          + " x:" + Math.round(slimeFrameSlot.x)
+          + " y:" + Math.round(slimeFrameSlot.y)
+          + " w:" + Math.round(slimeFrameSlot.width)
+          + " h:" + Math.round(slimeFrameSlot.height);
+      }
+    }
+
+    function adjustSlimeFrameSlot(key, delta) {
+      slimeFrameSlot = {
+        ...slimeFrameSlot,
+        [key]: slimeFrameSlot[key] + delta
+      };
+
+      saveSlimeFrameSlot();
+      applySlimeFrameSlot();
+    }
+
+    function setSlimeFrameCandidate(candidate) {
+      slimeFrameSlot = {
+        ...slimeFrameSlot,
+        candidate: String(candidate)
+      };
+
+      saveSlimeFrameSlot();
+      loadSlimeFrameSourceCandidate();
+      applySlimeFrameSlot();
+    }
+
+    function resetSlimeFrameSlot() {
+      slimeFrameSlot = { ...DEFAULT_SLIME_FRAME_SLOT };
+      saveSlimeFrameSlot();
+      loadSlimeFrameSourceCandidate();
+      applySlimeFrameSlot();
     }
 
     function loadViewportSlot() {
@@ -347,6 +465,48 @@
       }
 
       applyViewportSlot();
+    }
+
+    function buildSlimeFrameControls() {
+      const title = document.createElement("span");
+      title.className = "calibrationReadout";
+      title.textContent = "Slime frame";
+      viewportControls.appendChild(title);
+
+      const readout = document.createElement("span");
+      readout.id = "slimeFrameSlotReadout";
+      readout.className = "calibrationReadout";
+      viewportControls.appendChild(readout);
+
+      for (const candidate of ["244", "245", "246"]) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "sprite " + candidate;
+        button.addEventListener("click", () => setSlimeFrameCandidate(candidate));
+        viewportControls.appendChild(button);
+      }
+
+      const controls = [
+        ["sx -5", () => adjustSlimeFrameSlot("x", -5)],
+        ["sx +5", () => adjustSlimeFrameSlot("x", 5)],
+        ["sy -5", () => adjustSlimeFrameSlot("y", -5)],
+        ["sy +5", () => adjustSlimeFrameSlot("y", 5)],
+        ["sw -5", () => adjustSlimeFrameSlot("width", -5)],
+        ["sw +5", () => adjustSlimeFrameSlot("width", 5)],
+        ["sh -5", () => adjustSlimeFrameSlot("height", -5)],
+        ["sh +5", () => adjustSlimeFrameSlot("height", 5)],
+        ["reset slime", resetSlimeFrameSlot]
+      ];
+
+      for (const [label, handler] of controls) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", handler);
+        viewportControls.appendChild(button);
+      }
+
+      applySlimeFrameSlot();
     }
 
     function adjustViewportSlot(key, delta) {
@@ -561,6 +721,7 @@
         "source layers: " + mapped + "/" + currentLayers.length,
         "shell: " + MAIN_SHELL_SOURCE_CANDIDATE.key,
         "viewport: " + Math.round(uiViewportSlot.x) + "," + Math.round(uiViewportSlot.y) + " " + Math.round(uiViewportSlot.width) + "x" + Math.round(uiViewportSlot.height),
+        "slime: " + SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate].key,
         "loaded: " + loaded,
         "failed: " + failed,
         "missing: " + missing

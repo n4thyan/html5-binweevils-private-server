@@ -1,0 +1,226 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mainDEV661 UI Source Candidate Browser</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #111;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #111;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      color: #fff2a8;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: #d2c48b;
+      max-width: 1100px;
+      line-height: 1.4;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 14px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid #8f7f44;
+      background: #3a321d;
+      color: #fff2a8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #574823;
+    }
+
+    .readout {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      color: #fff2a8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font: 12px Consolas, Monaco, monospace;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid #8f7f44;
+      background: #191711;
+      padding: 10px;
+      min-height: 190px;
+    }
+
+    .preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 135px;
+      background: repeating-conic-gradient(#222 0% 25%, #181818 0% 50%) 50% / 20px 20px;
+      border: 1px solid rgba(255,242,168,.2);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .preview img {
+      max-width: 100%;
+      max-height: 130px;
+      object-fit: contain;
+    }
+
+    .key {
+      color: #fff2a8;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .path {
+      font: 11px Consolas, Monaco, monospace;
+      color: #d2c48b;
+      overflow-wrap: anywhere;
+    }
+
+    .bad {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>mainDEV661 UI Source Candidate Browser</h1>
+  <p>
+    Visual browser for exported <code>mainDEV661.swf</code> sprite SVGs. Use this to identify real source pieces for the viewport slime frame, chatbox, hunger/level UI and related shell elements. Do not use screenshots as final assets.
+  </p>
+
+  <div class="controls">
+    <button id="prevPage">Previous</button>
+    <button id="nextPage">Next</button>
+    <span class="readout" id="pageReadout">loading</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <script type="module">
+    const grid = document.getElementById("grid");
+    const pageReadout = document.getElementById("pageReadout");
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+
+    const base = "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites";
+    const knownCandidates = [
+      "DefineSprite_4",
+      "DefineSprite_96",
+      "DefineSprite_113"
+    ];
+
+    let page = Number(localStorage.getItem("mainDev661CandidateBrowserPage") || 0);
+    const pageSize = 48;
+
+    prevPage.addEventListener("click", () => {
+      page = Math.max(0, page - 1);
+      localStorage.setItem("mainDev661CandidateBrowserPage", String(page));
+      render();
+    });
+
+    nextPage.addEventListener("click", () => {
+      page += 1;
+      localStorage.setItem("mainDev661CandidateBrowserPage", String(page));
+      render();
+    });
+
+    function candidateName(index) {
+      return "DefineSprite_" + index;
+    }
+
+    function candidatePath(name) {
+      return base + "/" + name + "/1.svg";
+    }
+
+    function render() {
+      grid.innerHTML = "";
+
+      const start = page * pageSize;
+      const end = start + pageSize;
+
+      pageReadout.textContent = "page " + page + " / sprite ids " + start + " to " + (end - 1);
+
+      const names = [];
+
+      if (page === 0) {
+        for (const known of knownCandidates) {
+          names.push(known);
+        }
+      }
+
+      for (let index = start; index < end; index += 1) {
+        const name = candidateName(index);
+        if (!names.includes(name)) {
+          names.push(name);
+        }
+      }
+
+      for (const name of names) {
+        const path = candidatePath(name);
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const preview = document.createElement("div");
+        preview.className = "preview";
+
+        const img = document.createElement("img");
+        img.src = path + "?cacheBust=" + Date.now();
+        img.alt = name;
+        img.loading = "lazy";
+
+        img.addEventListener("error", () => {
+          card.style.display = "none";
+        });
+
+        preview.appendChild(img);
+
+        const key = document.createElement("div");
+        key.className = "key";
+        key.textContent = name;
+
+        const pathEl = document.createElement("div");
+        pathEl.className = "path";
+        pathEl.textContent = path;
+
+        card.appendChild(preview);
+        card.appendChild(key);
+        card.appendChild(pathEl);
+
+        grid.appendChild(card);
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
