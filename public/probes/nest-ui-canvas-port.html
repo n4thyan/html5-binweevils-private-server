@@ -52,6 +52,18 @@
       box-shadow: 0 12px 28px rgba(0,0,0,.55);
     }
 
+    #mainShellSourceLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 946px;
+      height: 653px;
+      z-index: 1;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
     #viewportSlot {
       position: absolute;
       left: 166px;
@@ -61,6 +73,7 @@
       overflow: hidden;
       background: #1b211b;
       border: 1px solid rgba(255,242,168,.25);
+      z-index: 10;
     }
 
     #roomStage {
@@ -157,10 +170,11 @@
   <h1>Nest UI Canvas Port</h1>
   <p>
     Clean 1:1 UI reconstruction canvas. First pass: source-backed Nest room render plus a static real rendered weevil.
-    Full viewport backdrop, slime shell, chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
+    Main/root source candidate is now placed as a backdrop layer. Slime shell, chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
   </p>
 
   <div id="portCanvas">
+    <img id="mainShellSourceLayer" alt="main/root shell source candidate" />
     <div id="viewportSlot">
       <div id="roomStage">
         <div id="renderRoot"></div>
@@ -195,6 +209,7 @@
     import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
     import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
 
+    const mainShellSourceLayer = document.getElementById("mainShellSourceLayer");
     const renderRoot = document.getElementById("renderRoot");
     const weevilMarker = document.getElementById("weevilMarker");
     const weevilContext = weevilMarker.getContext("2d");
@@ -209,13 +224,33 @@
     let weevilAvatar = null;
     let weevilRenderer = null;
 
+    const MAIN_SHELL_SOURCE_CANDIDATE = Object.freeze({
+      key: "fullMainShellSprite",
+      path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg",
+      note: "source candidate from ViewportSlimeFrameSourceMap; not final slime shell split yet"
+    });
+
     window.addEventListener("error", (event) => {
       setStatus(event.error?.message || event.message || "Unknown error", "fail");
     });
 
+    loadMainShellSourceCandidate();
     buildRoomButtons();
     await initWeevilRenderer();
     await loadLocation(5);
+
+    function loadMainShellSourceCandidate() {
+      mainShellSourceLayer.src = MAIN_SHELL_SOURCE_CANDIDATE.path + "?cacheBust=" + Date.now();
+      mainShellSourceLayer.title = MAIN_SHELL_SOURCE_CANDIDATE.key + " - " + MAIN_SHELL_SOURCE_CANDIDATE.note;
+
+      mainShellSourceLayer.addEventListener("load", () => {
+        console.log("Loaded main shell source candidate:", MAIN_SHELL_SOURCE_CANDIDATE.path);
+      });
+
+      mainShellSourceLayer.addEventListener("error", () => {
+        setStatus("Main shell source candidate did not load: " + MAIN_SHELL_SOURCE_CANDIDATE.path, "fail");
+      });
+    }
 
     function buildRoomButtons() {
       const order = [5, 1, 2, 3, 4, 6, 7, 8, 9];
@@ -411,6 +446,7 @@
       minimalHud.innerHTML = [
         location?.label || "loc " + currentLocationId,
         "source layers: " + mapped + "/" + currentLayers.length,
+        "shell: " + MAIN_SHELL_SOURCE_CANDIDATE.key,
         "loaded: " + loaded,
         "failed: " + failed,
         "missing: " + missing
