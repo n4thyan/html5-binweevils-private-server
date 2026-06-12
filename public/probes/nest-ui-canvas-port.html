@@ -157,6 +157,15 @@
       font: 12px Consolas, Monaco, monospace;
     }
 
+    .calibrationReadout {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      color: #fff2a8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font: 12px Consolas, Monaco, monospace;
+    }
+
     .warn {
       color: #ffd36b;
     }
@@ -185,6 +194,7 @@
   </div>
 
   <div class="toolbar" id="roomButtons"></div>
+  <div class="toolbar" id="viewportControls"></div>
   <div id="status">Loading...</div>
 
   <script type="module">
@@ -210,10 +220,12 @@
     import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
 
     const mainShellSourceLayer = document.getElementById("mainShellSourceLayer");
+    const viewportSlot = document.getElementById("viewportSlot");
     const renderRoot = document.getElementById("renderRoot");
     const weevilMarker = document.getElementById("weevilMarker");
     const weevilContext = weevilMarker.getContext("2d");
     const roomButtons = document.getElementById("roomButtons");
+    const viewportControls = document.getElementById("viewportControls");
     const statusEl = document.getElementById("status");
     const minimalHud = document.getElementById("minimalHud");
 
@@ -230,12 +242,23 @@
       note: "source candidate from ViewportSlimeFrameSourceMap; not final slime shell split yet"
     });
 
+    const DEFAULT_UI_VIEWPORT_SLOT = Object.freeze({
+      x: 166,
+      y: 78,
+      width: 614,
+      height: 366
+    });
+
+    let uiViewportSlot = loadViewportSlot();
+
     window.addEventListener("error", (event) => {
       setStatus(event.error?.message || event.message || "Unknown error", "fail");
     });
 
     loadMainShellSourceCandidate();
+    applyViewportSlot();
     buildRoomButtons();
+    buildViewportControls();
     await initWeevilRenderer();
     await loadLocation(5);
 
@@ -250,6 +273,96 @@
       mainShellSourceLayer.addEventListener("error", () => {
         setStatus("Main shell source candidate did not load: " + MAIN_SHELL_SOURCE_CANDIDATE.path, "fail");
       });
+    }
+
+    function loadViewportSlot() {
+      try {
+        const raw = localStorage.getItem("nestUiCanvasViewportSlot");
+
+        if (!raw) {
+          return { ...DEFAULT_UI_VIEWPORT_SLOT };
+        }
+
+        const parsed = JSON.parse(raw);
+
+        return {
+          x: Number.isFinite(parsed.x) ? parsed.x : DEFAULT_UI_VIEWPORT_SLOT.x,
+          y: Number.isFinite(parsed.y) ? parsed.y : DEFAULT_UI_VIEWPORT_SLOT.y,
+          width: Number.isFinite(parsed.width) ? parsed.width : DEFAULT_UI_VIEWPORT_SLOT.width,
+          height: Number.isFinite(parsed.height) ? parsed.height : DEFAULT_UI_VIEWPORT_SLOT.height
+        };
+      } catch {
+        return { ...DEFAULT_UI_VIEWPORT_SLOT };
+      }
+    }
+
+    function saveViewportSlot() {
+      localStorage.setItem("nestUiCanvasViewportSlot", JSON.stringify(uiViewportSlot));
+    }
+
+    function applyViewportSlot() {
+      viewportSlot.style.left = Math.round(uiViewportSlot.x) + "px";
+      viewportSlot.style.top = Math.round(uiViewportSlot.y) + "px";
+      viewportSlot.style.width = Math.round(uiViewportSlot.width) + "px";
+      viewportSlot.style.height = Math.round(uiViewportSlot.height) + "px";
+
+      const readout = document.getElementById("viewportSlotReadout");
+      if (readout) {
+        readout.textContent = "viewport x:" + Math.round(uiViewportSlot.x)
+          + " y:" + Math.round(uiViewportSlot.y)
+          + " w:" + Math.round(uiViewportSlot.width)
+          + " h:" + Math.round(uiViewportSlot.height);
+      }
+    }
+
+    function buildViewportControls() {
+      const title = document.createElement("span");
+      title.className = "calibrationReadout";
+      title.textContent = "Viewport calibration";
+      viewportControls.appendChild(title);
+
+      const readout = document.createElement("span");
+      readout.id = "viewportSlotReadout";
+      readout.className = "calibrationReadout";
+      viewportControls.appendChild(readout);
+
+      const controls = [
+        ["x -5", () => adjustViewportSlot("x", -5)],
+        ["x +5", () => adjustViewportSlot("x", 5)],
+        ["y -5", () => adjustViewportSlot("y", -5)],
+        ["y +5", () => adjustViewportSlot("y", 5)],
+        ["w -5", () => adjustViewportSlot("width", -5)],
+        ["w +5", () => adjustViewportSlot("width", 5)],
+        ["h -5", () => adjustViewportSlot("height", -5)],
+        ["h +5", () => adjustViewportSlot("height", 5)],
+        ["reset", resetViewportSlot]
+      ];
+
+      for (const [label, handler] of controls) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", handler);
+        viewportControls.appendChild(button);
+      }
+
+      applyViewportSlot();
+    }
+
+    function adjustViewportSlot(key, delta) {
+      uiViewportSlot = {
+        ...uiViewportSlot,
+        [key]: uiViewportSlot[key] + delta
+      };
+
+      saveViewportSlot();
+      applyViewportSlot();
+    }
+
+    function resetViewportSlot() {
+      uiViewportSlot = { ...DEFAULT_UI_VIEWPORT_SLOT };
+      saveViewportSlot();
+      applyViewportSlot();
     }
 
     function buildRoomButtons() {
@@ -447,6 +560,7 @@
         location?.label || "loc " + currentLocationId,
         "source layers: " + mapped + "/" + currentLayers.length,
         "shell: " + MAIN_SHELL_SOURCE_CANDIDATE.key,
+        "viewport: " + Math.round(uiViewportSlot.x) + "," + Math.round(uiViewportSlot.y) + " " + Math.round(uiViewportSlot.width) + "x" + Math.round(uiViewportSlot.height),
         "loaded: " + loaded,
         "failed: " + failed,
         "missing: " + missing
