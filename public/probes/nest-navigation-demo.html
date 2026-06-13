@@ -45,6 +45,21 @@
       pointer-events:none;
       box-shadow:0 6px 16px rgba(0,0,0,.35);
     }
+      #core5ProjectionDebugHud{
+      position:absolute;
+      left:8px;
+      bottom:8px;
+      z-index:10000;
+      background:rgba(0,0,0,.72);
+      border:1px solid rgba(110,190,255,.7);
+      color:#cfeeff;
+      border-radius:8px;
+      padding:8px;
+      font:11px Consolas,monospace;
+      min-width:260px;
+      pointer-events:none;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+    }
   </style>
 </head>
 <body>
@@ -1199,6 +1214,152 @@ function escapeHtml(value) {
   ensureMovementSnapshotHud();
   updateMovementSnapshotHud();
   setInterval(updateMovementSnapshotHud, 100);
+
+  const core5ProjectionDebugState = {
+    hasClick: false,
+    clickX: 0,
+    clickY: 0,
+    beforeX: 0,
+    beforeZ: 0,
+    afterX: 0,
+    afterZ: 0,
+    destX: null,
+    destZ: null,
+    dx: null,
+    dz: null,
+    rotY: null,
+    rendererYaw: null
+  };
+
+  function ensureCore5ProjectionDebugHud() {
+    let hud = document.getElementById("core5ProjectionDebugHud");
+
+    if (hud) {
+      return hud;
+    }
+
+    const stageElement = document.getElementById("stage");
+
+    if (!stageElement) {
+      return null;
+    }
+
+    hud = document.createElement("div");
+    hud.id = "core5ProjectionDebugHud";
+    stageElement.appendChild(hud);
+
+    return hud;
+  }
+
+  function formatCore5ProjectionValue(value, decimals = 0) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return "-";
+    }
+
+    return decimals > 0 ? number.toFixed(decimals) : String(Math.round(number));
+  }
+
+  function getCore5ProjectionSnapshot() {
+    if (
+      typeof core5MovementModel === "undefined"
+      || !core5MovementModel
+      || typeof core5MovementModel.getSnapshot !== "function"
+    ) {
+      return null;
+    }
+
+    return core5MovementModel.getSnapshot();
+  }
+
+  function updateCore5ProjectionDebugHud() {
+    const hud = ensureCore5ProjectionDebugHud();
+
+    if (!hud) {
+      return;
+    }
+
+    const snapshot = getCore5ProjectionSnapshot();
+
+    if (!snapshot) {
+      hud.innerHTML = "Core5 projection<br>no movement model";
+      return;
+    }
+
+    const walker = snapshot.walker;
+    const destX = walker ? walker.destination.x : core5ProjectionDebugState.destX;
+    const destZ = walker ? walker.destination.z : core5ProjectionDebugState.destZ;
+    const dx = Number.isFinite(Number(destX)) ? Number(destX) - Number(snapshot.weevil.x) : null;
+    const dz = Number.isFinite(Number(destZ)) ? Number(destZ) - Number(snapshot.weevil.z) : null;
+
+    const lines = [
+      "Core5 projection debug",
+      "screen click: " + (
+        core5ProjectionDebugState.hasClick
+          ? formatCore5ProjectionValue(core5ProjectionDebugState.clickX) + " / " + formatCore5ProjectionValue(core5ProjectionDebugState.clickY)
+          : "-"
+      ),
+      "core current x/z: " + formatCore5ProjectionValue(snapshot.weevil.x) + " / " + formatCore5ProjectionValue(snapshot.weevil.z),
+      "core dest x/z: " + formatCore5ProjectionValue(destX) + " / " + formatCore5ProjectionValue(destZ),
+      "core delta x/z: " + formatCore5ProjectionValue(dx) + " / " + formatCore5ProjectionValue(dz),
+      "core rotY: " + formatCore5ProjectionValue(snapshot.weevil.rotY),
+      "renderer yaw: " + (Number.isFinite(lastRendererYaw) ? formatCore5ProjectionValue(lastRendererYaw) : "default"),
+      "walking: " + snapshot.weevil.walking
+    ];
+
+    hud.innerHTML = lines
+      .map((line) => String(line)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;"))
+      .join("<br>");
+  }
+
+  function captureCore5ProjectionClick(event) {
+    const stageElement = document.getElementById("stage");
+
+    if (!stageElement || !stageElement.contains(event.target)) {
+      return;
+    }
+
+    const rect = stageElement.getBoundingClientRect();
+    const snapshotBefore = getCore5ProjectionSnapshot();
+
+    core5ProjectionDebugState.hasClick = true;
+    core5ProjectionDebugState.clickX = event.clientX - rect.left;
+    core5ProjectionDebugState.clickY = event.clientY - rect.top;
+
+    if (snapshotBefore) {
+      core5ProjectionDebugState.beforeX = snapshotBefore.weevil.x;
+      core5ProjectionDebugState.beforeZ = snapshotBefore.weevil.z;
+    }
+
+    setTimeout(() => {
+      const snapshotAfter = getCore5ProjectionSnapshot();
+
+      if (snapshotAfter) {
+        core5ProjectionDebugState.afterX = snapshotAfter.weevil.x;
+        core5ProjectionDebugState.afterZ = snapshotAfter.weevil.z;
+        core5ProjectionDebugState.rotY = snapshotAfter.weevil.rotY;
+        core5ProjectionDebugState.rendererYaw = Number.isFinite(lastRendererYaw) ? lastRendererYaw : null;
+
+        if (snapshotAfter.walker) {
+          core5ProjectionDebugState.destX = snapshotAfter.walker.destination.x;
+          core5ProjectionDebugState.destZ = snapshotAfter.walker.destination.z;
+          core5ProjectionDebugState.dx = snapshotAfter.walker.destination.x - snapshotAfter.weevil.x;
+          core5ProjectionDebugState.dz = snapshotAfter.walker.destination.z - snapshotAfter.weevil.z;
+        }
+      }
+
+      updateCore5ProjectionDebugHud();
+    }, 0);
+  }
+
+  ensureCore5ProjectionDebugHud();
+  updateCore5ProjectionDebugHud();
+  setInterval(updateCore5ProjectionDebugHud, 100);
+  document.addEventListener("click", captureCore5ProjectionClick, true);
 </script>
 </body>
 </html>
