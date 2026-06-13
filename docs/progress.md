@@ -4,78 +4,27 @@ Date: 2026-06-13
 
 ## Current state
 
-The project is now in a source-backed Nest-room and gameplay-reference UI reconstruction phase.
+The project is now in a source-backed Nest-room and gameplay UI reconstruction phase.
 
 Confirmed:
 
 ```text
 HTML5/Vite app boots locally
 weevil renderer restored from the proven old HTML5 demo
-weevil rendering visually confirmed
 mainDEV661.swf boot flow mapped and tested
 core5.swf Bin.as init flow mapped and tested
 core5.swf UImain.as structure mapped and tested
 core5.swf CamUI.as structure and behaviour mapped and tested for later 3D-camera rooms
-core5.swf UI symbols mapped to real FFDec DefineSprite export paths
 real core UI SVG exports load in browser probes
-FixedCamera LocFactory/Loc/LocFixedCam source model mapped and tested
-RumsCove/RumsAirport preserved as a complex research checkpoint
 Nest room family selected as the active simpler room target
 Nest navigation demo has source-backed loc, door, spawn, scale, movement snapshot, yaw bridge, and projection research checkpoints
 Core5 Walk.as behaviour ids and walking snapshot state are ported/tested
 Core5 getFloorClickCoords-style floor projection module exists and is smoke-tested
 mainDEV661.swf green loading/shell candidates are separated from core5 gameplay HUD work
-core5 gameplay HUD sprite registry now exists for level, mulch, Dosh, hunger, chatbar, and map candidates
-nest-ui-canvas-port.html has been reset around a 640x360 gameplay-reference frame instead of the earlier oversized green shell layout
-```
-
-## Active room decision
-
-Use the Nest room set as the active first complete room family.
-
-```text
-loc 1,2,3,4,6,7,8,9: normal Nest rooms
-loc 5: Nest Hall
-loc 10: home cinema / tycoon room, deferred
-loc 20: garden, deferred
-```
-
-Source file:
-
-```text
-source/knowyourknot-binweevils/game-full/binConfig/getFile/200/uk/nestLocDefs.xml
-```
-
-Important camera/scale source values:
-
-```text
-normal Nest rooms: camPos 0,190,-330 / camAim 0,90,260 / weevilScale 0.5
-Nest Hall: camPos 0,145,-115 / camAim 0,15,500 / weevilScale 0.45
-Nest Garden: camPos -880,870,-680 / camAim 10,108,200 / weevilScale 0.16
-```
-
-## Current Nest proof pages
-
-```text
-/probes/nest-navigation-demo.html
-/probes/nest-coordinate-lab.html
-/probes/nest-ui-canvas-port.html
-```
-
-Status:
-
-```text
-room render and visual door targets are source-backed enough for debug work
-rendered weevil overlay works
-Core5 movement snapshot HUD works
-yaw bridge calibration exists but is not final movement
-Core5 floor projection module is checkpointed but not yet wired as final movement
-clean UI canvas is the active UI reconstruction surface
+core5 gameplay HUD sprite registry is now source-led but the active render pass is deliberately limited to Level and Mulch only
 ```
 
 ## Current UI shell direction
-
-The green slime/loading/canvas shell is a `mainDEV661.swf` target, but it must not be used as the gameplay HUD background.
 
 The gameplay HUD pieces are a `core5.swf` target and are tracked in a first-pass registry.
 
@@ -89,24 +38,32 @@ tests/core5-ui-canvas-first-pass-layout-smoke.mjs
 docs/core5-first-pass-ui-sprite-registry.md
 ```
 
-First-pass gameplay UI targets:
+Current active UI pass:
 
 ```text
-level: DefineSprite 1680, 1681, 1682, 1684, 1685
-mulch: DefineSprite 1686, 1688
+Level: DefineSprite 1685
+Mulch: DefineSprite 1688
+```
+
+Source leads for later passes:
+
+```text
+Level parts: DefineSprite 1680, 1681, 1682, 1684
+Mulch large pile: DefineSprite 1686
 Dosh: DefineSprite 1701, 1706, 1708
-hunger: DefineSprite 1697, 1699
-chatbar: DefineSprite 1716, 1718, 1724, 1725
-map: sidebar Map button ID is still pending; do not use DefineSprite 1757 as the Map button
+Hunger: DefineSprite 1697, 1699
+Chatbar: DefineSprite 1716, 1718, 1724, 1725
+Map: DefineSprite 1786 and 1790 are visible source-grid leads; exact sidebar Map button still needs its own visual pass
 ```
 
 Current UI rule:
 
 ```text
+Do one UI element group at a time.
 Do not invent UI art.
 Use the registry and original exported SVGs.
 Screenshots/JPEXS grids are identification aids only.
-Wrong candidates should be marked pending, not stretched into place.
+Do not stretch later candidates into the canvas before confirming them.
 ```
 
 ## Movement status
@@ -133,23 +90,17 @@ leg animation bridge into the renderer
 legaliseClick/isForbidden/walk-mask integration
 ```
 
-## Useful docs
+## Current Nest proof pages
 
 ```text
-docs/roadmap.md
-docs/rooms/nest-room-port-plan.md
-docs/rooms/rums-cove-video-pod-audit.md
-docs/rooms/videoPod1_10_05_12-audit.md
-docs/rooms/videoPod1-locationDefinitions-link.md
-docs/room-camera-model-notes.md
-docs/core-ui-asset-probe-findings.md
-docs/core5-first-pass-ui-sprite-registry.md
-docs/ui-layout-reference-notes.md
+/probes/nest-navigation-demo.html
+/probes/nest-coordinate-lab.html
+/probes/nest-ui-canvas-port.html
 ```
 
 ## Current test suite additions
 
-`npm.cmd test` now includes UI and movement/projection smoke tests.
+`npm.cmd test` includes UI and movement/projection smoke tests.
 
 Useful individual checks:
 
@@ -171,21 +122,9 @@ node tests/nest-door-visual-targets-smoke.mjs
 1. Pull latest nest-room-demo.
 2. Run npm.cmd test.
 3. Open /probes/nest-ui-canvas-port.html.
-4. Visually compare the 640x360 HUD stack against the gameplay reference.
-5. Identify the correct sidebar Map button DefineSprite id from JPEXS/source before rendering it.
-6. Keep movement parked unless explicitly resumed.
-7. Do not add public/generated, xml, or local decompiled scratch folders to commits.
-```
-
-## Do not do yet
-
-```text
-do not implement backend/session bridge
-do not implement multiplayer
-do not guess missing UI art as final
-do not replace the proven weevil renderer
-do not resume movement unless requested
-do not treat screenshots as final assets
-do not hand-draw permanent gameplay HUD pieces
-do not use DefineSprite_1757 as the sidebar Map button
+4. Visually compare only the Level and Mulch placements against the gameplay reference.
+5. Adjust Level/Mulch placement until they look right.
+6. Then move to the next UI group.
+7. Keep movement parked unless explicitly resumed.
+8. Do not add public/generated, xml, or local decompiled scratch folders to commits.
 ```
