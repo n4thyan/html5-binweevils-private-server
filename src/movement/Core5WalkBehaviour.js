@@ -287,6 +287,55 @@ export class Core5WalkBehaviour {
     this.legs[5].setPose(this.m);
   }
 
+  getLegPoses() {
+    return this.legs.map((leg) => leg.pose);
+  }
+
+  getSnapshot() {
+    return {
+      behaviourId: this.id,
+      type: this.type,
+      x: this.weevil.x,
+      y: this.weevil.y,
+      z: this.weevil.z,
+      rotY: this.weevil.rotY,
+      walking: Boolean(this.weevil.walking),
+      arrived: Boolean(this.arrived),
+      halted: Boolean(this.halted),
+      destination: {
+        x: this.xDest,
+        z: this.zDest,
+        r: this.rDest
+      },
+      increments: {
+        x: this.xIncr,
+        z: this.zIncr,
+        r: this.rIncr
+      },
+      turn: {
+        dir: this.dir,
+        r: this.r,
+        dr: this.dr,
+        rCheck: this.rCheck,
+        clockwise: Boolean(this.cw)
+      },
+      cycle: {
+        n: this.n,
+        m: this.m,
+        p: this.p,
+        q: this.q
+      },
+      creature: {
+        y: this.creature.y ?? 0,
+        rotY: this.creature.rotY ?? 0
+      },
+      head: {
+        rotY: this.head.rotY ?? 0
+      },
+      legPoses: this.getLegPoses()
+    };
+  }
+
   setPose(frameStep = 1) {
     if (this.halted) {
       return;

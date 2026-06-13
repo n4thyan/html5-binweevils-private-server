@@ -160,6 +160,36 @@ export class Core5MovementModel {
     }
   }
 
+  getLegPoses() {
+    return this.legs.map((leg) => leg.pose);
+  }
+
+  getSnapshot() {
+    return {
+      weevilScale: this.weevilScale,
+      speed: this.weevilSpeed,
+      weevil: {
+        x: this.weevil.x,
+        y: this.weevil.y,
+        z: this.weevil.z,
+        rotY: this.weevil.rotY,
+        pose: this.weevil.pose,
+        walking: Boolean(this.weevil.walking)
+      },
+      creature: {
+        y: this.creature.y,
+        rotY: this.creature.rotY
+      },
+      head: {
+        rotY: this.head.rotY
+      },
+      legPoses: this.getLegPoses(),
+      walker: this.walker && typeof this.walker.getSnapshot === "function"
+        ? this.walker.getSnapshot()
+        : null
+    };
+  }
+
   arrived() {
     this.weevil.walking = false;
 
