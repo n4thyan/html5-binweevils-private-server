@@ -4,7 +4,7 @@ Date: 2026-06-13
 
 ## Current state
 
-The project is now in a strong source-backed Nest-room and first-pass gameplay UI reconstruction phase.
+The project is now in a source-backed Nest-room and gameplay-reference UI reconstruction phase.
 
 Confirmed:
 
@@ -24,8 +24,9 @@ Nest room family selected as the active simpler room target
 Nest navigation demo has source-backed loc, door, spawn, scale, movement snapshot, yaw bridge, and projection research checkpoints
 Core5 Walk.as behaviour ids and walking snapshot state are ported/tested
 Core5 getFloorClickCoords-style floor projection module exists and is smoke-tested
-mainDEV661.swf green slime/canvas shell separated from core5 gameplay HUD work
+mainDEV661.swf green loading/shell candidates are separated from core5 gameplay HUD work
 core5 gameplay HUD sprite registry now exists for level, mulch, Dosh, hunger, chatbar, and map candidates
+nest-ui-canvas-port.html has been reset around a 640x360 gameplay-reference frame instead of the earlier oversized green shell layout
 ```
 
 ## Active room decision
@@ -74,15 +75,17 @@ clean UI canvas is the active UI reconstruction surface
 
 ## Current UI shell direction
 
-The green slime/canvas shell is a `mainDEV661.swf` target.
+The green slime/loading/canvas shell is a `mainDEV661.swf` target, but it must not be used as the gameplay HUD background.
 
-The gameplay HUD pieces are a `core5.swf` target and are now tracked in a first-pass registry.
+The gameplay HUD pieces are a `core5.swf` target and are tracked in a first-pass registry.
 
-Current UI registry files:
+Current UI registry/layout files:
 
 ```text
 src/ui/Core5UiSpriteIds.js
+src/ui/Core5UiCanvasFirstPassLayout.js
 tests/core5-ui-sprite-ids-smoke.mjs
+tests/core5-ui-canvas-first-pass-layout-smoke.mjs
 docs/core5-first-pass-ui-sprite-registry.md
 ```
 
@@ -93,8 +96,8 @@ level: DefineSprite 1680, 1681, 1682, 1684, 1685
 mulch: DefineSprite 1686, 1688
 Dosh: DefineSprite 1701, 1706, 1708
 hunger: DefineSprite 1697, 1699
-chatbar: DefineSprite 1716, 1718, 1721, 1723, 1724, 1725
-map: DefineSprite 1757, 1761, 1786, 1790, 1795 candidates
+chatbar: DefineSprite 1716, 1718, 1724, 1725
+map: sidebar Map button ID is still pending; do not use DefineSprite 1757 as the Map button
 ```
 
 Current UI rule:
@@ -103,6 +106,7 @@ Current UI rule:
 Do not invent UI art.
 Use the registry and original exported SVGs.
 Screenshots/JPEXS grids are identification aids only.
+Wrong candidates should be marked pending, not stretched into place.
 ```
 
 ## Movement status
@@ -145,16 +149,13 @@ docs/ui-layout-reference-notes.md
 
 ## Current test suite additions
 
-`npm.cmd test` now includes:
-
-```text
-node tests/core5-ui-sprite-ids-smoke.mjs
-```
+`npm.cmd test` now includes UI and movement/projection smoke tests.
 
 Useful individual checks:
 
 ```text
 node tests/core5-ui-sprite-ids-smoke.mjs
+node tests/core5-ui-canvas-first-pass-layout-smoke.mjs
 node tests/core5-floor-projection-smoke.mjs
 node tests/core5-weevil-behaviours-smoke.mjs
 node tests/core5-walk-snapshot-smoke.mjs
@@ -170,9 +171,10 @@ node tests/nest-door-visual-targets-smoke.mjs
 1. Pull latest nest-room-demo.
 2. Run npm.cmd test.
 3. Open /probes/nest-ui-canvas-port.html.
-4. Start wiring level/mulch/Dosh/hunger/chatbar/map visual candidates from src/ui/Core5UiSpriteIds.js.
-5. Keep movement parked unless explicitly resumed.
-6. Do not add public/generated, xml, or local decompiled scratch folders to commits.
+4. Visually compare the 640x360 HUD stack against the gameplay reference.
+5. Identify the correct sidebar Map button DefineSprite id from JPEXS/source before rendering it.
+6. Keep movement parked unless explicitly resumed.
+7. Do not add public/generated, xml, or local decompiled scratch folders to commits.
 ```
 
 ## Do not do yet
@@ -185,4 +187,5 @@ do not replace the proven weevil renderer
 do not resume movement unless requested
 do not treat screenshots as final assets
 do not hand-draw permanent gameplay HUD pieces
+do not use DefineSprite_1757 as the sidebar Map button
 ```
