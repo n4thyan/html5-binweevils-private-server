@@ -152,11 +152,23 @@ let core5MovementLastResult = null;
 let core5MovementOnArrived = null;
 let core5MovementArrivedStatus = null;
 
+let lastCore5RotY = 0;
+let lastRendererYaw = null;
+
+const DEFAULT_CORE5_YAW_BRIDGE = Object.freeze({
+  enabled: true,
+  offset: 302,
+  multiplier: 1
+});
+
+let core5YawBridge = loadCore5YawBridge();
+
 window.addEventListener("error", (event) => showFatal(event.error || event.message));
 window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
 
 buildLocationButtons();
 buildViewportControls();
+buildYawBridgeControls();
 stage.addEventListener("click", handleStageClickToMove);
 window.addEventListener("resize", () => {
   if (currentViewportPreset === "fit") {
@@ -248,27 +260,38 @@ function drawWeevilOverlay(rotation = weevilAvatar?.r ?? 0) {
     return;
   }
 
+  const core5RotY = Number.isFinite(Number(rotation)) ? Number(rotation) : 0;
+  lastCore5RotY = core5RotY;
+  lastRendererYaw = core5YawBridge.enabled ? core5RotYToRendererYaw(core5RotY) : null;
+
   weevilAvatar.updatePosition({
     x: weevilAvatar.x,
     y: weevilAvatar.y,
     z: weevilAvatar.z,
-    r: rotation
+    r: core5RotY
   });
 
   const renderPlan = weevilAvatar.createRenderPlan();
 
   weevilContext.clearRect(0, 0, WEEVIL_CANVAS_SIZE, WEEVIL_CANVAS_SIZE);
 
+  const renderOptions = {
+    mode: "legacy-demo-assets",
+    displayWidth: getCurrentWeevilDisplaySize().width,
+    displayHeight: getCurrentWeevilDisplaySize().height,
+    pitch: 16
+  };
+
+  if (core5YawBridge.enabled && Number.isFinite(lastRendererYaw)) {
+    renderOptions.yaw = lastRendererYaw;
+  }
+
   weevilRenderer.render(
     weevilContext,
     renderPlan,
     WEEVIL_FOOT_X - getCurrentWeevilDisplaySize().width / 2,
     WEEVIL_FOOT_Y - getCurrentWeevilDisplaySize().height + 10,
-    {
-      mode: "legacy-demo-assets",
-      displayWidth: getCurrentWeevilDisplaySize().width,
-      displayHeight: getCurrentWeevilDisplaySize().height
-    }
+    renderOptions
   );
 }
 
@@ -331,6 +354,153 @@ function getViewportShell() {
   shell.appendChild(stage);
 
   return shell;
+}
+
+function normaliseDegrees(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return 0;
+  }
+
+  return ((number % 360) + 360) % 360;
+}
+
+function loadCore5YawBridge() {
+  try {
+    const raw = localStorage.getItem("nestNavigationCore5YawBridge");
+
+    if (!raw) {
+      return { ...DEFAULT_CORE5_YAW_BRIDGE };
+    }
+
+    const parsed = JSON.parse(raw);
+
+    return {
+      enabled: typeof parsed.enabled === "boolean" ? parsed.enabled : DEFAULT_CORE5_YAW_BRIDGE.enabled,
+      offset: Number.isFinite(parsed.offset) ? parsed.offset : DEFAULT_CORE5_YAW_BRIDGE.offset,
+      multiplier: Number.isFinite(parsed.multiplier) ? parsed.multiplier : DEFAULT_CORE5_YAW_BRIDGE.multiplier
+    };
+  } catch {
+    return { ...DEFAULT_CORE5_YAW_BRIDGE };
+  }
+}
+
+function saveCore5YawBridge() {
+  localStorage.setItem("nestNavigationCore5YawBridge", JSON.stringify(core5YawBridge));
+}
+
+function core5RotYToRendererYaw(rotY) {
+  return normaliseDegrees(core5YawBridge.offset + Number(rotY || 0) * core5YawBridge.multiplier);
+}
+
+function redrawWeevilForYawBridge() {
+  drawWeevilOverlay(lastCore5RotY);
+  updateHud();
+  updateYawBridgeControls();
+}
+
+function updateYawBridgeControls() {
+  const readout = document.getElementById("yawBridgeReadout");
+
+  if (!readout) {
+    return;
+  }
+
+  readout.textContent = [
+    "yaw bridge",
+    core5YawBridge.enabled ? "on" : "off",
+    "offset " + Math.round(core5YawBridge.offset),
+    "mult " + core5YawBridge.multiplier,
+    "core rotY " + Math.round(lastCore5RotY),
+    "renderer yaw " + (Number.isFinite(lastRendererYaw) ? Math.round(lastRendererYaw) : "default")
+  ].join(" | ");
+}
+
+function adjustYawOffset(delta) {
+  core5YawBridge = {
+    ...core5YawBridge,
+    offset: normaliseDegrees(core5YawBridge.offset + delta)
+  };
+
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function toggleYawMultiplier() {
+  core5YawBridge = {
+    ...core5YawBridge,
+    multiplier: core5YawBridge.multiplier === 1 ? -1 : 1
+  };
+
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function toggleYawBridge() {
+  core5YawBridge = {
+    ...core5YawBridge,
+    enabled: !core5YawBridge.enabled
+  };
+
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function resetYawBridge() {
+  core5YawBridge = { ...DEFAULT_CORE5_YAW_BRIDGE };
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function buildYawBridgeControls() {
+  if (document.getElementById("yawBridgeControls")) {
+    return;
+  }
+
+  const controls = document.createElement("div");
+  controls.id = "yawBridgeControls";
+  controls.style.cssText = [
+    "display:flex",
+    "flex-wrap:wrap",
+    "gap:6px",
+    "align-items:center",
+    "margin:8px 0",
+    "font:12px Verdana,Arial,sans-serif"
+  ].join(";");
+
+  const readout = document.createElement("span");
+  readout.id = "yawBridgeReadout";
+  readout.style.cssText = [
+    "border:1px solid #8f7f44",
+    "background:#211f16",
+    "color:#d9ff9a",
+    "border-radius:6px",
+    "padding:6px 8px",
+    "font:11px Consolas,monospace"
+  ].join(";");
+  controls.appendChild(readout);
+
+  const buttons = [
+    ["yaw -45", () => adjustYawOffset(-45)],
+    ["yaw +45", () => adjustYawOffset(45)],
+    ["invert", toggleYawMultiplier],
+    ["on/off", toggleYawBridge],
+    ["reset yaw", resetYawBridge]
+  ];
+
+  for (const [label, handler] of buttons) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    button.addEventListener("click", handler);
+    controls.appendChild(button);
+  }
+
+  const shell = getViewportShell();
+  shell.parentNode.insertBefore(controls, shell);
+
+  updateYawBridgeControls();
 }
 
 function buildViewportControls() {
@@ -863,6 +1033,9 @@ function updateHud() {
     "spawn: " + getNestWeevilSpawnProfile(currentLocationId).x + "/" + getNestWeevilSpawnProfile(currentLocationId).y,
     "weevil pos: " + Math.round(lastWeevilStagePoint.x) + "/" + Math.round(lastWeevilStagePoint.y),
     "last move: " + lastWeevilMoveMode,
+    "core rotY: " + Math.round(lastCore5RotY),
+    "renderer yaw: " + (Number.isFinite(lastRendererYaw) ? Math.round(lastRendererYaw) : "default"),
+    "yaw bridge: " + (core5YawBridge.enabled ? "on" : "off"),
     "last click: " + (lastClickedStagePoint ? lastClickedStagePoint.x + "/" + lastClickedStagePoint.y : "none"),
     "viewport: " + currentViewportPreset,
     "viewportScale: " + currentViewportScale,
@@ -990,6 +1163,8 @@ function escapeHtml(value) {
       && typeof core5MovementModel.getSnapshot === "function"
         ? core5MovementModel.getSnapshot()
         : null;
+
+    updateYawBridgeControls();
 
     if (!snapshot) {
       hud.innerHTML = "Core5 snapshot<br>no movement model";
