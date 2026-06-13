@@ -6,7 +6,7 @@ The goal is not to make a loose remake, a reimagining, or a generic Bin Weevils-
 
 ## Current confirmed state
 
-The project is currently in the source-backed foundation, Nest room rendering, Core5 movement research, and first gameplay UI sprite-registry phase.
+The project is currently in the source-backed foundation, Nest room rendering, Core5 movement research, and first gameplay UI reconstruction phase.
 
 Confirmed working:
 
@@ -33,7 +33,8 @@ RumsCove/RumsAirport is now treated as a complex research checkpoint, not the fi
 Nest room export has been inspected and selected as the simpler active room family
 Nest navigation demo has source-backed room/door/scale/spawn movement probes
 Core5 Walk.as behaviour ids, walking snapshot state, yaw bridge calibration, and floor projection module are checkpointed
-Core5 gameplay UI sprite ids for level, mulch, Dosh, hunger, map, and chatbar are now registered and smoke-tested
+Core5 gameplay UI sprite ids for level, mulch, Dosh, hunger and chatbar are registered and smoke-tested
+Nest UI canvas now uses a 640x360 gameplay-reference layout instead of the earlier oversized green shell experiment
 ```
 
 Not implemented yet:
@@ -133,22 +134,15 @@ Movement is currently parked after the Core5 floor projection checkpoint. The ne
 
 ## UI shell direction
 
-The green slime/canvas shell belongs to `mainDEV661.swf`, not the core/playercard UI asset track.
-
-Current slime shell candidate paths:
-
-```text
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg
-```
+The green slime/loading/canvas shell belongs to `mainDEV661.swf`, not the core gameplay HUD track. It must not be used as the final gameplay background.
 
 The gameplay HUD/core UI pass is now tracked separately:
 
 ```text
 src/ui/Core5UiSpriteIds.js
+src/ui/Core5UiCanvasFirstPassLayout.js
 tests/core5-ui-sprite-ids-smoke.mjs
+tests/core5-ui-canvas-first-pass-layout-smoke.mjs
 docs/core5-first-pass-ui-sprite-registry.md
 public/probes/nest-ui-canvas-port.html
 ```
@@ -160,8 +154,8 @@ level: DefineSprite 1680, 1681, 1682, 1684, 1685
 mulch: DefineSprite 1686, 1688
 Dosh: DefineSprite 1701, 1706, 1708
 hunger: DefineSprite 1697, 1699
-chatbar: DefineSprite 1716, 1718, 1721, 1723, 1724, 1725
-map: DefineSprite 1757, 1761, 1786, 1790, 1795 candidates
+chatbar: DefineSprite 1716, 1718, 1724, 1725
+map: sidebar Map button source ID still pending; DefineSprite 1757 is documented as a wrong map-panel candidate, not the HUD button
 ```
 
 Playercard icons/assets are a separate core/playercard target. Recent playercard icon screenshots should not be used as slime-frame sources.
@@ -199,7 +193,6 @@ core5.swf/scripts/com/binweevils/engine3D/ViewPort.as
 core5.swf/scripts/com/binweevils/engine3D/visuals/LocFactory.as
 core5.swf/scripts/com/binweevils/engine3D/visuals/Loc.as
 core5.swf/scripts/com/binweevils/engine3D/visuals/LocNest.as
-core5.swf/scripts/com/binweevils/engine3D/visuals/LocFixedCam.as
 core5.swf/symbolClass/symbols.csv
 ```
 
@@ -218,41 +211,4 @@ docs/rooms/videoPod1-locationDefinitions-link.md
 src/                    Clean HTML5 port source code.
 tests/                  Smoke tests that pin source-backed behaviour and paths.
 docs/                   Port rules, architecture notes, source audits, and roadmap.
-reference/              Decompiled SWF exports and old demo reference material.
-source/                 External source/reference material. Do not edit as port code.
-public/                 Static files served by the browser during development.
-```
-
-## Porting rule
-
-Every ported system must answer these questions before implementation:
-
-```text
-Which original Flash/ActionScript/source file controlled it?
-Which original assets did it use?
-Which data format did it expect?
-What is the matching HTML5 module?
-How will fidelity be tested?
-```
-
-No feature should be accepted just because it looks close. If behaviour or visuals are guessed, they must be marked as temporary.
-
-## Development commands
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run local dev server:
-
-```bash
-npm run dev
-```
-
-Run tests:
-
-```bash
-npm test
 ```
