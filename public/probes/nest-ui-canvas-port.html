@@ -42,7 +42,7 @@
       position: relative;
       width: 640px;
       height: 360px;
-      background: #71c92a;
+      background: #111;
       overflow: hidden;
       border: 2px solid #8f7f44;
       box-shadow: 0 12px 28px rgba(0,0,0,.55);
@@ -50,10 +50,10 @@
 
     #viewportSlot {
       position: absolute;
-      left: 55px;
+      left: 0;
       top: 0;
-      width: 585px;
-      height: 306px;
+      width: 640px;
+      height: 360px;
       overflow: hidden;
       background: #1b211b;
       z-index: 10;
@@ -104,7 +104,7 @@
       top: 0;
       width: 640px;
       height: 360px;
-      z-index: 40;
+      z-index: 800;
       pointer-events: none;
       user-select: none;
     }
@@ -116,21 +116,6 @@
       pointer-events: none;
       user-select: none;
       filter: drop-shadow(0 2px 2px rgba(0,0,0,.35));
-    }
-
-    .core5UiPendingSlot {
-      position: absolute;
-      box-sizing: border-box;
-      border: 1px dashed rgba(255,242,168,.75);
-      border-radius: 6px;
-      background: rgba(0,0,0,.18);
-      color: #fff2a8;
-      font: 9px Consolas, Monaco, monospace;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2px;
     }
 
     #minimalHud {
@@ -183,7 +168,7 @@
 <body>
   <h1>Nest UI Canvas Port</h1>
   <p>
-    Gameplay-reference UI layout pass. Movement is parked. The room is scaled into a 640x360 reference canvas, the HUD is placed in the left/bottom stack, and incorrect map/sidebar candidates are left pending instead of rendering wrong art.
+    One-piece-at-a-time gameplay UI pass. Movement is parked. The room/background composition is left intact and only the confirmed static Level badge and Mulch counter candidates are overlaid from the Core5 UI registry.
   </p>
 
   <div id="portCanvas">
@@ -275,19 +260,6 @@
       const layout = getCore5UiCanvasFirstPassLayout();
 
       for (const item of layout) {
-        if (item.kind === "pending") {
-          const pending = document.createElement("div");
-          pending.className = "core5UiPendingSlot";
-          pending.textContent = "Map ID pending";
-          pending.title = item.role || item.note || item.label;
-          pending.style.left = Math.round(item.x) + "px";
-          pending.style.top = Math.round(item.y) + "px";
-          pending.style.width = Math.round(item.width) + "px";
-          pending.style.height = Math.round(item.height) + "px";
-          core5UiSourceLayer.appendChild(pending);
-          continue;
-        }
-
         if (!item.path) {
           uiCandidateFailed += 1;
           continue;
@@ -384,7 +356,7 @@
       buildScene(config, scene.placements || []);
       drawStaticWeevil(locationId);
       updateHud(config, location);
-      setStatus("Loaded " + location.label + " in gameplay-reference UI canvas.", "ok");
+      setStatus("Loaded " + location.label + " with Level + Mulch UI candidates.", "ok");
     }
 
     function buildScene(config, placements) {
@@ -483,7 +455,7 @@
       minimalHud.innerHTML = [
         location?.label || "loc " + currentLocationId,
         "layers " + mapped + "/" + currentLayers.length,
-        "ui " + uiCandidateLoaded + "/" + getCore5UiCanvasFirstPassLayout().filter((item) => item.kind !== "pending").length,
+        "ui " + uiCandidateLoaded + "/" + getCore5UiCanvasFirstPassLayout().length,
         "failed " + failed,
         "missing " + missing
       ].join("<br>");
