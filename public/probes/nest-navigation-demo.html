@@ -30,6 +30,21 @@
     #weevilMarker.debugFallback{border-radius:50%;background:#c8842b;border:2px solid #fff2a8;box-shadow:0 3px 8px rgba(0,0,0,.55)}
     .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
     .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
+      #movementSnapshotHud{
+      position:absolute;
+      right:8px;
+      top:8px;
+      z-index:10000;
+      background:rgba(0,0,0,.72);
+      border:1px solid rgba(150,220,90,.7);
+      color:#d9ff9a;
+      border-radius:8px;
+      padding:8px;
+      font:11px Consolas,monospace;
+      min-width:215px;
+      pointer-events:none;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+    }
   </style>
 </head>
 <body>
@@ -925,6 +940,90 @@ function escapeHtml(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
 }
+
+  function movementSnapshotEscapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  function formatMovementSnapshotNumber(value, decimals = 0) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return "-";
+    }
+
+    return decimals > 0 ? number.toFixed(decimals) : String(Math.round(number));
+  }
+
+  function ensureMovementSnapshotHud() {
+    let hud = document.getElementById("movementSnapshotHud");
+
+    if (hud) {
+      return hud;
+    }
+
+    const stageElement = document.getElementById("stage");
+
+    if (!stageElement) {
+      return null;
+    }
+
+    hud = document.createElement("div");
+    hud.id = "movementSnapshotHud";
+    stageElement.appendChild(hud);
+
+    return hud;
+  }
+
+  function updateMovementSnapshotHud() {
+    const hud = ensureMovementSnapshotHud();
+
+    if (!hud) {
+      return;
+    }
+
+    const snapshot = typeof core5MovementModel !== "undefined"
+      && core5MovementModel
+      && typeof core5MovementModel.getSnapshot === "function"
+        ? core5MovementModel.getSnapshot()
+        : null;
+
+    if (!snapshot) {
+      hud.innerHTML = "Core5 snapshot<br>no movement model";
+      return;
+    }
+
+    const walker = snapshot.walker;
+    const lines = [
+      "Core5 snapshot",
+      "walking: " + snapshot.weevil.walking,
+      "x/z: " + formatMovementSnapshotNumber(snapshot.weevil.x) + " / " + formatMovementSnapshotNumber(snapshot.weevil.z),
+      "rotY: " + formatMovementSnapshotNumber(snapshot.weevil.rotY),
+      "legs: " + snapshot.legPoses.join(",")
+    ];
+
+    if (walker) {
+      lines.push(
+        "dest: " + formatMovementSnapshotNumber(walker.destination.x) + " / " + formatMovementSnapshotNumber(walker.destination.z),
+        "inc: " + formatMovementSnapshotNumber(walker.increments.x, 2) + " / " + formatMovementSnapshotNumber(walker.increments.z, 2),
+        "turn r: " + formatMovementSnapshotNumber(walker.turn.r) + " -> " + formatMovementSnapshotNumber(walker.destination.r),
+        "turn dir: " + formatMovementSnapshotNumber(walker.turn.dir),
+        "cycle: " + [walker.cycle.n, walker.cycle.m, walker.cycle.p, walker.cycle.q].map((value) => formatMovementSnapshotNumber(value)).join(","),
+        "walker legs: " + walker.legPoses.join(",")
+      );
+    } else {
+      lines.push("walker: none");
+    }
+
+    hud.innerHTML = lines.map(movementSnapshotEscapeHtml).join("<br>");
+  }
+
+  ensureMovementSnapshotHud();
+  updateMovementSnapshotHud();
+  setInterval(updateMovementSnapshotHud, 100);
 </script>
 </body>
 </html>
