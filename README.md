@@ -6,7 +6,7 @@ The goal is not to make a loose remake, a reimagining, or a generic Bin Weevils-
 
 ## Current confirmed state
 
-The project is currently in the source-backed foundation, room-rendering research, movement-coordinate, and first simple room-family planning phase.
+The project is currently in the source-backed foundation, Nest room rendering, Core5 movement research, and first gameplay UI sprite-registry phase.
 
 Confirmed working:
 
@@ -30,10 +30,10 @@ RumsCove locID 129 has been identified and heavily audited
 RumsCove source-backed manifest is tested
 RumsCove preview/render probes proved XML placement, source sprites, bitmap base layers, and door overlays
 RumsCove/RumsAirport is now treated as a complex research checkpoint, not the first complete room target
-movement source data audit scans real locationDefinitions data
-movement scale baselines separate normal sandbox scale from room-specific scale
-blank movement coordinate sandbox model and smoke test exist
-Nest room export has been inspected and selected as the next simpler room family
+Nest room export has been inspected and selected as the simpler active room family
+Nest navigation demo has source-backed room/door/scale/spawn movement probes
+Core5 Walk.as behaviour ids, walking snapshot state, yaw bridge calibration, and floor projection module are checkpointed
+Core5 gameplay UI sprite ids for level, mulch, Dosh, hunger, map, and chatbar are now registered and smoke-tested
 ```
 
 Not implemented yet:
@@ -43,22 +43,21 @@ final UI shell
 real room rendering in the main client scene
 source-backed FixedCam projection/depth in production scene
 final Flash-accurate click-to-move
-room-to-room navigation
+room-to-room navigation in the main client
 chat
 playercards
 inventory
-map
 backend/session bridge
 multiplayer sync
 ```
 
-The visible debug scenes/probes are not intended to be the final client screen. They are verification surfaces for renderer, boot-flow, source-map, asset-path, room audit, and movement-coordinate work.
+The visible debug scenes/probes are not intended to be the final client screen. They are verification surfaces for renderer, boot-flow, source-map, asset-path, room audit, UI registry, and movement-coordinate work.
 
 ## Current room direction
 
 Rums Cove / Rums Airport remains valuable, but it is now parked as a complex research checkpoint.
 
-The new recommended first complete room family is the Nest room set from the uploaded `nest dump.zip`:
+The active first complete room family is the Nest room set from the uploaded `nest dump.zip`:
 
 ```text
 nestRoom1.swf
@@ -80,7 +79,7 @@ nestRoom1/nestRoom2 are small and source-backed
 simple rooms expose roomBG_spr, door1_mc and clickArea_btn
 simple rooms have matching SWF XML exports
 simple rooms avoid dynamic ads, planes, video pods and complex one-off Rums layers
-Nest Hall is available but deferred because it is much larger and more complex
+Nest Hall is available but more complex
 ```
 
 Current Nest source manifest / plan:
@@ -109,19 +108,28 @@ Current files:
 src/movement/MovementPortPlan.js
 src/movement/MovementScaleBaselines.js
 src/movement/MovementCoordinateSandbox.js
+src/movement/Core5WalkBehaviour.js
+src/movement/Core5MovementModel.js
+src/movement/Core5WeevilBehaviours.js
+src/movement/Core5FloorProjection.js
 scripts/audit-movement-source-data.mjs
 tests/movement-coordinate-sandbox-smoke.mjs
+tests/core5-weevil-behaviours-smoke.mjs
+tests/core5-walk-behaviour-smoke.mjs
+tests/core5-walk-snapshot-smoke.mjs
+tests/core5-floor-projection-smoke.mjs
 public/probes/movement-coordinate-sandbox.html
+public/probes/nest-navigation-demo.html
 ```
 
 Important rule:
 
 ```text
-movement sandbox is allowed
+movement sandbox/probes are allowed
 fake movement system is not
 ```
 
-The sandbox uses a normal audited `0.28` movement baseline, while room-specific values such as Rums Cove exterior `0.18` stay attached to their original rooms only.
+Movement is currently parked after the Core5 floor projection checkpoint. The next active work is the gameplay UI shell registry/canvas pass unless movement is explicitly resumed.
 
 ## UI shell direction
 
@@ -134,6 +142,26 @@ reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png
 reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg
 reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg
 reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg
+```
+
+The gameplay HUD/core UI pass is now tracked separately:
+
+```text
+src/ui/Core5UiSpriteIds.js
+tests/core5-ui-sprite-ids-smoke.mjs
+docs/core5-first-pass-ui-sprite-registry.md
+public/probes/nest-ui-canvas-port.html
+```
+
+First-pass gameplay UI targets:
+
+```text
+level: DefineSprite 1680, 1681, 1682, 1684, 1685
+mulch: DefineSprite 1686, 1688
+Dosh: DefineSprite 1701, 1706, 1708
+hunger: DefineSprite 1697, 1699
+chatbar: DefineSprite 1716, 1718, 1721, 1723, 1724, 1725
+map: DefineSprite 1757, 1761, 1786, 1790, 1795 candidates
 ```
 
 Playercard icons/assets are a separate core/playercard target. Recent playercard icon screenshots should not be used as slime-frame sources.
@@ -154,6 +182,7 @@ reference/decompiled-dumpassets/dumpassets/core5.swf/
 reference/demo-html5/BWR_HTML5_the_peel_room_layers_and_auth_fix/
 source/knowyourknot-binweevils/
 source/knowyourknot-binweevils/game-full/binConfig/getFile/7/uk/locationDefinitions.xml
+source/knowyourknot-binweevils/game-full/binConfig/getFile/200/uk/nestLocDefs.xml
 reference/rooms/nest-dump/  # local extract target for nest dump.zip
 ```
 
@@ -165,8 +194,11 @@ mainDEV661.swf/scripts/com/binweevils/STAGE.as
 core5.swf/scripts/com/binweevils/Bin.as
 core5.swf/scripts/com/binweevils/UImain.as
 core5.swf/scripts/com/binweevils/CamUI.as
+core5.swf/scripts/com/binweevils/engine3D/Cam3D.as
+core5.swf/scripts/com/binweevils/engine3D/ViewPort.as
 core5.swf/scripts/com/binweevils/engine3D/visuals/LocFactory.as
 core5.swf/scripts/com/binweevils/engine3D/visuals/Loc.as
+core5.swf/scripts/com/binweevils/engine3D/visuals/LocNest.as
 core5.swf/scripts/com/binweevils/engine3D/visuals/LocFixedCam.as
 core5.swf/symbolClass/symbols.csv
 ```
@@ -219,83 +251,8 @@ Run local dev server:
 npm run dev
 ```
 
-Run all smoke tests:
+Run tests:
 
 ```bash
 npm test
 ```
-
-Useful individual tests:
-
-```bash
-npm run test:boot-flow
-npm run test:core-init-flow
-npm run test:ui-main-source-map
-npm run test:cam-ui-source-map
-npm run test:fixed-cam-room-source-map
-npm run test:fixed-cam-loc-definition
-npm run test:rums-cove-manifest
-npm run test:rums-cove-preview-calibration
-npm run test:core-symbol-locator
-npm run test:core-ui-asset-probe-plan
-npm run test:core-ui-asset-files
-npm run test:render-plan
-npm run test:prototype-renderer
-node tests/movement-coordinate-sandbox-smoke.mjs
-```
-
-Useful debug pages:
-
-```text
-/probes/core-ui-assets.html
-/probes/rums-cove-preview.html
-/probes/rums-cove-canvas.html
-/probes/rums-cove-weevil.html
-/probes/rums-cove-render-basics-v2.html
-/probes/movement-coordinate-sandbox.html
-/probes/main-slime-shell.html
-```
-
-## Current roadmap snapshot
-
-```text
-Milestone 001: client foundation - mostly complete
-Milestone 002: weevil renderer baseline - confirmed visually working
-Milestone 003: main/core source mapping - strong progress
-Milestone 004: real core UI asset probe - debug page working
-Milestone 005: source-backed UI shell from mainDEV661.swf/core5.swf assets - active source mapping
-Milestone 006: FixedCamera/Rums research checkpoint - strong progress, parked for later
-Milestone 007: Nest simple room render + movement - next target
-Milestone 008: source-backed local movement/depth
-Milestone 009: local chat and speech bubbles
-Milestone 010: backend/session bridge
-```
-
-For the full roadmap, read:
-
-```text
-docs/roadmap.md
-docs/milestones.md
-docs/progress.md
-docs/main-core-source-map.md
-docs/decompiled-core-main-audit.md
-```
-
-## Start here
-
-Read these first:
-
-```text
-docs/progress.md
-docs/port-charter.md
-docs/architecture.md
-docs/roadmap.md
-docs/milestones.md
-docs/main-core-source-map.md
-docs/decompiled-core-main-audit.md
-docs/renderer-transplant-checklist.md
-docs/rooms/nest-room-port-plan.md
-docs/rooms/rums-cove-video-pod-audit.md
-```
-
-The project is intentionally moving slowly and verifiably. The aim is a proper 1:1 source-backed port, not a fast fake remake.
