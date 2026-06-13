@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -86,6 +86,39 @@
       object-fit: fill;
       pointer-events: none;
       user-select: none;
+    }
+
+    #core5UiSourceLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 946px;
+      height: 653px;
+      z-index: 40;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .core5UiSpriteCandidate {
+      position: absolute;
+      display: block;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      filter: drop-shadow(0 3px 3px rgba(0,0,0,.35));
+    }
+
+    .core5UiCandidateLabel {
+      position: absolute;
+      transform: translateY(-100%);
+      color: #c9f1ff;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(127,220,255,.4);
+      border-radius: 4px;
+      padding: 2px 4px;
+      font: 10px Consolas, Monaco, monospace;
+      white-space: nowrap;
+      pointer-events: none;
     }
 
     #roomStage {
@@ -191,7 +224,7 @@
   <h1>Nest UI Canvas Port</h1>
   <p>
     Clean 1:1 UI reconstruction canvas. First pass: source-backed Nest room render plus a static real rendered weevil.
-    Main/root source candidate is placed as a backdrop layer. Source slime frame candidates 244, 245 and 246 are now available as real mainDEV661 overlays. Chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
+    Main/root source candidate is placed as a backdrop layer. Source slime frame candidates 244, 245 and 246 are available as real mainDEV661 overlays. Core5 gameplay HUD candidates for level, mulch, Dosh, hunger, map and chatbar now load from the source-backed UI registry.
   </p>
 
   <div id="portCanvas">
@@ -203,6 +236,7 @@
       </div>
     </div>
     <img id="slimeFrameSourceLayer" alt="mainDEV661 slime frame source sprite" />
+    <div id="core5UiSourceLayer" aria-label="source-backed Core5 UI sprite candidates"></div>
     <div id="minimalHud">loading</div>
   </div>
 
@@ -228,12 +262,17 @@
       getNestWeevilSpawnProfile
     } from "/src/rooms/NestWeevilSpawnProfiles.js";
 
+    import {
+      getCore5UiCanvasFirstPassLayout
+    } from "/src/ui/Core5UiCanvasFirstPassLayout.js";
+
     import { AvatarState } from "/src/avatar/AvatarState.js";
     import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
     import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
 
     const mainShellSourceLayer = document.getElementById("mainShellSourceLayer");
     const slimeFrameSourceLayer = document.getElementById("slimeFrameSourceLayer");
+    const core5UiSourceLayer = document.getElementById("core5UiSourceLayer");
     const viewportSlot = document.getElementById("viewportSlot");
     const renderRoot = document.getElementById("renderRoot");
     const weevilMarker = document.getElementById("weevilMarker");
@@ -247,6 +286,8 @@
     let currentLayers = [];
     let loaded = 0;
     let failed = 0;
+    let uiCandidateLoaded = 0;
+    let uiCandidateFailed = 0;
     let weevilAvatar = null;
     let weevilRenderer = null;
 
@@ -287,7 +328,6 @@
     });
 
     let slimeFrameSlot = loadSlimeFrameSlot();
-
     let uiViewportSlot = loadViewportSlot();
 
     window.addEventListener("error", (event) => {
@@ -298,6 +338,7 @@
     applyViewportSlot();
     applySlimeFrameSlot();
     loadSlimeFrameSourceCandidate();
+    buildCore5UiSourceLayer();
     buildRoomButtons();
     buildViewportControls();
     buildSlimeFrameControls();
@@ -315,6 +356,47 @@
       mainShellSourceLayer.addEventListener("error", () => {
         setStatus("Main shell source candidate did not load: " + MAIN_SHELL_SOURCE_CANDIDATE.path, "fail");
       });
+    }
+
+    function buildCore5UiSourceLayer() {
+      core5UiSourceLayer.innerHTML = "";
+      uiCandidateLoaded = 0;
+      uiCandidateFailed = 0;
+
+      const layout = getCore5UiCanvasFirstPassLayout();
+
+      for (const item of layout) {
+        if (!item.path) {
+          uiCandidateFailed += 1;
+          continue;
+        }
+
+        const img = new Image();
+        img.className = "core5UiSpriteCandidate";
+        img.alt = item.label + " source candidate";
+        img.title = item.label + " / DefineSprite_" + item.defineSpriteId + " / " + item.role;
+        img.style.left = Math.round(item.x) + "px";
+        img.style.top = Math.round(item.y) + "px";
+        img.style.width = Math.round(item.width) + "px";
+        img.style.height = Math.round(item.height) + "px";
+        img.src = "/" + item.path + "?cacheBust=" + Date.now();
+        img.addEventListener("load", () => {
+          uiCandidateLoaded += 1;
+          updateHud(null, getNestLocation(currentLocationId));
+        });
+        img.addEventListener("error", () => {
+          uiCandidateFailed += 1;
+          updateHud(null, getNestLocation(currentLocationId));
+        });
+        core5UiSourceLayer.appendChild(img);
+
+        const label = document.createElement("span");
+        label.className = "core5UiCandidateLabel";
+        label.textContent = item.label + " DS" + item.defineSpriteId;
+        label.style.left = Math.round(item.x) + "px";
+        label.style.top = Math.round(item.y) + "px";
+        core5UiSourceLayer.appendChild(label);
+      }
     }
 
     function loadSlimeFrameSlot() {
@@ -722,8 +804,10 @@
         "shell: " + MAIN_SHELL_SOURCE_CANDIDATE.key,
         "viewport: " + Math.round(uiViewportSlot.x) + "," + Math.round(uiViewportSlot.y) + " " + Math.round(uiViewportSlot.width) + "x" + Math.round(uiViewportSlot.height),
         "slime: " + SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate].key,
+        "core5 ui: " + uiCandidateLoaded + "/" + getCore5UiCanvasFirstPassLayout().length,
         "loaded: " + loaded,
         "failed: " + failed,
+        "ui failed: " + uiCandidateFailed,
         "missing: " + missing
       ].join("<br>");
     }
