@@ -1,8 +1,9 @@
-// Source-backed first-pass target map for core5.swf HUD/UI sprites.
+// Source-backed first-pass target map for core5.swf gameplay HUD/UI sprites.
 //
-// These are DefineSprite ids Nathan identified in JPEXS for the first clean UI
-// reconstruction pass. Keep this as a registry/verification layer: final UI work
-// should render the original exported symbols, not hand-drawn replacement art.
+// This registry is intentionally conservative. The first UI pass should only
+// render sprite ids that are visually confirmed from the JPEXS source grid.
+// Anything not confirmed yet stays as a pending slot in the layout instead of
+// using a wrong candidate.
 
 export const CORE5_UI_SOURCE_SWF = 'reference/decompiled-dumpassets/dumpassets/core5.swf';
 export const CORE5_UI_SPRITE_BASE_PATH = `${CORE5_UI_SOURCE_SWF}/sprites`;
@@ -16,11 +17,11 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     label: 'Level badge',
     priority: 1,
     candidates: Object.freeze([
-      Object.freeze({ key: 'levelMeterBarEmpty', defineSpriteId: 1680, role: 'level meter empty bar' }),
-      Object.freeze({ key: 'levelMeterBarFill', defineSpriteId: 1681, role: 'level meter filled bar' }),
+      Object.freeze({ key: 'levelMeterBarEmpty', defineSpriteId: 1680, role: 'empty level meter bar' }),
+      Object.freeze({ key: 'levelMeterBarFill', defineSpriteId: 1681, role: 'filled level meter bar' }),
       Object.freeze({ key: 'levelStarPlain', defineSpriteId: 1682, role: 'plain level star' }),
-      Object.freeze({ key: 'levelStarNumber', defineSpriteId: 1684, role: 'level star with number text' }),
-      Object.freeze({ key: 'levelBadgeComposite', defineSpriteId: 1685, role: 'composite level badge with bar' })
+      Object.freeze({ key: 'levelStarNumber', defineSpriteId: 1684, role: 'level star with digits' }),
+      Object.freeze({ key: 'levelBadgeComposite', defineSpriteId: 1685, role: 'full level badge with star and bar' })
     ])
   }),
 
@@ -28,8 +29,8 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     label: 'Mulch counter',
     priority: 2,
     candidates: Object.freeze([
-      Object.freeze({ key: 'mulchCoinStack', defineSpriteId: 1686, role: 'mulch coin stack' }),
-      Object.freeze({ key: 'mulchCounterComposite', defineSpriteId: 1688, role: 'mulch counter with digits' })
+      Object.freeze({ key: 'mulchCoinStack', defineSpriteId: 1686, role: 'large mulch coin stack' }),
+      Object.freeze({ key: 'mulchCounterComposite', defineSpriteId: 1688, role: 'small mulch counter with digits' })
     ])
   }),
 
@@ -39,7 +40,7 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     candidates: Object.freeze([
       Object.freeze({ key: 'doshLargeCoin', defineSpriteId: 1701, role: 'large Dosh coin medallion' }),
       Object.freeze({ key: 'doshCoinStack', defineSpriteId: 1706, role: 'Dosh coin stack' }),
-      Object.freeze({ key: 'doshCounterComposite', defineSpriteId: 1708, role: 'Dosh counter with digits' })
+      Object.freeze({ key: 'doshCounterComposite', defineSpriteId: 1708, role: 'small Dosh counter with digits' })
     ])
   }),
 
@@ -48,7 +49,7 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     priority: 4,
     candidates: Object.freeze([
       Object.freeze({ key: 'hungerCutlery', defineSpriteId: 1697, role: 'fork and knife icon' }),
-      Object.freeze({ key: 'hungerMeterComposite', defineSpriteId: 1699, role: 'fork and knife with green meter' })
+      Object.freeze({ key: 'hungerMeterComposite', defineSpriteId: 1699, role: 'fork and knife with horizontal meter' })
     ])
   }),
 
@@ -56,11 +57,9 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     label: 'Chat bar',
     priority: 5,
     candidates: Object.freeze([
-      Object.freeze({ key: 'chatInputBar', defineSpriteId: 1716, role: 'long chat input bar' }),
+      Object.freeze({ key: 'chatInputBar', defineSpriteId: 1716, role: 'long yellow chat input bar' }),
       Object.freeze({ key: 'chatDisabledText', defineSpriteId: 1718, role: 'chat disabled text' }),
-      Object.freeze({ key: 'chatPanelDarkFill', defineSpriteId: 1721, role: 'dark chat panel fill' }),
-      Object.freeze({ key: 'chatPanelGreenFill', defineSpriteId: 1723, role: 'green chat panel fill' }),
-      Object.freeze({ key: 'chatRoundedInput', defineSpriteId: 1724, role: 'rounded chat input/button shell' }),
+      Object.freeze({ key: 'chatRoundedInput', defineSpriteId: 1724, role: 'rounded green/white bottom button shell' }),
       Object.freeze({ key: 'chatSmileLine', defineSpriteId: 1725, role: 'black curved chat/smile line' })
     ])
   }),
@@ -69,11 +68,10 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     label: 'Map button / map UI',
     priority: 6,
     candidates: Object.freeze([
-      Object.freeze({ key: 'mapPanelLandscape', defineSpriteId: 1757, role: 'map landscape panel candidate' }),
-      Object.freeze({ key: 'mapLargeParchment', defineSpriteId: 1761, role: 'rolled parchment candidate' }),
-      Object.freeze({ key: 'mapWhitePathLine', defineSpriteId: 1786, role: 'white map path line candidate' }),
-      Object.freeze({ key: 'mapBluePathLine', defineSpriteId: 1790, role: 'blue map path line candidate' }),
-      Object.freeze({ key: 'mapIslandComposite', defineSpriteId: 1795, role: 'island/map composite candidate' })
+      // Do not use DefineSprite_1757 as the sidebar Map button; it is a map-panel
+      // landscape/source candidate and does not match the gameplay HUD button.
+      Object.freeze({ key: 'mapPanelLandscape', defineSpriteId: 1757, role: 'large map landscape panel candidate; not the sidebar Map button', firstPassVerified: false }),
+      Object.freeze({ key: 'mapIslandComposite', defineSpriteId: 1795, role: 'island/map composite candidate; not the sidebar Map button', firstPassVerified: false })
     ])
   })
 });
@@ -92,6 +90,7 @@ export const CORE5_UI_FIRST_PASS_CANDIDATES = Object.freeze(
     const group = CORE5_UI_SPRITE_GROUPS[groupKey];
 
     return group.candidates.map((candidate) => Object.freeze({
+      firstPassVerified: true,
       ...candidate,
       groupKey,
       groupLabel: group.label,
@@ -113,6 +112,7 @@ export function getCore5UiSpriteCandidatesByGroup(groupKey) {
   }
 
   return group.candidates.map((candidate) => ({
+    firstPassVerified: true,
     ...candidate,
     groupKey,
     groupLabel: group.label,
