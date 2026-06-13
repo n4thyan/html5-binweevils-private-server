@@ -27,21 +27,26 @@ const requiredCandidateKeys = [
   'doshCounterComposite',
   'hungerMeterComposite',
   'chatInputBar',
-  'mapPanelLandscape'
+  'chatRoundedInput'
 ];
 
 for (const key of requiredCandidateKeys) {
   const candidate = getCore5UiSpriteCandidateByKey(key);
   assert(candidate, `${key} candidate should exist`);
   assert(Number.isInteger(candidate.defineSpriteId), `${key} should have an integer DefineSprite id`);
+  assert(candidate.firstPassVerified === true, `${key} should be marked first-pass verified`);
   assert(candidate.path === getCore5UiSpritePath(candidate.defineSpriteId), `${key} should resolve to the expected SVG path`);
 }
 
 const knownIds = new Set(CORE5_UI_FIRST_PASS_CANDIDATES.map((candidate) => candidate.defineSpriteId));
 
-for (const id of [1685, 1688, 1708, 1699, 1716, 1757]) {
+for (const id of [1685, 1688, 1708, 1699, 1716, 1724]) {
   assert(knownIds.has(id), `first-pass UI sprite ids should include DefineSprite_${id}`);
 }
+
+const mapPanel = getCore5UiSpriteCandidateByKey('mapPanelLandscape');
+assert(mapPanel, 'map panel candidate should remain documented');
+assert(mapPanel.firstPassVerified === false, 'DefineSprite_1757 must not be treated as the sidebar Map button');
 
 console.log('Core5 UI sprite id smoke test passed');
 console.log('groups:', CORE5_UI_FIRST_PASS_GROUP_KEYS.join(', '));
