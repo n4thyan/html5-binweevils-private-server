@@ -43,10 +43,11 @@ const levelIcon = layout.find((item) => item.key === 'levelIcon');
 const xpBar = layout.find((item) => item.key === 'levelXpBar');
 
 assert(levelIcon.defineSpriteId === 1704, 'level icon layout should use DefineSprite_1704');
-assert(xpBar.defineSpriteId === 1681, 'XP bar layout should use DefineSprite_1681');
+assert(xpBar.defineSpriteId === 1699, 'XP bar layout should use DefineSprite_1699');
+assert(xpBar.path.includes('DefineSprite_1699_core390_fla.levelBar_110'), 'XP bar layout should use the named levelBar export folder');
 assert(xpBar.y > levelIcon.y, 'XP bar should sit below the level icon');
 
-for (const key of ['levelBadgeComposite', 'mulchCounterComposite', 'doshCounterComposite', 'hungerMeterComposite', 'chatRoundedInput', 'chatInputBar', 'mapButtonPending']) {
+for (const key of ['levelBadgeComposite', 'levelXpBarPreviewLead', 'mulchCounterComposite', 'doshCounterComposite', 'hungerMeterComposite', 'chatRoundedInput', 'chatInputBar', 'mapButtonPending']) {
   assert(!layout.some((item) => item.key === key), `${key} should not render during the level-only pass`);
 }
 
