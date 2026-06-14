@@ -1,6 +1,6 @@
 # Core5 first-pass UI sprite registry
 
-This note records the first gameplay HUD/UI symbols selected from `core5.swf` for the next clean Nest UI canvas pass.
+This note records the gameplay HUD/UI symbols currently selected from `core5.swf` for the clean Nest UI canvas work.
 
 The ids came from direct JPEXS/FFDec inspection of the exported `DefineSprite` grid. They are source leads for reconstruction, not hand-drawn replacements.
 
@@ -10,12 +10,27 @@ The ids came from direct JPEXS/FFDec inspection of the exported `DefineSprite` g
 reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_<id>/1.svg
 ```
 
-## First-pass groups
+## Active pass
+
+The active pass is deliberately limited to the Level HUD only:
+
+| UI area | Active ids | Notes |
+|---|---:|---|
+| Level icon | 1704 | User-selected level icon candidate from the source grid. |
+| XP bar | 1681 | User-selected horizontal XP bar that sits below the level icon. |
+
+A dedicated verification page exists for these two symbols:
+
+```text
+/probes/core5-ui-level-xp-candidate.html
+```
+
+## Parked source leads
 
 | UI area | Candidate ids | Notes |
 |---|---:|---|
-| Level | 1680, 1681, 1682, 1684, 1685 | Level meter bar, star, and composite level badge. |
-| Mulch | 1686, 1688 | Mulch coin stack and counter composite. |
+| Other level parts | 1680, 1682, 1684, 1685 | Keep documented, but do not render in the current pass. |
+| Mulch | 1686, 1688 | Mulch coin stack and counter composite. Next likely UI group after Level is visually confirmed. |
 | Dosh | 1701, 1706, 1708 | Large Dosh medallion, coin stack, and counter composite. |
 | Hunger | 1697, 1699 | Fork/knife icon and hunger meter composite. |
 | Chatbar | 1716, 1718, 1721, 1723, 1724, 1725 | Long input bar, disabled text, panel fills, rounded input shell, curved line. |
@@ -26,18 +41,5 @@ reference/decompiled-dumpassets/dumpassets/core5.swf/sprites/DefineSprite_<id>/1
 Use `src/ui/Core5UiSpriteIds.js` as the code registry for these ids. The clean UI canvas should consume the registry rather than hard-coding one-off ids in the page.
 
 When a symbol is confirmed in the canvas, keep the source id and exported SVG path visible in debug metadata until the layout is stable.
-
-## Current scope
-
-The active UI pass is limited to:
-
-```text
-level
-mulch
-dosh
-hunger
-map
-chatbar
-```
 
 Movement work is parked after the Core5 floor projection checkpoint. The next work should stay on the UI shell unless movement is explicitly resumed.
