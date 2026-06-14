@@ -13,18 +13,18 @@ function assert(condition, message) {
 
 const layout = getCore5UiCanvasFirstPassLayout();
 
-assert(CORE5_UI_CANVAS_SIZE.width === 640, 'canvas width should match gameplay reference width');
-assert(CORE5_UI_CANVAS_SIZE.height === 360, 'canvas height should match gameplay reference height');
-assert(CORE5_UI_ROOM_VIEWPORT_SLOT.x === 0, 'room viewport should fill the gameplay canvas during the 1:1 UI pass');
-assert(CORE5_UI_ROOM_VIEWPORT_SLOT.y === 0, 'room viewport should start at the top of the gameplay canvas');
-assert(CORE5_UI_ROOM_VIEWPORT_SLOT.width === 640, 'room viewport should fill the canvas width');
-assert(CORE5_UI_ROOM_VIEWPORT_SLOT.height === 360, 'room viewport should fill the canvas height');
+assert(CORE5_UI_CANVAS_SIZE.width === 946, 'canvas width should match the current clean UI canvas shell width');
+assert(CORE5_UI_CANVAS_SIZE.height === 653, 'canvas height should match the current clean UI canvas shell height');
+assert(CORE5_UI_ROOM_VIEWPORT_SLOT.x === 166, 'room viewport should keep the restored canvas x offset');
+assert(CORE5_UI_ROOM_VIEWPORT_SLOT.y === 78, 'room viewport should keep the restored canvas y offset');
+assert(CORE5_UI_ROOM_VIEWPORT_SLOT.width === 614, 'room viewport should keep the restored canvas width');
+assert(CORE5_UI_ROOM_VIEWPORT_SLOT.height === 366, 'room viewport should keep the restored canvas height');
 assert(layout.length === CORE5_UI_FIRST_PASS_LAYOUT.length, 'resolved layout length should match source layout length');
-assert(layout.length === 2, 'current tiny first pass should render only level and mulch');
+assert(layout.length === 2, 'current tiny first pass should render only level icon and XP bar');
 
 const requiredSourceKeys = [
-  'levelBadgeComposite',
-  'mulchCounterComposite'
+  'levelIcon',
+  'levelXpBar'
 ];
 
 for (const key of requiredSourceKeys) {
@@ -39,8 +39,15 @@ for (const key of requiredSourceKeys) {
   assert(item.width > 0 && item.height > 0, `${key} should have a positive layout size`);
 }
 
-for (const key of ['doshCounterComposite', 'hungerMeterComposite', 'chatRoundedInput', 'chatInputBar', 'mapButtonPending']) {
-  assert(!layout.some((item) => item.key === key), `${key} should not render during the level/mulch-only pass`);
+const levelIcon = layout.find((item) => item.key === 'levelIcon');
+const xpBar = layout.find((item) => item.key === 'levelXpBar');
+
+assert(levelIcon.defineSpriteId === 1704, 'level icon layout should use DefineSprite_1704');
+assert(xpBar.defineSpriteId === 1681, 'XP bar layout should use DefineSprite_1681');
+assert(xpBar.y > levelIcon.y, 'XP bar should sit below the level icon');
+
+for (const key of ['levelBadgeComposite', 'mulchCounterComposite', 'doshCounterComposite', 'hungerMeterComposite', 'chatRoundedInput', 'chatInputBar', 'mapButtonPending']) {
+  assert(!layout.some((item) => item.key === key), `${key} should not render during the level-only pass`);
 }
 
 console.log('Core5 UI canvas first-pass layout smoke test passed');
