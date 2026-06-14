@@ -21,7 +21,7 @@ Nest navigation demo has source-backed loc, door, spawn, scale, movement snapsho
 Core5 Walk.as behaviour ids and walking snapshot state are ported/tested
 Core5 getFloorClickCoords-style floor projection module exists and is smoke-tested
 mainDEV661.swf green loading/shell candidates are separated from core5 gameplay HUD work
-core5 gameplay HUD sprite registry is source-led and the active render pass is narrowed to the user-selected Level icon and XP bar only
+core5 gameplay HUD sprite registry is source-led and the active render pass is narrowed to the user-selected Level icon and corrected XP bar only
 ```
 
 ## Current UI shell direction
@@ -43,16 +43,23 @@ Current active UI pass:
 
 ```text
 Level icon: DefineSprite 1704
-XP bar below level icon: DefineSprite 1681
+XP bar below level icon: DefineSprite 1699_core390_fla.levelBar_110
+```
+
+Important correction:
+
+```text
+DefineSprite 1681 looked like the XP bar in a JPEXS grid preview, but the exported SVG at DefineSprite_1681/1.svg is not the XP bar.
+Use the named export folder DefineSprite_1699_core390_fla.levelBar_110 for the current XP bar pass.
 ```
 
 Source leads for later passes:
 
 ```text
-Other level parts: DefineSprite 1680, 1682, 1684, 1685
+Other level parts: DefineSprite 1680, 1681 preview lead, 1682, 1684, 1685
 Mulch: DefineSprite 1686, 1688
 Dosh: DefineSprite 1701, 1706, 1708
-Hunger: DefineSprite 1697, 1699
+Hunger: DefineSprite 1697 plus a new dedicated pass to re-identify the green hunger meter after removing 1699 from hunger
 Chatbar: DefineSprite 1716, 1718, 1724, 1725
 Map: DefineSprite 1786 and 1790 are visible source-grid leads; exact sidebar Map button still needs its own visual pass
 ```
@@ -125,7 +132,7 @@ node tests/nest-door-visual-targets-smoke.mjs
 1. Pull latest nest-room-demo.
 2. Run npm.cmd test.
 3. Open /probes/core5-ui-level-xp-candidate.html.
-4. Confirm DefineSprite 1704 and DefineSprite 1681 visibly load from the local core5 export.
+4. Confirm DefineSprite 1704 and DefineSprite_1699_core390_fla.levelBar_110 visibly load from the local core5 export.
 5. Only after that, place those two confirmed pieces into /probes/nest-ui-canvas-port.html.
 6. Then move to Mulch as the next UI group.
 7. Keep movement parked unless explicitly resumed.
