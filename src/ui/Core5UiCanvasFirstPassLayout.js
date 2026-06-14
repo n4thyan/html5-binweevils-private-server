@@ -2,42 +2,44 @@ import { getCore5UiSpriteCandidateByKey } from './Core5UiSpriteIds.js';
 
 // Gameplay-reference canvas for the clean Nest UI page.
 //
-// This pass intentionally renders only the first two confirmed static HUD
-// pieces: the Level badge and Mulch counter. The room/background composition is
-// left alone and the HUD sprites overlay the gameplay frame, matching the
-// workflow of building the UI 1:1 one element at a time.
+// This pass intentionally renders only the user-selected static Level HUD pieces:
+// DefineSprite_1704 for the level icon and DefineSprite_1681 for the XP bar.
+// Mulch, Dosh, hunger, chatbar and map stay parked until the level placement is
+// visually confirmed against the gameplay reference screenshot.
 export const CORE5_UI_CANVAS_SIZE = Object.freeze({
-  width: 640,
-  height: 360
+  width: 946,
+  height: 653
 });
 
 export const CORE5_UI_ROOM_VIEWPORT_SLOT = Object.freeze({
-  x: 0,
-  y: 0,
-  width: 640,
-  height: 360,
+  x: 166,
+  y: 78,
+  width: 614,
+  height: 366,
   sourceWidth: 614,
   sourceHeight: 366
 });
 
 export const CORE5_UI_FIRST_PASS_LAYOUT = Object.freeze([
   Object.freeze({
-    key: 'levelBadgeComposite',
+    key: 'levelIcon',
     kind: 'source',
-    label: 'Level badge',
-    x: 4,
-    y: 43,
-    width: 50,
-    height: 58
+    label: 'Level icon',
+    defineSpriteId: 1704,
+    x: 12,
+    y: 80,
+    width: 48,
+    height: 48
   }),
   Object.freeze({
-    key: 'mulchCounterComposite',
+    key: 'levelXpBar',
     kind: 'source',
-    label: 'Mulch counter',
-    x: 4,
-    y: 106,
-    width: 55,
-    height: 34
+    label: 'Level XP bar',
+    defineSpriteId: 1681,
+    x: 10,
+    y: 127,
+    width: 62,
+    height: 14
   })
 ]);
 
@@ -50,7 +52,8 @@ export function getCore5UiCanvasFirstPassLayout() {
         ...layoutItem,
         candidate: null,
         path: null,
-        defineSpriteId: null
+        groupKey: null,
+        role: null
       };
     }
 
