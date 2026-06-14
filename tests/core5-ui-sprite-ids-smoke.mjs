@@ -22,20 +22,16 @@ for (const groupKey of sourceLeadGroups) {
   assert(getCore5UiSpriteCandidatesByGroup(groupKey).length > 0, `${groupKey} should have candidates`);
 }
 
-const firstPassGroups = ['level', 'mulch'];
+assert(CORE5_UI_FIRST_PASS_GROUP_KEYS.length === 1, 'current first pass should only include the level group');
+assert(CORE5_UI_FIRST_PASS_GROUP_KEYS.includes('level'), 'Level should be in first-pass group keys');
 
-for (const groupKey of firstPassGroups) {
-  assert(CORE5_UI_FIRST_PASS_GROUP_KEYS.includes(groupKey), `${groupKey} should be in first-pass group keys`);
+for (const groupKey of ['mulch', 'dosh', 'hunger', 'chatbar', 'map']) {
+  assert(!CORE5_UI_FIRST_PASS_GROUP_KEYS.includes(groupKey), `${groupKey} should not render in the level-only first pass`);
 }
 
-assert(!CORE5_UI_FIRST_PASS_GROUP_KEYS.includes('dosh'), 'Dosh should not be rendered in the current tiny first pass');
-assert(!CORE5_UI_FIRST_PASS_GROUP_KEYS.includes('hunger'), 'Hunger should not be rendered in the current tiny first pass');
-assert(!CORE5_UI_FIRST_PASS_GROUP_KEYS.includes('chatbar'), 'Chatbar should not be rendered in the current tiny first pass');
-assert(!CORE5_UI_FIRST_PASS_GROUP_KEYS.includes('map'), 'Map should not be rendered in the current tiny first pass');
-
 const requiredFirstPassKeys = [
-  'levelBadgeComposite',
-  'mulchCounterComposite'
+  'levelIcon',
+  'levelXpBar'
 ];
 
 for (const key of requiredFirstPassKeys) {
@@ -46,13 +42,16 @@ for (const key of requiredFirstPassKeys) {
   assert(candidate.path === getCore5UiSpritePath(candidate.defineSpriteId), `${key} should resolve to the expected SVG path`);
 }
 
+assert(getCore5UiSpriteCandidateByKey('levelIcon').defineSpriteId === 1704, 'Level icon should use DefineSprite_1704 for this pass');
+assert(getCore5UiSpriteCandidateByKey('levelXpBar').defineSpriteId === 1681, 'XP bar should use DefineSprite_1681 for this pass');
+
 const knownFirstPassIds = new Set(CORE5_UI_FIRST_PASS_CANDIDATES.map((candidate) => candidate.defineSpriteId));
 
-for (const id of [1685, 1688]) {
+for (const id of [1704, 1681]) {
   assert(knownFirstPassIds.has(id), `first-pass UI sprite ids should include DefineSprite_${id}`);
 }
 
-for (const id of [1708, 1699, 1716, 1724, 1786, 1790]) {
+for (const id of [1685, 1688, 1708, 1699, 1716, 1724, 1786, 1790]) {
   assert(!knownFirstPassIds.has(id), `DefineSprite_${id} should remain a later source lead, not a rendered first-pass sprite`);
 }
 
