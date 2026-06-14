@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -20,43 +20,72 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 14px;
+      padding: 18px;
     }
 
     h1 {
       margin: 0 0 6px;
-      font-size: 20px;
+      font-size: 22px;
       color: #fff2a8;
     }
 
     p {
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       color: #d2c48b;
-      max-width: 700px;
-      font-size: 12px;
+      max-width: 946px;
+      font-size: 13px;
       line-height: 1.35;
       text-align: center;
     }
 
+    code {
+      color: #fff2a8;
+    }
+
     #portCanvas {
       position: relative;
-      width: 640px;
-      height: 360px;
-      background: #111;
+      width: 946px;
+      height: 653px;
+      background: #050505;
       overflow: hidden;
       border: 2px solid #8f7f44;
       box-shadow: 0 12px 28px rgba(0,0,0,.55);
     }
 
-    #viewportSlot {
+    #mainShellSourceLayer {
       position: absolute;
       left: 0;
       top: 0;
-      width: 640px;
-      height: 360px;
+      width: 946px;
+      height: 653px;
+      z-index: 1;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #viewportSlot {
+      position: absolute;
+      left: 166px;
+      top: 78px;
+      width: 614px;
+      height: 366px;
       overflow: hidden;
       background: #1b211b;
+      border: 1px solid rgba(255,242,168,.25);
       z-index: 10;
+    }
+
+    #slimeFrameSourceLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 614px;
+      height: 366px;
+      z-index: 20;
+      object-fit: fill;
+      pointer-events: none;
+      user-select: none;
     }
 
     #roomStage {
@@ -67,7 +96,6 @@
       height: 366px;
       overflow: hidden;
       background: #1b211b;
-      transform-origin: 0 0;
     }
 
     #renderRoot {
@@ -98,46 +126,26 @@
       filter: drop-shadow(0 6px 5px rgba(0,0,0,.38));
     }
 
-    #core5UiSourceLayer {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 640px;
-      height: 360px;
-      z-index: 800;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .core5UiSpriteCandidate {
-      position: absolute;
-      display: block;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-      filter: drop-shadow(0 2px 2px rgba(0,0,0,.35));
-    }
-
     #minimalHud {
       position: absolute;
-      right: 8px;
-      top: 8px;
+      left: 12px;
+      top: 12px;
       z-index: 1000;
-      background: rgba(0,0,0,.55);
+      background: rgba(0,0,0,.58);
       color: #fff2a8;
-      padding: 5px 7px;
-      font: 10px Consolas, Monaco, monospace;
+      padding: 7px 9px;
+      font: 11px Consolas, Monaco, monospace;
       border: 1px solid rgba(255,242,168,.35);
       pointer-events: none;
     }
 
     .toolbar {
-      width: 640px;
+      width: 946px;
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
       align-items: center;
-      margin: 10px 0 0;
+      margin: 12px 0 0;
     }
 
     button {
@@ -155,34 +163,51 @@
     }
 
     #status {
-      width: 640px;
+      width: 946px;
       margin-top: 8px;
       color: #9fd36b;
       font: 12px Consolas, Monaco, monospace;
     }
 
-    .warn { color: #ffd36b; }
-    .fail { color: #ff8e8e; }
+    .calibrationReadout {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      color: #fff2a8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font: 12px Consolas, Monaco, monospace;
+    }
+
+    .warn {
+      color: #ffd36b;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
   </style>
 </head>
 <body>
   <h1>Nest UI Canvas Port</h1>
   <p>
-    One-piece-at-a-time gameplay UI pass. Movement is parked. The room/background composition is left intact and only the confirmed static Level badge and Mulch counter candidates are overlaid from the Core5 UI registry.
+    Clean 1:1 UI reconstruction canvas. First pass: source-backed Nest room render plus a static real rendered weevil.
+    Main/root source candidate is placed as a backdrop layer. Source slime frame candidates 244, 245 and 246 are now available as real mainDEV661 overlays. Chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
   </p>
 
   <div id="portCanvas">
+    <img id="mainShellSourceLayer" alt="main/root shell source candidate" />
     <div id="viewportSlot">
       <div id="roomStage">
         <div id="renderRoot"></div>
         <canvas id="weevilMarker" width="140" height="140"></canvas>
       </div>
     </div>
-    <div id="core5UiSourceLayer" aria-label="source-backed Core5 UI sprite candidates"></div>
+    <img id="slimeFrameSourceLayer" alt="mainDEV661 slime frame source sprite" />
     <div id="minimalHud">loading</div>
   </div>
 
   <div class="toolbar" id="roomButtons"></div>
+  <div class="toolbar" id="viewportControls"></div>
   <div id="status">Loading...</div>
 
   <script type="module">
@@ -203,22 +228,18 @@
       getNestWeevilSpawnProfile
     } from "/src/rooms/NestWeevilSpawnProfiles.js";
 
-    import {
-      CORE5_UI_ROOM_VIEWPORT_SLOT,
-      getCore5UiCanvasFirstPassLayout
-    } from "/src/ui/Core5UiCanvasFirstPassLayout.js";
-
     import { AvatarState } from "/src/avatar/AvatarState.js";
     import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
     import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
 
+    const mainShellSourceLayer = document.getElementById("mainShellSourceLayer");
+    const slimeFrameSourceLayer = document.getElementById("slimeFrameSourceLayer");
     const viewportSlot = document.getElementById("viewportSlot");
-    const roomStage = document.getElementById("roomStage");
     const renderRoot = document.getElementById("renderRoot");
     const weevilMarker = document.getElementById("weevilMarker");
     const weevilContext = weevilMarker.getContext("2d");
-    const core5UiSourceLayer = document.getElementById("core5UiSourceLayer");
     const roomButtons = document.getElementById("roomButtons");
+    const viewportControls = document.getElementById("viewportControls");
     const statusEl = document.getElementById("status");
     const minimalHud = document.getElementById("minimalHud");
 
@@ -226,64 +247,282 @@
     let currentLayers = [];
     let loaded = 0;
     let failed = 0;
-    let uiCandidateLoaded = 0;
-    let uiCandidateFailed = 0;
     let weevilAvatar = null;
     let weevilRenderer = null;
+
+    const MAIN_SHELL_SOURCE_CANDIDATE = Object.freeze({
+      key: "fullMainShellSprite",
+      path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg",
+      note: "source candidate from ViewportSlimeFrameSourceMap; not final slime shell split yet"
+    });
+
+    const DEFAULT_UI_VIEWPORT_SLOT = Object.freeze({
+      x: 166,
+      y: 78,
+      width: 614,
+      height: 366
+    });
+
+    const SLIME_FRAME_SOURCE_CANDIDATES = Object.freeze({
+      244: {
+        key: "DefineSprite_244",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_244/1.svg"
+      },
+      245: {
+        key: "DefineSprite_245",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_245/1.svg"
+      },
+      246: {
+        key: "DefineSprite_246",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_246/1.svg"
+      }
+    });
+
+    const DEFAULT_SLIME_FRAME_SLOT = Object.freeze({
+      candidate: "245",
+      x: 150,
+      y: 68,
+      width: 646,
+      height: 386
+    });
+
+    let slimeFrameSlot = loadSlimeFrameSlot();
+
+    let uiViewportSlot = loadViewportSlot();
 
     window.addEventListener("error", (event) => {
       setStatus(event.error?.message || event.message || "Unknown error", "fail");
     });
 
-    applyReferenceViewport();
-    buildCore5UiSourceLayer();
+    loadMainShellSourceCandidate();
+    applyViewportSlot();
+    applySlimeFrameSlot();
+    loadSlimeFrameSourceCandidate();
     buildRoomButtons();
+    buildViewportControls();
+    buildSlimeFrameControls();
     await initWeevilRenderer();
     await loadLocation(5);
 
-    function applyReferenceViewport() {
-      viewportSlot.style.left = CORE5_UI_ROOM_VIEWPORT_SLOT.x + "px";
-      viewportSlot.style.top = CORE5_UI_ROOM_VIEWPORT_SLOT.y + "px";
-      viewportSlot.style.width = CORE5_UI_ROOM_VIEWPORT_SLOT.width + "px";
-      viewportSlot.style.height = CORE5_UI_ROOM_VIEWPORT_SLOT.height + "px";
+    function loadMainShellSourceCandidate() {
+      mainShellSourceLayer.src = MAIN_SHELL_SOURCE_CANDIDATE.path + "?cacheBust=" + Date.now();
+      mainShellSourceLayer.title = MAIN_SHELL_SOURCE_CANDIDATE.key + " - " + MAIN_SHELL_SOURCE_CANDIDATE.note;
 
-      const scaleX = CORE5_UI_ROOM_VIEWPORT_SLOT.width / CORE5_UI_ROOM_VIEWPORT_SLOT.sourceWidth;
-      const scaleY = CORE5_UI_ROOM_VIEWPORT_SLOT.height / CORE5_UI_ROOM_VIEWPORT_SLOT.sourceHeight;
-      roomStage.style.transform = "scale(" + scaleX + ", " + scaleY + ")";
+      mainShellSourceLayer.addEventListener("load", () => {
+        console.log("Loaded main shell source candidate:", MAIN_SHELL_SOURCE_CANDIDATE.path);
+      });
+
+      mainShellSourceLayer.addEventListener("error", () => {
+        setStatus("Main shell source candidate did not load: " + MAIN_SHELL_SOURCE_CANDIDATE.path, "fail");
+      });
     }
 
-    function buildCore5UiSourceLayer() {
-      core5UiSourceLayer.innerHTML = "";
-      uiCandidateLoaded = 0;
-      uiCandidateFailed = 0;
+    function loadSlimeFrameSlot() {
+      try {
+        const raw = localStorage.getItem("nestUiCanvasSlimeFrameSlot");
 
-      const layout = getCore5UiCanvasFirstPassLayout();
-
-      for (const item of layout) {
-        if (!item.path) {
-          uiCandidateFailed += 1;
-          continue;
+        if (!raw) {
+          return { ...DEFAULT_SLIME_FRAME_SLOT };
         }
 
-        const img = new Image();
-        img.className = "core5UiSpriteCandidate";
-        img.alt = item.label + " source candidate";
-        img.title = item.label + " / DefineSprite_" + item.defineSpriteId + " / " + item.role;
-        img.style.left = Math.round(item.x) + "px";
-        img.style.top = Math.round(item.y) + "px";
-        img.style.width = Math.round(item.width) + "px";
-        img.style.height = Math.round(item.height) + "px";
-        img.src = "/" + item.path + "?cacheBust=" + Date.now();
-        img.addEventListener("load", () => {
-          uiCandidateLoaded += 1;
-          updateHud(null, getNestLocation(currentLocationId));
-        });
-        img.addEventListener("error", () => {
-          uiCandidateFailed += 1;
-          updateHud(null, getNestLocation(currentLocationId));
-        });
-        core5UiSourceLayer.appendChild(img);
+        const parsed = JSON.parse(raw);
+
+        return {
+          candidate: SLIME_FRAME_SOURCE_CANDIDATES[String(parsed.candidate)] ? String(parsed.candidate) : DEFAULT_SLIME_FRAME_SLOT.candidate,
+          x: Number.isFinite(parsed.x) ? parsed.x : DEFAULT_SLIME_FRAME_SLOT.x,
+          y: Number.isFinite(parsed.y) ? parsed.y : DEFAULT_SLIME_FRAME_SLOT.y,
+          width: Number.isFinite(parsed.width) ? parsed.width : DEFAULT_SLIME_FRAME_SLOT.width,
+          height: Number.isFinite(parsed.height) ? parsed.height : DEFAULT_SLIME_FRAME_SLOT.height
+        };
+      } catch {
+        return { ...DEFAULT_SLIME_FRAME_SLOT };
       }
+    }
+
+    function saveSlimeFrameSlot() {
+      localStorage.setItem("nestUiCanvasSlimeFrameSlot", JSON.stringify(slimeFrameSlot));
+    }
+
+    function loadSlimeFrameSourceCandidate() {
+      const candidate = SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate];
+      slimeFrameSourceLayer.src = candidate.path + "?cacheBust=" + Date.now();
+      slimeFrameSourceLayer.title = candidate.key + " - mainDEV661 source slime/frame candidate";
+    }
+
+    function applySlimeFrameSlot() {
+      slimeFrameSourceLayer.style.left = Math.round(slimeFrameSlot.x) + "px";
+      slimeFrameSourceLayer.style.top = Math.round(slimeFrameSlot.y) + "px";
+      slimeFrameSourceLayer.style.width = Math.round(slimeFrameSlot.width) + "px";
+      slimeFrameSourceLayer.style.height = Math.round(slimeFrameSlot.height) + "px";
+
+      const readout = document.getElementById("slimeFrameSlotReadout");
+      if (readout) {
+        readout.textContent = "slime " + SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate].key
+          + " x:" + Math.round(slimeFrameSlot.x)
+          + " y:" + Math.round(slimeFrameSlot.y)
+          + " w:" + Math.round(slimeFrameSlot.width)
+          + " h:" + Math.round(slimeFrameSlot.height);
+      }
+    }
+
+    function adjustSlimeFrameSlot(key, delta) {
+      slimeFrameSlot = {
+        ...slimeFrameSlot,
+        [key]: slimeFrameSlot[key] + delta
+      };
+
+      saveSlimeFrameSlot();
+      applySlimeFrameSlot();
+    }
+
+    function setSlimeFrameCandidate(candidate) {
+      slimeFrameSlot = {
+        ...slimeFrameSlot,
+        candidate: String(candidate)
+      };
+
+      saveSlimeFrameSlot();
+      loadSlimeFrameSourceCandidate();
+      applySlimeFrameSlot();
+    }
+
+    function resetSlimeFrameSlot() {
+      slimeFrameSlot = { ...DEFAULT_SLIME_FRAME_SLOT };
+      saveSlimeFrameSlot();
+      loadSlimeFrameSourceCandidate();
+      applySlimeFrameSlot();
+    }
+
+    function loadViewportSlot() {
+      try {
+        const raw = localStorage.getItem("nestUiCanvasViewportSlot");
+
+        if (!raw) {
+          return { ...DEFAULT_UI_VIEWPORT_SLOT };
+        }
+
+        const parsed = JSON.parse(raw);
+
+        return {
+          x: Number.isFinite(parsed.x) ? parsed.x : DEFAULT_UI_VIEWPORT_SLOT.x,
+          y: Number.isFinite(parsed.y) ? parsed.y : DEFAULT_UI_VIEWPORT_SLOT.y,
+          width: Number.isFinite(parsed.width) ? parsed.width : DEFAULT_UI_VIEWPORT_SLOT.width,
+          height: Number.isFinite(parsed.height) ? parsed.height : DEFAULT_UI_VIEWPORT_SLOT.height
+        };
+      } catch {
+        return { ...DEFAULT_UI_VIEWPORT_SLOT };
+      }
+    }
+
+    function saveViewportSlot() {
+      localStorage.setItem("nestUiCanvasViewportSlot", JSON.stringify(uiViewportSlot));
+    }
+
+    function applyViewportSlot() {
+      viewportSlot.style.left = Math.round(uiViewportSlot.x) + "px";
+      viewportSlot.style.top = Math.round(uiViewportSlot.y) + "px";
+      viewportSlot.style.width = Math.round(uiViewportSlot.width) + "px";
+      viewportSlot.style.height = Math.round(uiViewportSlot.height) + "px";
+
+      const readout = document.getElementById("viewportSlotReadout");
+      if (readout) {
+        readout.textContent = "viewport x:" + Math.round(uiViewportSlot.x)
+          + " y:" + Math.round(uiViewportSlot.y)
+          + " w:" + Math.round(uiViewportSlot.width)
+          + " h:" + Math.round(uiViewportSlot.height);
+      }
+    }
+
+    function buildViewportControls() {
+      const title = document.createElement("span");
+      title.className = "calibrationReadout";
+      title.textContent = "Viewport calibration";
+      viewportControls.appendChild(title);
+
+      const readout = document.createElement("span");
+      readout.id = "viewportSlotReadout";
+      readout.className = "calibrationReadout";
+      viewportControls.appendChild(readout);
+
+      const controls = [
+        ["x -5", () => adjustViewportSlot("x", -5)],
+        ["x +5", () => adjustViewportSlot("x", 5)],
+        ["y -5", () => adjustViewportSlot("y", -5)],
+        ["y +5", () => adjustViewportSlot("y", 5)],
+        ["w -5", () => adjustViewportSlot("width", -5)],
+        ["w +5", () => adjustViewportSlot("width", 5)],
+        ["h -5", () => adjustViewportSlot("height", -5)],
+        ["h +5", () => adjustViewportSlot("height", 5)],
+        ["reset", resetViewportSlot]
+      ];
+
+      for (const [label, handler] of controls) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", handler);
+        viewportControls.appendChild(button);
+      }
+
+      applyViewportSlot();
+    }
+
+    function buildSlimeFrameControls() {
+      const title = document.createElement("span");
+      title.className = "calibrationReadout";
+      title.textContent = "Slime frame";
+      viewportControls.appendChild(title);
+
+      const readout = document.createElement("span");
+      readout.id = "slimeFrameSlotReadout";
+      readout.className = "calibrationReadout";
+      viewportControls.appendChild(readout);
+
+      for (const candidate of ["244", "245", "246"]) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "sprite " + candidate;
+        button.addEventListener("click", () => setSlimeFrameCandidate(candidate));
+        viewportControls.appendChild(button);
+      }
+
+      const controls = [
+        ["sx -5", () => adjustSlimeFrameSlot("x", -5)],
+        ["sx +5", () => adjustSlimeFrameSlot("x", 5)],
+        ["sy -5", () => adjustSlimeFrameSlot("y", -5)],
+        ["sy +5", () => adjustSlimeFrameSlot("y", 5)],
+        ["sw -5", () => adjustSlimeFrameSlot("width", -5)],
+        ["sw +5", () => adjustSlimeFrameSlot("width", 5)],
+        ["sh -5", () => adjustSlimeFrameSlot("height", -5)],
+        ["sh +5", () => adjustSlimeFrameSlot("height", 5)],
+        ["reset slime", resetSlimeFrameSlot]
+      ];
+
+      for (const [label, handler] of controls) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", handler);
+        viewportControls.appendChild(button);
+      }
+
+      applySlimeFrameSlot();
+    }
+
+    function adjustViewportSlot(key, delta) {
+      uiViewportSlot = {
+        ...uiViewportSlot,
+        [key]: uiViewportSlot[key] + delta
+      };
+
+      saveViewportSlot();
+      applyViewportSlot();
+    }
+
+    function resetViewportSlot() {
+      uiViewportSlot = { ...DEFAULT_UI_VIEWPORT_SLOT };
+      saveViewportSlot();
+      applyViewportSlot();
     }
 
     function buildRoomButtons() {
@@ -356,7 +595,7 @@
       buildScene(config, scene.placements || []);
       drawStaticWeevil(locationId);
       updateHud(config, location);
-      setStatus("Loaded " + location.label + " with Level + Mulch UI candidates.", "ok");
+      setStatus("Loaded " + location.label + " in clean UI canvas.", "ok");
     }
 
     function buildScene(config, placements) {
@@ -364,7 +603,11 @@
         const placement = findPlacement(item, placements);
 
         if (!placement || !placement.spritePath) {
-          currentLayers.push({ item, placement, status: placement ? "missing-asset" : "missing-placement" });
+          currentLayers.push({
+            item,
+            placement,
+            status: placement ? "missing-asset" : "missing-placement"
+          });
           continue;
         }
 
@@ -386,14 +629,24 @@
         });
 
         img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
         renderRoot.appendChild(img);
-        currentLayers.push({ item, placement, image: img, status: "mapped" });
+        currentLayers.push({
+          item,
+          placement,
+          image: img,
+          status: "mapped"
+        });
       }
     }
 
     function drawStaticWeevil(locationId) {
       const spawn = getNestWeevilSpawnProfile(locationId);
-      const displaySize = getNestWeevilScaleDisplaySize(locationId, { baseWidth: 238, baseHeight: 238 });
+      const displaySize = getNestWeevilScaleDisplaySize(locationId, {
+        baseWidth: 238,
+        baseHeight: 238
+      });
+
       const displayWidth = displaySize.width;
       const displayHeight = displaySize.height;
       const markerWidth = 140;
@@ -407,6 +660,7 @@
       weevilMarker.style.height = markerHeight + "px";
       weevilMarker.style.left = Math.round(spawn.x - footX) + "px";
       weevilMarker.style.top = Math.round(spawn.y - footY) + "px";
+
       weevilContext.clearRect(0, 0, markerWidth, markerHeight);
 
       if (!weevilRenderer || !weevilAvatar) {
@@ -418,12 +672,19 @@
       weevilAvatar.r = 180;
 
       const plan = weevilAvatar.createRenderPlan();
-      weevilRenderer.render(weevilContext, plan, Math.round((markerWidth - displayWidth) / 2), Math.round((markerHeight - displayHeight) / 2), {
-        mode: "legacy-demo-assets",
-        displayWidth,
-        displayHeight,
-        pitch: 16
-      });
+
+      weevilRenderer.render(
+        weevilContext,
+        plan,
+        Math.round((markerWidth - displayWidth) / 2),
+        Math.round((markerHeight - displayHeight) / 2),
+        {
+          mode: "legacy-demo-assets",
+          displayWidth,
+          displayHeight,
+          pitch: 16
+        }
+      );
     }
 
     function findPlacement(item, placements) {
@@ -441,8 +702,10 @@
       const scaleY = m?.scaleY ?? 1;
       const x = m?.x ?? m?.translateXPixels ?? ((m?.translateX ?? 0) / 20);
       const y = m?.y ?? m?.translateYPixels ?? ((m?.translateY ?? 0) / 20);
+
       const regX = registration?.x ?? 0;
       const regY = registration?.y ?? 0;
+
       const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
       const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
 
@@ -452,12 +715,16 @@
     function updateHud(config, location) {
       const mapped = currentLayers.filter((layer) => layer.status === "mapped").length;
       const missing = currentLayers.length - mapped;
+
       minimalHud.innerHTML = [
         location?.label || "loc " + currentLocationId,
-        "layers " + mapped + "/" + currentLayers.length,
-        "ui " + uiCandidateLoaded + "/" + getCore5UiCanvasFirstPassLayout().length,
-        "failed " + failed,
-        "missing " + missing
+        "source layers: " + mapped + "/" + currentLayers.length,
+        "shell: " + MAIN_SHELL_SOURCE_CANDIDATE.key,
+        "viewport: " + Math.round(uiViewportSlot.x) + "," + Math.round(uiViewportSlot.y) + " " + Math.round(uiViewportSlot.width) + "x" + Math.round(uiViewportSlot.height),
+        "slime: " + SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate].key,
+        "loaded: " + loaded,
+        "failed: " + failed,
+        "missing: " + missing
       ].join("<br>");
     }
 
