@@ -1,9 +1,9 @@
 // Source-backed target map for core5.swf gameplay HUD/UI sprites.
 //
-// The registry separates broad source leads from the current canvas pass. The
-// active pass is deliberately tiny: only the visually confirmed static level
-// badge and mulch counter are rendered. Other ids stay documented as leads and
-// must not be stretched into the UI before they are confirmed 1:1.
+// This registry separates visual source leads from the currently rendered pass.
+// The active UI pass is intentionally tiny: only the user-confirmed Level icon
+// and XP bar candidates are enabled. Other HUD items stay documented until they
+// are matched 1:1 against the gameplay reference.
 
 export const CORE5_UI_SOURCE_SWF = 'reference/decompiled-dumpassets/dumpassets/core5.swf';
 export const CORE5_UI_SPRITE_BASE_PATH = `${CORE5_UI_SOURCE_SWF}/sprites`;
@@ -14,14 +14,15 @@ export function getCore5UiSpritePath(defineSpriteId) {
 
 export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
   level: Object.freeze({
-    label: 'Level badge',
+    label: 'Level / XP HUD',
     priority: 1,
     candidates: Object.freeze([
-      Object.freeze({ key: 'levelMeterBarEmpty', defineSpriteId: 1680, role: 'empty level meter bar', firstPassVerified: false }),
-      Object.freeze({ key: 'levelMeterBarFill', defineSpriteId: 1681, role: 'filled level meter bar', firstPassVerified: false }),
-      Object.freeze({ key: 'levelStarPlain', defineSpriteId: 1682, role: 'plain level star', firstPassVerified: false }),
-      Object.freeze({ key: 'levelStarNumber', defineSpriteId: 1684, role: 'level star with digits', firstPassVerified: false }),
-      Object.freeze({ key: 'levelBadgeComposite', defineSpriteId: 1685, role: 'full level badge with star and bar', firstPassVerified: true })
+      Object.freeze({ key: 'levelMeterBarEmpty', defineSpriteId: 1680, role: 'empty level meter bar source lead', firstPassVerified: false }),
+      Object.freeze({ key: 'levelXpBar', defineSpriteId: 1681, role: 'XP bar that sits under the level icon', firstPassVerified: true }),
+      Object.freeze({ key: 'levelStarPlain', defineSpriteId: 1682, role: 'plain level star source lead', firstPassVerified: false }),
+      Object.freeze({ key: 'levelStarNumber', defineSpriteId: 1684, role: 'level star with digits source lead', firstPassVerified: false }),
+      Object.freeze({ key: 'levelIcon', defineSpriteId: 1704, role: 'user-selected first-pass level icon candidate', firstPassVerified: true }),
+      Object.freeze({ key: 'levelBadgeComposite', defineSpriteId: 1685, role: 'full level badge with star and bar source lead; not active for this pass', firstPassVerified: false })
     ])
   }),
 
@@ -29,8 +30,8 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     label: 'Mulch counter',
     priority: 2,
     candidates: Object.freeze([
-      Object.freeze({ key: 'mulchCoinStack', defineSpriteId: 1686, role: 'large mulch coin stack', firstPassVerified: false }),
-      Object.freeze({ key: 'mulchCounterComposite', defineSpriteId: 1688, role: 'small mulch counter with digits', firstPassVerified: true })
+      Object.freeze({ key: 'mulchCoinStack', defineSpriteId: 1686, role: 'large mulch coin stack source lead', firstPassVerified: false }),
+      Object.freeze({ key: 'mulchCounterComposite', defineSpriteId: 1688, role: 'small mulch counter with digits source lead', firstPassVerified: false })
     ])
   }),
 
@@ -86,8 +87,7 @@ export const CORE5_UI_SOURCE_LEAD_GROUP_KEYS = Object.freeze([
 ]);
 
 export const CORE5_UI_FIRST_PASS_GROUP_KEYS = Object.freeze([
-  'level',
-  'mulch'
+  'level'
 ]);
 
 function enrichCandidate(groupKey, group, candidate) {
