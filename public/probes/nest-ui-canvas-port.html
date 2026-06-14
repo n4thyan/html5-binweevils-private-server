@@ -126,6 +126,26 @@
       filter: drop-shadow(0 6px 5px rgba(0,0,0,.38));
     }
 
+    #sourceHudLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 946px;
+      height: 653px;
+      z-index: 850;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .sourceHudPiece {
+      position: absolute;
+      display: block;
+      object-fit: contain;
+      max-width: none;
+      pointer-events: none;
+      user-select: none;
+    }
+
     #minimalHud {
       position: absolute;
       left: 12px;
@@ -203,6 +223,7 @@
       </div>
     </div>
     <img id="slimeFrameSourceLayer" alt="mainDEV661 slime frame source sprite" />
+    <div id="sourceHudLayer" aria-label="source-backed HUD candidate overlay"></div>
     <div id="minimalHud">loading</div>
   </div>
 
@@ -232,6 +253,10 @@
     import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
     import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
 
+    import {
+      getCore5UiCanvasFirstPassLayout
+    } from "/src/ui/Core5UiCanvasFirstPassLayout.js";
+
     const mainShellSourceLayer = document.getElementById("mainShellSourceLayer");
     const slimeFrameSourceLayer = document.getElementById("slimeFrameSourceLayer");
     const viewportSlot = document.getElementById("viewportSlot");
@@ -242,6 +267,7 @@
     const viewportControls = document.getElementById("viewportControls");
     const statusEl = document.getElementById("status");
     const minimalHud = document.getElementById("minimalHud");
+    const sourceHudLayer = document.getElementById("sourceHudLayer");
 
     let currentLocationId = 5;
     let currentLayers = [];
@@ -302,7 +328,32 @@
     buildViewportControls();
     buildSlimeFrameControls();
     await initWeevilRenderer();
+    renderFirstPassHudCandidates();
     await loadLocation(5);
+
+    function renderFirstPassHudCandidates() {
+      sourceHudLayer.innerHTML = "";
+
+      for (const item of getCore5UiCanvasFirstPassLayout()) {
+        if (!item.path) {
+          continue;
+        }
+
+        const img = new Image();
+        img.className = "sourceHudPiece";
+        img.alt = item.label + " source candidate";
+        img.title = item.label + " - DefineSprite " + item.defineSpriteId;
+        img.dataset.uiKey = item.key;
+        img.style.left = Math.round(item.x) + "px";
+        img.style.top = Math.round(item.y) + "px";
+        img.style.width = Math.round(item.width) + "px";
+        img.style.height = Math.round(item.height) + "px";
+        img.style.zIndex = String(item.zIndex || 1);
+        img.src = "/" + item.path + "?cacheBust=" + Date.now();
+
+        sourceHudLayer.appendChild(img);
+      }
+    }
 
     function loadMainShellSourceCandidate() {
       mainShellSourceLayer.src = MAIN_SHELL_SOURCE_CANDIDATE.path + "?cacheBust=" + Date.now();
