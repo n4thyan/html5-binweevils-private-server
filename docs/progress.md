@@ -1,169 +1,140 @@
 # Current progress handoff
 
-Date: 2026-06-06
+Date: 2026-06-13
 
 ## Current state
 
-The project is now in a strong source-backed foundation state with the first real room and first main-shell UI candidates visually proven.
+The project is now in a source-backed Nest-room and gameplay UI reconstruction phase.
 
 Confirmed:
 
 ```text
 HTML5/Vite app boots locally
 weevil renderer restored from the proven old HTML5 demo
-weevil rendering visually confirmed
 mainDEV661.swf boot flow mapped and tested
 core5.swf Bin.as init flow mapped and tested
 core5.swf UImain.as structure mapped and tested
 core5.swf CamUI.as structure and behaviour mapped and tested for later 3D-camera rooms
-core5.swf UI symbols mapped to real FFDec DefineSprite export paths
-real core UI SVG exports load in a browser probe page
-FixedCamera LocFactory/Loc/LocFixedCam source model mapped and tested
-FixedCamera loc XML parser/candidate scorer added and tested
-locationDefinitions.xml checked
-RumsCove locID 129 selected as first strict FixedCamera room target
-RumsCove manifest added and tested
-Rums Cove room preview loads in-browser from exported room-family assets
-Rums Cove canvas overlay probe consumes source-backed manifest data
-Rums Cove + real weevil probe works after renderer preload fix
-Rums Cove weevilScale 0.18 visually looks correct in the room preview
-Rums Cove preview calibration constants added and tested
-mainDEV661.swf green slime/canvas shell separated from core/playercard UI work
-mainDEV661.swf slime shell candidates identified for browser probing
-```
-
-## Current first-room decision
-
-Use Rums Cove as the first strict FixedCamera room milestone.
-
-```text
-locID: 129
-name: RumsCove
-type: 2 / FixedCam
-roomBG from XML: fixedCam/RumsAirport_180321.swf
-uploaded room-family export: RumsAirport_dynamAds_videoPodv2_release.zip
-boundary: -240,60,680,90
-camPos: 0,190,-330
-camAim: 0,90,260
-entryPos: 0,80
-entryDir: 180
-weevilScale: 0.18
-```
-
-Important caution:
-
-```text
-locationDefinitions.xml references fixedCam/RumsAirport_180321.swf
-uploaded export is RumsAirport_dynamAds_videoPodv2_release.zip
-```
-
-Treat these as the same room family for planning, but do not claim exact equivalence until checked.
-
-## Current Rums proof pages
-
-```text
-/probes/rums-cove-preview.html
-/probes/rums-cove-canvas.html
-/probes/rums-cove-weevil.html
-```
-
-Status:
-
-```text
-preview image loads
-manifest data can be overlaid
-real weevil renderer appears after preload
-scale 0.18 looks correct for this room
-placement is still manually calibrated and debug-only
+real core UI SVG exports load in browser probes
+Nest room family selected as the active simpler room target
+Nest navigation demo has source-backed loc, door, spawn, scale, movement snapshot, yaw bridge, and projection research checkpoints
+Core5 Walk.as behaviour ids and walking snapshot state are ported/tested
+Core5 getFloorClickCoords-style floor projection module exists and is smoke-tested
+mainDEV661.swf green loading/shell candidates are separated from core5 gameplay HUD work
+core5 gameplay HUD sprite registry is source-led and the active render pass is narrowed to the user-selected Level icon and corrected XP bar only
 ```
 
 ## Current UI shell direction
 
-The green slime/canvas shell is a `mainDEV661.swf` target.
+The gameplay HUD pieces are a `core5.swf` target and are tracked in a first-pass registry.
 
-The playercard icons/assets are a separate `core5.swf` playercard target and must not be mixed into the slime-frame work.
-
-Current main slime shell candidates:
+Current UI registry/layout files:
 
 ```text
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/frames/1.png
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_4/1.svg
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_96/1.svg
-reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg
+src/ui/Core5UiSpriteIds.js
+src/ui/Core5UiCanvasFirstPassLayout.js
+tests/core5-ui-sprite-ids-smoke.mjs
+tests/core5-ui-canvas-first-pass-layout-smoke.mjs
+docs/core5-first-pass-ui-sprite-registry.md
+public/probes/core5-ui-level-xp-candidate.html
 ```
 
-Current slime shell probe:
+Current active UI pass:
 
 ```text
-/probes/main-slime-shell.html
+Level icon: DefineSprite 1704
+XP bar below level icon: DefineSprite 1699_core390_fla.levelBar_110
 ```
 
-## Related scene
-
-`videoPod1_10_05_12` is useful, but it is not the first strict FixedCam room target.
-
-Use it later as a related VOD/interior scene candidate once Rums Cove render and door/navigation logic are further along.
-
-## Useful docs
+Important correction:
 
 ```text
-docs/rooms/rums-cove-video-pod-audit.md
-docs/rooms/videoPod1_10_05_12-audit.md
-docs/rooms/videoPod1-locationDefinitions-link.md
-docs/room-camera-model-notes.md
-docs/core-ui-asset-probe-findings.md
-docs/ui-layout-reference-notes.md
+DefineSprite 1681 looked like the XP bar in a JPEXS grid preview, but the exported SVG at DefineSprite_1681/1.svg is not the XP bar.
+Use the named export folder DefineSprite_1699_core390_fla.levelBar_110 for the current XP bar pass.
 ```
 
-## Current test suite
-
-`npm.cmd test` covers:
+Source leads for later passes:
 
 ```text
-boot flow
-core init flow
-UImain source map
-CamUI source map
-FixedCam room source map
-FixedCam loc definition parser
-RumsCove manifest
-RumsCove preview calibration
-core symbol locator
-core UI asset probe plan
-core UI asset file existence
-render plan
-prototype renderer
+Other level parts: DefineSprite 1680, 1681 preview lead, 1682, 1684, 1685
+Mulch: DefineSprite 1686, 1688
+Dosh: DefineSprite 1701, 1706, 1708
+Hunger: DefineSprite 1697 plus a new dedicated pass to re-identify the green hunger meter after removing 1699 from hunger
+Chatbar: DefineSprite 1716, 1718, 1724, 1725
+Map: DefineSprite 1786 and 1790 are visible source-grid leads; exact sidebar Map button still needs its own visual pass
 ```
 
-Individual useful new checks:
+Current UI rule:
 
 ```text
-node tests/rums-cove-manifest-smoke.mjs
-node tests/rums-cove-preview-calibration-smoke.mjs
-node tests/viewport-slime-frame-source-map-smoke.mjs
+Do one UI element group at a time.
+Do not invent UI art.
+Use the registry and original exported SVGs.
+Screenshots/JPEXS grids are identification aids only.
+Do not stretch later candidates into the canvas before confirming them.
+Verify the raw Level/XP candidates before placing more HUD elements into the main Nest UI canvas.
+```
+
+## Movement status
+
+Movement is parked for now.
+
+Completed checkpoints:
+
+```text
+Core5 behaviour ID registry
+Core5 Walk.as movement model
+Core5 walk snapshot state
+Nest movement debug HUD
+yaw bridge calibration layer
+Core5 floor projection module
+```
+
+Not final yet:
+
+```text
+full 1:1 click-to-world wiring in the demo
+reverse Core5 x/z to screen placement in the demo
+leg animation bridge into the renderer
+legaliseClick/isForbidden/walk-mask integration
+```
+
+## Current Nest proof pages
+
+```text
+/probes/nest-navigation-demo.html
+/probes/nest-coordinate-lab.html
+/probes/nest-ui-canvas-port.html
+/probes/core5-ui-level-xp-candidate.html
+```
+
+## Current test suite additions
+
+`npm.cmd test` includes UI and movement/projection smoke tests.
+
+Useful individual checks:
+
+```text
+node tests/core5-ui-sprite-ids-smoke.mjs
+node tests/core5-ui-canvas-first-pass-layout-smoke.mjs
+node tests/core5-floor-projection-smoke.mjs
+node tests/core5-weevil-behaviours-smoke.mjs
+node tests/core5-walk-snapshot-smoke.mjs
+node tests/core5-walk-behaviour-smoke.mjs
+node tests/nest-weevil-spawn-profiles-smoke.mjs
+node tests/nest-weevil-scale-profiles-smoke.mjs
+node tests/nest-door-visual-targets-smoke.mjs
 ```
 
 ## Next recommended order
 
 ```text
-1. Pull latest main.
+1. Pull latest nest-room-demo.
 2. Run npm.cmd test.
-3. Open /probes/main-slime-shell.html and verify mainDEV661 slime shell candidates load.
-4. If the main shell probe looks correct, record which candidate(s) are the real shell pieces.
-5. Begin a reusable FixedCam/RumsCove scene module from the successful room + weevil probe.
-6. Add a source-backed UI shell probe that puts RumsCove behind the main slime frame.
-7. Only after that, begin projection/depth/movement work.
-```
-
-## Do not do yet
-
-```text
-do not implement backend/session bridge
-do not implement multiplayer
-do not guess missing room data as final
-do not prioritise 3D camera CamUI rooms before the first FixedCamera milestone
-do not implement dynamic room extras before the static room render works
-do not replace the proven weevil renderer
-do not treat playercard icon screenshots as slime-frame assets
-do not hand-draw a permanent slime border
+3. Open /probes/core5-ui-level-xp-candidate.html.
+4. Confirm DefineSprite 1704 and DefineSprite_1699_core390_fla.levelBar_110 visibly load from the local core5 export.
+5. Only after that, place those two confirmed pieces into /probes/nest-ui-canvas-port.html.
+6. Then move to Mulch as the next UI group.
+7. Keep movement parked unless explicitly resumed.
+8. Do not add public/generated, xml, or local decompiled scratch folders to commits.
 ```

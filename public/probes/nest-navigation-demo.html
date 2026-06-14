@@ -1,0 +1,1365 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nest Navigation Demo</title>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#151515;color:#f4e9bd}
+    body{margin:0;padding:24px;background:#151515}
+    h1{margin:0 0 8px;font-size:26px}
+    p{margin:0 0 14px;color:#d2c48b;max-width:1180px}
+    code{color:#fff2a8}
+    button{border:1px solid #8f7f44;background:#3a321d;color:#fff2a8;border-radius:6px;padding:7px 10px;cursor:pointer}
+    button:hover{background:#574823}
+    .layout{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .box{border:1px solid #8f7f44;background:#211f16;padding:12px 14px;margin:0 0 14px;max-width:1180px}
+    .panel{width:330px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+    .wrap{display:inline-block;border:2px solid #8f7f44;background:#0d0d0d;padding:12px;max-width:calc(100vw - 72px);overflow:auto}
+    #stage{position:relative;width:614px;height:366px;background:#1b211b;overflow:hidden}
+    #renderRoot{position:absolute;left:0;top:0;transform-origin:0 0}
+    .layer{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;pointer-events:none}
+    .layer.clickable{pointer-events:auto;cursor:pointer;filter:drop-shadow(0 0 0 rgba(255,255,255,0))}
+    .layer.clickable:hover{filter:drop-shadow(0 0 8px rgba(255,230,120,.9))}
+    .hud{position:absolute;left:8px;top:8px;z-index:9999;background:rgba(0,0,0,.68);padding:7px;font:11px Consolas,monospace}
+    .doorTag{position:absolute;z-index:9998;background:rgba(0,0,0,.72);border:1px solid rgba(255,230,120,.8);color:#fff2a8;border-radius:5px;padding:2px 5px;font:10px Consolas,monospace;pointer-events:none;transform:translate(-50%,-50%);white-space:nowrap}
+    .doorHitbox{position:absolute;z-index:9996;border:2px solid rgba(255,230,120,.45);background:rgba(255,230,120,.08);box-sizing:border-box;cursor:pointer}
+    .doorHitbox:hover{border-color:rgba(255,230,120,1);background:rgba(255,230,120,.18)}
+    #weevilMarker{position:absolute;z-index:9997;left:222px;top:172px;width:140px;height:140px;transition:left .42s ease, top .42s ease;pointer-events:none;image-rendering:auto}
+    #weevilMarker.debugFallback{border-radius:50%;background:#c8842b;border:2px solid #fff2a8;box-shadow:0 3px 8px rgba(0,0,0,.55)}
+    .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
+      #movementSnapshotHud{
+      position:absolute;
+      right:8px;
+      top:8px;
+      z-index:10000;
+      background:rgba(0,0,0,.72);
+      border:1px solid rgba(150,220,90,.7);
+      color:#d9ff9a;
+      border-radius:8px;
+      padding:8px;
+      font:11px Consolas,monospace;
+      min-width:215px;
+      pointer-events:none;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+    }
+      #core5ProjectionDebugHud{
+      position:absolute;
+      left:8px;
+      bottom:8px;
+      z-index:10000;
+      background:rgba(0,0,0,.72);
+      border:1px solid rgba(110,190,255,.7);
+      color:#cfeeff;
+      border-radius:8px;
+      padding:8px;
+      font:11px Consolas,monospace;
+      min-width:260px;
+      pointer-events:none;
+      box-shadow:0 6px 16px rgba(0,0,0,.35);
+    }
+  </style>
+</head>
+<body>
+  <h1>Nest Navigation Demo</h1>
+  <p>Source-backed first traversal demo. Hall and rooms render from SWF XML scene JSON plus layer plans. Door clicks use <code>NestNavigationManifest.js</code>.</p>
+
+  <div class="layout">
+    <div>
+      <div id="status" class="box">Loading...</div>
+      <div class="wrap">
+        <div id="stage">
+          <div id="renderRoot"></div>
+          <canvas id="weevilMarker" width="140" height="140" title="real rendered weevil overlay"></canvas>
+          <div id="hud" class="hud">loading</div>
+        </div>
+      </div>
+      <div id="legend" class="box legend"></div>
+    </div>
+
+    <div class="box panel">
+      <strong>Locations</strong>
+      <div id="locationButtons" class="row"></div>
+      <hr>
+      <strong>Doors in current room</strong>
+      <div id="doorButtons" class="row"></div>
+      <hr>
+      <div id="notes" class="legend"></div>
+    </div>
+  </div>
+
+<script type="module">
+import {
+  NEST_LOCATIONS,
+  NEST_HALL_DOOR_TO_LAYER_KEY,
+  getNestDoorTarget,
+  getNestLocation
+} from "/src/rooms/NestNavigationManifest.js";
+
+import {
+  NEST_RENDERABLE_LOCATIONS,
+  getNestRenderableLocation
+} from "/src/rooms/NestRenderRegistry.js";
+
+import { NEST_HALL_2011_VISUAL_HITBOXES } from "/src/rooms/NestHall2011VisualHitboxes.js";
+
+import { getNestDoorVisualTarget } from "/src/rooms/NestDoorVisualTargets.js";
+
+import {
+  getNestWeevilScale,
+  getNestWeevilScaleDisplaySize
+} from "/src/rooms/NestWeevilScaleProfiles.js";
+
+import { getNestWeevilSpawnProfile } from "/src/rooms/NestWeevilSpawnProfiles.js";
+
+import { AvatarState } from "/src/avatar/AvatarState.js";
+import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
+import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
+
+import { Core5MovementModel } from "/src/movement/Core5MovementModel.js";
+
+const stage = document.getElementById("stage");
+const renderRoot = document.getElementById("renderRoot");
+const status = document.getElementById("status");
+const hud = document.getElementById("hud");
+const weevilMarker = document.getElementById("weevilMarker");
+const weevilContext = weevilMarker.getContext("2d");
+const legend = document.getElementById("legend");
+const notes = document.getElementById("notes");
+const locationButtons = document.getElementById("locationButtons");
+const doorButtons = document.getElementById("doorButtons");
+
+let currentLocationId = 5;
+let currentLayers = [];
+let loaded = 0;
+let failed = 0;
+
+const WEEVIL_CANVAS_SIZE = 140;
+const WEEVIL_BASE_DISPLAY_WIDTH = 132;
+const WEEVIL_BASE_DISPLAY_HEIGHT = 132;
+const WEEVIL_FOOT_X = 70;
+const WEEVIL_FOOT_Y = 128;
+
+let weevilAvatar = null;
+let weevilRenderer = null;
+let weevilRendererReady = false;
+let lastWeevilStagePoint = { x: 292, y: 300 };
+let lastClickedStagePoint = null;
+let lastWeevilMoveMode = "spawn";
+
+const VIEWPORT_PRESETS = Object.freeze({
+  native: Object.freeze({ label: "Native", targetHeight: null }),
+  "480": Object.freeze({ label: "480", targetHeight: 480 }),
+  "720": Object.freeze({ label: "720", targetHeight: 720 }),
+  "1080": Object.freeze({ label: "1080", targetHeight: 1080 }),
+  fit: Object.freeze({ label: "Fit", targetHeight: null })
+});
+
+let currentViewportPreset = localStorage.getItem("nestNavigationViewportPreset") || "native";
+let currentViewportScale = 1;
+
+let core5MovementModel = null;
+let core5MovementAnimationFrame = null;
+let core5MovementTargetStagePoint = null;
+let core5MovementLastResult = null;
+let core5MovementOnArrived = null;
+let core5MovementArrivedStatus = null;
+
+let lastCore5RotY = 0;
+let lastRendererYaw = null;
+
+const DEFAULT_CORE5_YAW_BRIDGE = Object.freeze({
+  enabled: true,
+  offset: 302,
+  multiplier: 1
+});
+
+let core5YawBridge = loadCore5YawBridge();
+
+window.addEventListener("error", (event) => showFatal(event.error || event.message));
+window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
+
+buildLocationButtons();
+buildViewportControls();
+buildYawBridgeControls();
+stage.addEventListener("click", handleStageClickToMove);
+window.addEventListener("resize", () => {
+  if (currentViewportPreset === "fit") {
+    applyViewportPreset("fit");
+  }
+});
+await initWeevilRenderer();
+await loadLocation(5);
+applyViewportPreset(currentViewportPreset);
+
+function buildLocationButtons() {
+  const order = [5, 1, 2, 3, 4, 6, 7, 8, 9];
+
+  for (const locationId of order) {
+    const location = getNestLocation(locationId);
+    const button = document.createElement("button");
+    button.textContent = location.label;
+    button.addEventListener("click", () => loadLocation(locationId));
+    locationButtons.appendChild(button);
+  }
+}
+
+async function initWeevilRenderer() {
+  weevilAvatar = AvatarState.fromUserVars({
+    userId: 1,
+    idx: 1,
+    name: "debug_weevil",
+    weevilDef: SAMPLE_WEEVIL_DEF,
+    x: 0,
+    y: 0,
+    z: 0,
+    r: 0,
+    ps: 0,
+    ex: 0,
+    locID: 5
+  });
+
+  weevilRenderer = new WeevilCanvasRenderer({ mode: "legacy-demo-assets" });
+  drawWeevilLoadingState();
+
+  try {
+    await weevilRenderer.legacyDemoAssetRenderer.preload();
+    weevilRendererReady = true;
+    drawWeevilOverlay();
+  } catch (error) {
+    console.error(error);
+    drawWeevilFallback("renderer failed");
+  }
+}
+
+function drawWeevilLoadingState() {
+  weevilContext.clearRect(0, 0, WEEVIL_CANVAS_SIZE, WEEVIL_CANVAS_SIZE);
+  weevilContext.fillStyle = "rgba(0,0,0,.65)";
+  weevilContext.fillRect(18, 35, 60, 22);
+  weevilContext.fillStyle = "#fff2a8";
+  weevilContext.font = "10px Consolas, monospace";
+  weevilContext.fillText("loading", 26, 50);
+}
+
+function drawWeevilFallback(label = "weevil") {
+  weevilContext.clearRect(0, 0, WEEVIL_CANVAS_SIZE, WEEVIL_CANVAS_SIZE);
+  weevilContext.fillStyle = "#c8842b";
+  weevilContext.strokeStyle = "#fff2a8";
+  weevilContext.lineWidth = 2;
+  weevilContext.beginPath();
+  weevilContext.arc(WEEVIL_FOOT_X, WEEVIL_FOOT_Y - 12, 12, 0, Math.PI * 2);
+  weevilContext.fill();
+  weevilContext.stroke();
+  weevilContext.fillStyle = "#151515";
+  weevilContext.beginPath();
+  weevilContext.arc(WEEVIL_FOOT_X - 4, WEEVIL_FOOT_Y - 15, 2, 0, Math.PI * 2);
+  weevilContext.arc(WEEVIL_FOOT_X + 4, WEEVIL_FOOT_Y - 15, 2, 0, Math.PI * 2);
+  weevilContext.fill();
+  weevilContext.fillStyle = "#fff2a8";
+  weevilContext.font = "9px Consolas, monospace";
+  weevilContext.fillText(label, 27, 94);
+}
+
+function getCurrentWeevilDisplaySize() {
+  return getNestWeevilScaleDisplaySize(currentLocationId, {
+    baseWidth: WEEVIL_BASE_DISPLAY_WIDTH,
+    baseHeight: WEEVIL_BASE_DISPLAY_HEIGHT
+  });
+}
+
+function drawWeevilOverlay(rotation = weevilAvatar?.r ?? 0) {
+  if (!weevilRendererReady || !weevilAvatar || !weevilRenderer) {
+    drawWeevilLoadingState();
+    return;
+  }
+
+  const core5RotY = Number.isFinite(Number(rotation)) ? Number(rotation) : 0;
+  lastCore5RotY = core5RotY;
+  lastRendererYaw = core5YawBridge.enabled ? core5RotYToRendererYaw(core5RotY) : null;
+
+  weevilAvatar.updatePosition({
+    x: weevilAvatar.x,
+    y: weevilAvatar.y,
+    z: weevilAvatar.z,
+    r: core5RotY
+  });
+
+  const renderPlan = weevilAvatar.createRenderPlan();
+
+  weevilContext.clearRect(0, 0, WEEVIL_CANVAS_SIZE, WEEVIL_CANVAS_SIZE);
+
+  const renderOptions = {
+    mode: "legacy-demo-assets",
+    displayWidth: getCurrentWeevilDisplaySize().width,
+    displayHeight: getCurrentWeevilDisplaySize().height,
+    pitch: 16
+  };
+
+  if (core5YawBridge.enabled && Number.isFinite(lastRendererYaw)) {
+    renderOptions.yaw = lastRendererYaw;
+  }
+
+  weevilRenderer.render(
+    weevilContext,
+    renderPlan,
+    WEEVIL_FOOT_X - getCurrentWeevilDisplaySize().width / 2,
+    WEEVIL_FOOT_Y - getCurrentWeevilDisplaySize().height + 10,
+    renderOptions
+  );
+}
+
+function setWeevilVisualPosition(stageX, stageY, options = {}) {
+  lastWeevilStagePoint = { x: stageX, y: stageY };
+  lastWeevilMoveMode = options.moveMode || lastWeevilMoveMode;
+
+  weevilMarker.style.left = Math.round(stageX - WEEVIL_FOOT_X) + "px";
+  weevilMarker.style.top = Math.round(stageY - WEEVIL_FOOT_Y) + "px";
+
+  if (weevilAvatar) {
+    weevilAvatar.locId = currentLocationId;
+    if (Number.isFinite(options.sourceX)) {
+      weevilAvatar.x = options.sourceX;
+    }
+    if (Number.isFinite(options.sourceZ)) {
+      weevilAvatar.z = options.sourceZ;
+    }
+
+    weevilAvatar.scale = getNestWeevilScale(currentLocationId);
+  }
+
+  drawWeevilOverlay(options.rotation ?? weevilAvatar?.r ?? 0);
+
+  if (options.updateHud !== false) {
+    updateHud();
+  }
+}
+
+function getStageBaseSize() {
+  const rect = stage.getBoundingClientRect();
+
+  return {
+    width: Math.round(stage.offsetWidth || rect.width || 614),
+    height: Math.round(stage.offsetHeight || rect.height || 366)
+  };
+}
+
+function getViewportShell() {
+  let shell = document.getElementById("nestViewportShell");
+
+  if (shell) {
+    return shell;
+  }
+
+  shell = document.createElement("div");
+  shell.id = "nestViewportShell";
+  shell.style.cssText = [
+    "position:relative",
+    "overflow:auto",
+    "max-width:calc(100vw - 48px)",
+    "max-height:calc(100vh - 170px)",
+    "border:1px solid rgba(255,242,168,.35)",
+    "border-radius:8px",
+    "background:#050505",
+    "box-shadow:0 6px 20px rgba(0,0,0,.45)"
+  ].join(";");
+
+  stage.parentNode.insertBefore(shell, stage);
+  shell.appendChild(stage);
+
+  return shell;
+}
+
+function normaliseDegrees(value) {
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return 0;
+  }
+
+  return ((number % 360) + 360) % 360;
+}
+
+function loadCore5YawBridge() {
+  try {
+    const raw = localStorage.getItem("nestNavigationCore5YawBridge");
+
+    if (!raw) {
+      return { ...DEFAULT_CORE5_YAW_BRIDGE };
+    }
+
+    const parsed = JSON.parse(raw);
+
+    return {
+      enabled: typeof parsed.enabled === "boolean" ? parsed.enabled : DEFAULT_CORE5_YAW_BRIDGE.enabled,
+      offset: Number.isFinite(parsed.offset) ? parsed.offset : DEFAULT_CORE5_YAW_BRIDGE.offset,
+      multiplier: Number.isFinite(parsed.multiplier) ? parsed.multiplier : DEFAULT_CORE5_YAW_BRIDGE.multiplier
+    };
+  } catch {
+    return { ...DEFAULT_CORE5_YAW_BRIDGE };
+  }
+}
+
+function saveCore5YawBridge() {
+  localStorage.setItem("nestNavigationCore5YawBridge", JSON.stringify(core5YawBridge));
+}
+
+function core5RotYToRendererYaw(rotY) {
+  return normaliseDegrees(core5YawBridge.offset + Number(rotY || 0) * core5YawBridge.multiplier);
+}
+
+function redrawWeevilForYawBridge() {
+  drawWeevilOverlay(lastCore5RotY);
+  updateHud();
+  updateYawBridgeControls();
+}
+
+function updateYawBridgeControls() {
+  const readout = document.getElementById("yawBridgeReadout");
+
+  if (!readout) {
+    return;
+  }
+
+  readout.textContent = [
+    "yaw bridge",
+    core5YawBridge.enabled ? "on" : "off",
+    "offset " + Math.round(core5YawBridge.offset),
+    "mult " + core5YawBridge.multiplier,
+    "core rotY " + Math.round(lastCore5RotY),
+    "renderer yaw " + (Number.isFinite(lastRendererYaw) ? Math.round(lastRendererYaw) : "default")
+  ].join(" | ");
+}
+
+function adjustYawOffset(delta) {
+  core5YawBridge = {
+    ...core5YawBridge,
+    offset: normaliseDegrees(core5YawBridge.offset + delta)
+  };
+
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function toggleYawMultiplier() {
+  core5YawBridge = {
+    ...core5YawBridge,
+    multiplier: core5YawBridge.multiplier === 1 ? -1 : 1
+  };
+
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function toggleYawBridge() {
+  core5YawBridge = {
+    ...core5YawBridge,
+    enabled: !core5YawBridge.enabled
+  };
+
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function resetYawBridge() {
+  core5YawBridge = { ...DEFAULT_CORE5_YAW_BRIDGE };
+  saveCore5YawBridge();
+  redrawWeevilForYawBridge();
+}
+
+function buildYawBridgeControls() {
+  if (document.getElementById("yawBridgeControls")) {
+    return;
+  }
+
+  const controls = document.createElement("div");
+  controls.id = "yawBridgeControls";
+  controls.style.cssText = [
+    "display:flex",
+    "flex-wrap:wrap",
+    "gap:6px",
+    "align-items:center",
+    "margin:8px 0",
+    "font:12px Verdana,Arial,sans-serif"
+  ].join(";");
+
+  const readout = document.createElement("span");
+  readout.id = "yawBridgeReadout";
+  readout.style.cssText = [
+    "border:1px solid #8f7f44",
+    "background:#211f16",
+    "color:#d9ff9a",
+    "border-radius:6px",
+    "padding:6px 8px",
+    "font:11px Consolas,monospace"
+  ].join(";");
+  controls.appendChild(readout);
+
+  const buttons = [
+    ["yaw -45", () => adjustYawOffset(-45)],
+    ["yaw +45", () => adjustYawOffset(45)],
+    ["invert", toggleYawMultiplier],
+    ["on/off", toggleYawBridge],
+    ["reset yaw", resetYawBridge]
+  ];
+
+  for (const [label, handler] of buttons) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    button.addEventListener("click", handler);
+    controls.appendChild(button);
+  }
+
+  const shell = getViewportShell();
+  shell.parentNode.insertBefore(controls, shell);
+
+  updateYawBridgeControls();
+}
+
+function buildViewportControls() {
+  if (document.getElementById("viewportControls")) {
+    return;
+  }
+
+  const controls = document.createElement("div");
+  controls.id = "viewportControls";
+  controls.style.cssText = [
+    "display:flex",
+    "flex-wrap:wrap",
+    "gap:6px",
+    "align-items:center",
+    "margin:8px 0",
+    "font:12px Verdana,Arial,sans-serif"
+  ].join(";");
+
+  const label = document.createElement("strong");
+  label.textContent = "Viewport:";
+  label.style.color = "#fff2a8";
+  controls.appendChild(label);
+
+  for (const [key, preset] of Object.entries(VIEWPORT_PRESETS)) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.viewportPreset = key;
+    button.textContent = preset.label;
+    button.style.cssText = [
+      "background:#2b250d",
+      "color:#fff2a8",
+      "border:1px solid #8e7a26",
+      "border-radius:6px",
+      "padding:5px 8px",
+      "cursor:pointer"
+    ].join(";");
+
+    button.addEventListener("click", () => {
+      applyViewportPreset(key);
+    });
+
+    controls.appendChild(button);
+  }
+
+  stage.parentNode.insertBefore(controls, stage);
+}
+
+function getFitViewportScale(baseSize) {
+  const maxWidth = Math.max(320, window.innerWidth - 440);
+  const maxHeight = Math.max(240, window.innerHeight - 190);
+
+  return Math.max(
+    1,
+    Math.min(maxWidth / baseSize.width, maxHeight / baseSize.height)
+  );
+}
+
+function applyViewportPreset(presetName) {
+  const preset = VIEWPORT_PRESETS[presetName] ? presetName : "native";
+  const baseSize = getStageBaseSize();
+
+  currentViewportPreset = preset;
+  localStorage.setItem("nestNavigationViewportPreset", preset);
+
+  if (preset === "native") {
+    currentViewportScale = 1;
+  } else if (preset === "fit") {
+    currentViewportScale = getFitViewportScale(baseSize);
+  } else {
+    currentViewportScale = VIEWPORT_PRESETS[preset].targetHeight / baseSize.height;
+  }
+
+  currentViewportScale = Math.max(1, Number(currentViewportScale.toFixed(4)));
+
+  const shell = getViewportShell();
+
+  stage.style.transformOrigin = "0 0";
+  stage.style.transform = `scale(${currentViewportScale})`;
+
+  shell.style.width = Math.ceil(baseSize.width * currentViewportScale) + "px";
+  shell.style.height = Math.ceil(baseSize.height * currentViewportScale) + "px";
+
+  document.querySelectorAll("[data-viewport-preset]").forEach((button) => {
+    const active = button.dataset.viewportPreset === preset;
+    button.style.background = active ? "#6b5b16" : "#2b250d";
+    button.style.borderColor = active ? "#fff2a8" : "#8e7a26";
+  });
+
+  updateHud();
+}
+
+function getStagePointFromEvent(event) {
+  const rect = stage.getBoundingClientRect();
+  const baseWidth = Math.max(1, stage.offsetWidth || rect.width);
+  const baseHeight = Math.max(1, stage.offsetHeight || rect.height);
+  const scaleX = rect.width / baseWidth;
+  const scaleY = rect.height / baseHeight;
+
+  return {
+    x: Math.round((event.clientX - rect.left) / Math.max(0.0001, scaleX)),
+    y: Math.round((event.clientY - rect.top) / Math.max(0.0001, scaleY))
+  };
+}
+
+function handleStageClickToMove(event) {
+  const target = event.target;
+
+  if (target?.closest?.(".doorHitbox, button, .layer.clickable")) {
+    return;
+  }
+
+  const point = getStagePointFromEvent(event);
+
+  lastClickedStagePoint = point;
+
+  startCore5StageMovement(point);
+
+  setStatus(`Core5 walking to stage ${point.x}/${point.y}. Door clicks still navigate rooms.`, "warn");
+}
+
+function stopCore5Movement(reason = "stop") {
+  if (core5MovementAnimationFrame != null) {
+    cancelAnimationFrame(core5MovementAnimationFrame);
+    core5MovementAnimationFrame = null;
+  }
+
+  if (core5MovementModel?.walker && !core5MovementModel.walker.halted) {
+    core5MovementModel.walker.halt();
+  }
+
+  core5MovementModel = null;
+  core5MovementTargetStagePoint = null;
+  core5MovementOnArrived = null;
+  core5MovementArrivedStatus = null;
+
+  if (reason !== "silent") {
+    updateHud();
+  }
+}
+
+function startCore5StageMovement(stagePoint, options = {}) {
+  stopCore5Movement("silent");
+
+  const startX = Number.isFinite(lastWeevilStagePoint?.x) ? lastWeevilStagePoint.x : stagePoint.x;
+  const startZ = Number.isFinite(lastWeevilStagePoint?.y) ? lastWeevilStagePoint.y : stagePoint.y;
+  const weevilScale = getNestWeevilScale(currentLocationId);
+
+  core5MovementModel = new Core5MovementModel({
+    x: startX,
+    y: 0,
+    z: startZ,
+    rotY: weevilAvatar?.r ?? 0,
+    weevilScale,
+    mine: false,
+    broadcastMoves: false
+  });
+
+  core5MovementTargetStagePoint = { x: stagePoint.x, y: stagePoint.y };
+  core5MovementOnArrived = typeof options.onArrived === "function" ? options.onArrived : null;
+  core5MovementArrivedStatus = options.arrivedStatus || null;
+
+  core5MovementLastResult = core5MovementModel.moveMyWeevil(stagePoint.x, stagePoint.y, {
+    direction: options.direction ?? 999
+  });
+
+  setWeevilVisualPosition(startX, startZ, {
+    sourceX: startX,
+    sourceZ: startZ,
+    moveMode: options.startMoveMode || "core5-start",
+    updateHud: false
+  });
+
+  core5MovementAnimationFrame = requestAnimationFrame(tickCore5StageMovement);
+  updateHud();
+}
+
+function tickCore5StageMovement() {
+  if (!core5MovementModel) {
+    core5MovementAnimationFrame = null;
+    return;
+  }
+
+  core5MovementModel.update(1);
+
+  const stageX = core5MovementModel.weevil.x;
+  const stageY = core5MovementModel.weevil.z;
+  const stillWalking = core5MovementModel.walker && !core5MovementModel.walker.halted;
+
+  setWeevilVisualPosition(stageX, stageY, {
+    sourceX: core5MovementModel.weevil.x,
+    sourceZ: core5MovementModel.weevil.z,
+    rotation: core5MovementModel.weevil.rotY,
+    moveMode: stillWalking ? "core5-walking" : "core5-arrived",
+    updateHud: false
+  });
+
+  if (stillWalking) {
+    core5MovementAnimationFrame = requestAnimationFrame(tickCore5StageMovement);
+    updateHud();
+    return;
+  }
+
+  core5MovementAnimationFrame = null;
+
+  const arrivedCallback = core5MovementOnArrived;
+  const arrivedStatus = core5MovementArrivedStatus;
+
+  core5MovementOnArrived = null;
+  core5MovementArrivedStatus = null;
+
+  if (arrivedStatus) {
+    setStatus(arrivedStatus, "ok");
+  } else {
+    setStatus(`Core5 arrived at stage ${Math.round(stageX)}/${Math.round(stageY)}.`, "ok");
+  }
+
+  updateHud();
+
+  if (arrivedCallback) {
+    arrivedCallback({
+      x: Math.round(stageX),
+      y: Math.round(stageY),
+      sourceX: core5MovementModel?.weevil?.x,
+      sourceZ: core5MovementModel?.weevil?.z
+    });
+  }
+}
+
+function getDefaultWeevilStagePoint(locationId, arrivalDoorId = null) {
+  const spawnProfile = getNestWeevilSpawnProfile(locationId);
+
+  return {
+    x: spawnProfile.x,
+    y: spawnProfile.y,
+    sourceX: 0,
+    sourceZ: 0,
+    method: spawnProfile.method,
+    arrivalDoorId
+  };
+}
+
+async function loadLocation(locationId, arrivalDoorId = null) {
+  const config = getNestRenderableLocation(locationId);
+  const location = getNestLocation(locationId);
+
+  if (!config || !location) {
+    const fallback = getNestLocation(locationId);
+    setStatus(`Deferred target: ${fallback?.label || "Unknown loc " + locationId}. Not in this first render set yet.`, "warn");
+    return;
+  }
+
+  stopCore5Movement("silent");
+
+  currentLocationId = locationId;
+  currentLayers = [];
+  loaded = 0;
+  failed = 0;
+  renderRoot.innerHTML = "";
+  clearDoorTags();
+  clearDoorHitboxes();
+  resetWeevilMarker(locationId, arrivalDoorId);
+
+  renderRoot.style.width = `${config.renderWidth}px`;
+  renderRoot.style.height = `${config.renderHeight}px`;
+  renderRoot.style.transform = `scale(${config.scaleX}, ${config.scaleY})`;
+
+  setStatus(`Loading ${location.label}...`, "warn");
+
+  const res = await fetch(config.sceneJson + "?cacheBust=" + Date.now());
+  if (!res.ok) {
+    throw new Error(`Missing generated JSON for ${location.label}: ${config.sceneJson}`);
+  }
+
+  const scene = await res.json();
+  buildScene(config, scene.placements || []);
+  buildDoorButtons(location);
+  buildVisualHitboxes(config, location);
+  updateHud();
+  updateLegend(config, location, arrivalDoorId);
+
+  setStatus(`Loaded ${location.label}. Click a visible door or use the side buttons.`, "ok");
+}
+
+function buildScene(config, placements) {
+  for (const item of config.layerPlan) {
+    const placement = findPlacement(item, placements);
+
+    if (!placement || !placement.spritePath) {
+      currentLayers.push({ item, placement, image: null, status: placement ? "missing-asset" : "missing-placement" });
+      continue;
+    }
+
+    const doorId = getDoorIdForLayer(config.locationId, item.key);
+    const img = new Image();
+
+    img.className = doorId ? "layer clickable" : "layer";
+    img.alt = item.key;
+    img.title = doorId ? `${item.key} -> door ${doorId}` : item.key;
+    img.style.zIndex = String(placement.depth);
+    img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
+
+    if (doorId) {
+      img.addEventListener("click", (event) => {
+        event.stopPropagation();
+        followDoor(config.locationId, doorId);
+      });
+    }
+
+    img.addEventListener("load", () => { loaded += 1; updateHud(); if (doorId && config.locationId !== 5) labelDoorLayer(img, item, doorId, config.locationId); });
+    img.addEventListener("error", () => { failed += 1; updateHud(); });
+    img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
+    renderRoot.appendChild(img);
+    currentLayers.push({ item, placement, image: img, doorId, status: "mapped" });
+  }
+}
+
+function buildDoorButtons(location) {
+  doorButtons.innerHTML = "";
+
+  for (const door of location.doors || []) {
+    const target = getNestDoorTarget(location.id, door.id);
+    const label = target?.targetLocation?.label || `loc ${door.toLoc}`;
+    const button = document.createElement("button");
+
+    button.textContent = `door ${door.id} -> ${label}`;
+    button.addEventListener("click", () => followDoor(location.id, door.id));
+    doorButtons.appendChild(button);
+  }
+}
+
+function followDoor(locationId, doorId) {
+  const target = getNestDoorTarget(locationId, doorId);
+
+  if (!target) {
+    setStatus(`No manifest target for loc ${locationId} door ${doorId}`, "fail");
+    return;
+  }
+
+  const targetLocation = target.targetLocation;
+
+  if (!getNestRenderableLocation(target.toLoc)) {
+    setStatus(`${targetLocation?.label || "Target"} is mapped but deferred in this demo. loc ${target.toLoc}, door ${target.toDoor}`, "warn");
+    return;
+  }
+
+  walkToDoor(locationId, doorId, () => loadLocation(target.toLoc, target.toDoor));
+}
+
+function buildVisualHitboxes(config, location) {
+  if (location.id !== 5) {
+    return;
+  }
+
+  for (const door of location.doors || []) {
+    const hitbox = NEST_HALL_2011_VISUAL_HITBOXES[door.id];
+
+    if (!hitbox) {
+      continue;
+    }
+
+    const target = getNestDoorTarget(location.id, door.id);
+    const targetLabel = target?.targetLocation?.label || `loc ${door.toLoc}`;
+    const isDeferred = target && !getNestRenderableLocation(target.toLoc);
+
+    const box = document.createElement("button");
+    box.className = "doorHitbox";
+    box.title = `door ${door.id} -> ${targetLabel}${isDeferred ? " (later)" : ""}`;
+    box.style.left = hitbox.x + "px";
+    box.style.top = hitbox.y + "px";
+    box.style.width = hitbox.width + "px";
+    box.style.height = hitbox.height + "px";
+    box.setAttribute("aria-label", box.title);
+    box.addEventListener("click", (event) => {
+      event.stopPropagation();
+      followDoor(location.id, door.id);
+    });
+
+    stage.appendChild(box);
+
+    const tag = document.createElement("div");
+    tag.className = "doorTag";
+    tag.textContent = `door ${door.id} -> ${targetLabel}${isDeferred ? " (later)" : ""}`;
+    tag.style.left = Math.round(hitbox.x + hitbox.width / 2) + "px";
+    tag.style.top = Math.round(hitbox.y) + "px";
+    stage.appendChild(tag);
+  }
+}
+
+function clearDoorHitboxes() {
+  stage.querySelectorAll(".doorHitbox").forEach((box) => box.remove());
+}
+
+function walkToDoor(locationId, doorId, done) {
+  stopCore5Movement("silent");
+
+  const doorStagePoint = getDoorStagePoint(locationId, doorId);
+
+  if (!doorStagePoint) {
+    done();
+    return;
+  }
+
+  setStatus(`Core5 walking to loc ${locationId} door ${doorId}...`, "warn");
+
+  startCore5StageMovement(
+    { x: doorStagePoint.x, y: doorStagePoint.y },
+    {
+      startMoveMode: doorStagePoint.moveMode + "-start",
+      onArrived: done,
+      arrivedStatus: `Core5 reached loc ${locationId} door ${doorId}. Loading room...`
+    }
+  );
+}
+
+function getDoorStagePoint(locationId, doorId) {
+  const visualTarget = getNestDoorVisualTarget(locationId, doorId);
+
+  if (visualTarget) {
+    return {
+      x: visualTarget.stage.x,
+      y: visualTarget.stage.y,
+      sourceX: visualTarget.source.x,
+      sourceZ: visualTarget.source.z,
+      moveMode: "door"
+    };
+  }
+
+  const visualHitbox = locationId === 5 ? NEST_HALL_2011_VISUAL_HITBOXES[doorId] : null;
+
+  if (visualHitbox) {
+    return {
+      x: Math.round(visualHitbox.x + visualHitbox.width / 2),
+      y: Math.round(visualHitbox.y + visualHitbox.height - 10),
+      sourceX: null,
+      sourceZ: null,
+      moveMode: "door-hitbox-fallback"
+    };
+  }
+
+  const layer = currentLayers.find((entry) => entry.doorId === doorId && entry.image);
+
+  if (!layer) {
+    return null;
+  }
+
+  const stageRect = stage.getBoundingClientRect();
+  const layerRect = layer.image.getBoundingClientRect();
+  const baseWidth = Math.max(1, stage.offsetWidth || stageRect.width);
+  const baseHeight = Math.max(1, stage.offsetHeight || stageRect.height);
+  const scaleX = stageRect.width / baseWidth;
+  const scaleY = stageRect.height / baseHeight;
+
+  return {
+    x: Math.round((layerRect.left - stageRect.left + layerRect.width / 2) / Math.max(0.0001, scaleX)),
+    y: Math.round((layerRect.top - stageRect.top + layerRect.height - 10) / Math.max(0.0001, scaleY)),
+    sourceX: null,
+    sourceZ: null,
+    moveMode: "door-layer-fallback"
+  };
+}
+
+function labelDoorLayer(img, item, doorId, locationId) {
+  const target = getNestDoorTarget(locationId, doorId);
+  const targetLabel = target?.targetLocation?.label || `loc ${target?.toLoc ?? "?"}`;
+  const isDeferred = target && !getNestRenderableLocation(target.toLoc);
+
+  const stageRect = stage.getBoundingClientRect();
+  const imgRect = img.getBoundingClientRect();
+
+  const tag = document.createElement("div");
+  tag.className = "doorTag";
+  tag.textContent = `door ${doorId} -> ${targetLabel}${isDeferred ? " (later)" : ""}`;
+  tag.style.left = Math.round(imgRect.left - stageRect.left + imgRect.width / 2) + "px";
+  tag.style.top = Math.round(imgRect.top - stageRect.top + imgRect.height / 2) + "px";
+  tag.dataset.locationId = String(locationId);
+  tag.dataset.doorId = String(doorId);
+
+  stage.appendChild(tag);
+}
+
+function clearDoorTags() {
+  stage.querySelectorAll(".doorTag").forEach((tag) => tag.remove());
+}
+
+function resetWeevilMarker(locationId = currentLocationId, arrivalDoorId = null) {
+  const point = getDefaultWeevilStagePoint(locationId, arrivalDoorId);
+  setWeevilVisualPosition(point.x, point.y, {
+    sourceX: point.sourceX,
+    sourceZ: point.sourceZ,
+    moveMode: "spawn"
+  });
+}
+
+function getDoorIdForLayer(locationId, layerKey) {
+  if (locationId === 5) {
+    for (const [doorId, key] of Object.entries(NEST_HALL_DOOR_TO_LAYER_KEY)) {
+      if (key === layerKey) return Number(doorId);
+    }
+  }
+
+  const match = /^door(\d+)_mc$/.exec(layerKey);
+  return match ? Number(match[1]) : null;
+}
+
+function findPlacement(item, placements) {
+  return placements.find(p => {
+    if (item.name && p.name !== item.name) return false;
+    if (item.characterId && p.characterId !== item.characterId) return false;
+    return true;
+  }) || placements.find(p => item.characterId && p.characterId === item.characterId) || null;
+}
+
+function updateHud() {
+  const mapped = currentLayers.filter(l => l.status === "mapped").length;
+  const clickable = currentLayers.filter(l => l.doorId).length;
+  const missingPlacement = currentLayers.filter(l => l.status === "missing-placement").length;
+  const missingAsset = currentLayers.filter(l => l.status === "missing-asset").length;
+
+  hud.innerHTML = [
+    getNestLocation(currentLocationId)?.label || `loc ${currentLocationId}`,
+    "mapped: " + mapped,
+    "clickable doors: " + clickable,
+    "missing placement: " + missingPlacement,
+    "missing asset: " + missingAsset,
+    "loaded: " + loaded,
+    "failed: " + failed,
+    "weevilScale: " + getNestWeevilScale(currentLocationId),
+    "display: " + getCurrentWeevilDisplaySize().width + "x" + getCurrentWeevilDisplaySize().height,
+    "spawn: " + getNestWeevilSpawnProfile(currentLocationId).x + "/" + getNestWeevilSpawnProfile(currentLocationId).y,
+    "weevil pos: " + Math.round(lastWeevilStagePoint.x) + "/" + Math.round(lastWeevilStagePoint.y),
+    "last move: " + lastWeevilMoveMode,
+    "core rotY: " + Math.round(lastCore5RotY),
+    "renderer yaw: " + (Number.isFinite(lastRendererYaw) ? Math.round(lastRendererYaw) : "default"),
+    "yaw bridge: " + (core5YawBridge.enabled ? "on" : "off"),
+    "last click: " + (lastClickedStagePoint ? lastClickedStagePoint.x + "/" + lastClickedStagePoint.y : "none"),
+    "viewport: " + currentViewportPreset,
+    "viewportScale: " + currentViewportScale,
+    "core5: " + (core5MovementModel ? (core5MovementModel.walker?.halted ? "arrived" : "walking") : "idle"),
+    "core5 target: " + (core5MovementTargetStagePoint ? core5MovementTargetStagePoint.x + "/" + core5MovementTargetStagePoint.y : "none"),
+    "core5 speed: " + (core5MovementLastResult ? core5MovementLastResult.speed : "none")
+  ].join("<br>");
+}
+
+function updateLegend(config, location, arrivalDoorId) {
+  const lines = [];
+
+  lines.push(`${location.label} / loc ${location.id}`);
+  lines.push(`scene: ${config.sceneJson}`);
+  lines.push(`arrival door: ${arrivalDoorId ?? "direct"}`);
+  lines.push("");
+
+  for (const door of location.doors || []) {
+    const target = getNestDoorTarget(location.id, door.id);
+    lines.push(`door ${door.id}: loc ${location.id} -> loc ${door.toLoc} (${target?.targetLocation?.label || "unknown"})`);
+  }
+
+  lines.push("");
+  lines.push("Clickable SVG layers:");
+  for (const layer of currentLayers.filter(layer => layer.doorId)) {
+    lines.push(`${layer.item.key}: door ${layer.doorId}`);
+  }
+
+  legend.textContent = lines.join("\n");
+
+  notes.textContent = [
+    "Current rule:",
+    "Real weevil renderer overlay is active.",
+    "Click empty floor to visually move the rendered weevil.",
+    "Use viewport presets to test on modern display sizes.",
+    "Door click visually moves the rendered weevil, then swaps rooms using nestLocDefs mapping.",
+    "Floor and door clicks now use Core5 Walk.as frame movement with temporary stage x/y -> x/z mapping.",
+    "",
+    "Deferred:",
+    "loc 10 Home Cinema",
+    "loc 20 Garden"
+  ].join("\n");
+}
+
+function cssMatrixWithRegistration(m, registration) {
+  const scaleX = m?.scaleX ?? 1;
+  const rotateSkew0 = m?.rotateSkew0 ?? 0;
+  const rotateSkew1 = m?.rotateSkew1 ?? 0;
+  const scaleY = m?.scaleY ?? 1;
+  const x = m?.x ?? m?.translateXPixels ?? ((m?.translateX ?? 0) / 20);
+  const y = m?.y ?? m?.translateYPixels ?? ((m?.translateY ?? 0) / 20);
+
+  const regX = registration?.x ?? 0;
+  const regY = registration?.y ?? 0;
+
+  const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
+  const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
+
+  return `matrix(${scaleX}, ${rotateSkew0}, ${rotateSkew1}, ${scaleY}, ${correctedX}, ${correctedY})`;
+}
+
+function setStatus(message, type = "ok") {
+  status.innerHTML = `<span class="${type}">${escapeHtml(message)}</span>`;
+}
+
+function showFatal(error) {
+  console.error(error);
+  status.innerHTML = '<span class="fail">Failed.</span><br><code>' + escapeHtml(String(error?.stack || error?.message || error)) + "</code>";
+  hud.innerHTML = "failed";
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+  function movementSnapshotEscapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  function formatMovementSnapshotNumber(value, decimals = 0) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return "-";
+    }
+
+    return decimals > 0 ? number.toFixed(decimals) : String(Math.round(number));
+  }
+
+  function ensureMovementSnapshotHud() {
+    let hud = document.getElementById("movementSnapshotHud");
+
+    if (hud) {
+      return hud;
+    }
+
+    const stageElement = document.getElementById("stage");
+
+    if (!stageElement) {
+      return null;
+    }
+
+    hud = document.createElement("div");
+    hud.id = "movementSnapshotHud";
+    stageElement.appendChild(hud);
+
+    return hud;
+  }
+
+  function updateMovementSnapshotHud() {
+    const hud = ensureMovementSnapshotHud();
+
+    if (!hud) {
+      return;
+    }
+
+    const snapshot = typeof core5MovementModel !== "undefined"
+      && core5MovementModel
+      && typeof core5MovementModel.getSnapshot === "function"
+        ? core5MovementModel.getSnapshot()
+        : null;
+
+    updateYawBridgeControls();
+
+    if (!snapshot) {
+      hud.innerHTML = "Core5 snapshot<br>no movement model";
+      return;
+    }
+
+    const walker = snapshot.walker;
+    const lines = [
+      "Core5 snapshot",
+      "walking: " + snapshot.weevil.walking,
+      "x/z: " + formatMovementSnapshotNumber(snapshot.weevil.x) + " / " + formatMovementSnapshotNumber(snapshot.weevil.z),
+      "rotY: " + formatMovementSnapshotNumber(snapshot.weevil.rotY),
+      "legs: " + snapshot.legPoses.join(",")
+    ];
+
+    if (walker) {
+      lines.push(
+        "dest: " + formatMovementSnapshotNumber(walker.destination.x) + " / " + formatMovementSnapshotNumber(walker.destination.z),
+        "inc: " + formatMovementSnapshotNumber(walker.increments.x, 2) + " / " + formatMovementSnapshotNumber(walker.increments.z, 2),
+        "turn r: " + formatMovementSnapshotNumber(walker.turn.r) + " -> " + formatMovementSnapshotNumber(walker.destination.r),
+        "turn dir: " + formatMovementSnapshotNumber(walker.turn.dir),
+        "cycle: " + [walker.cycle.n, walker.cycle.m, walker.cycle.p, walker.cycle.q].map((value) => formatMovementSnapshotNumber(value)).join(","),
+        "walker legs: " + walker.legPoses.join(",")
+      );
+    } else {
+      lines.push("walker: none");
+    }
+
+    hud.innerHTML = lines.map(movementSnapshotEscapeHtml).join("<br>");
+  }
+
+  ensureMovementSnapshotHud();
+  updateMovementSnapshotHud();
+  setInterval(updateMovementSnapshotHud, 100);
+
+  const core5ProjectionDebugState = {
+    hasClick: false,
+    clickX: 0,
+    clickY: 0,
+    beforeX: 0,
+    beforeZ: 0,
+    afterX: 0,
+    afterZ: 0,
+    destX: null,
+    destZ: null,
+    dx: null,
+    dz: null,
+    rotY: null,
+    rendererYaw: null
+  };
+
+  function ensureCore5ProjectionDebugHud() {
+    let hud = document.getElementById("core5ProjectionDebugHud");
+
+    if (hud) {
+      return hud;
+    }
+
+    const stageElement = document.getElementById("stage");
+
+    if (!stageElement) {
+      return null;
+    }
+
+    hud = document.createElement("div");
+    hud.id = "core5ProjectionDebugHud";
+    stageElement.appendChild(hud);
+
+    return hud;
+  }
+
+  function formatCore5ProjectionValue(value, decimals = 0) {
+    const number = Number(value);
+
+    if (!Number.isFinite(number)) {
+      return "-";
+    }
+
+    return decimals > 0 ? number.toFixed(decimals) : String(Math.round(number));
+  }
+
+  function getCore5ProjectionSnapshot() {
+    if (
+      typeof core5MovementModel === "undefined"
+      || !core5MovementModel
+      || typeof core5MovementModel.getSnapshot !== "function"
+    ) {
+      return null;
+    }
+
+    return core5MovementModel.getSnapshot();
+  }
+
+  function updateCore5ProjectionDebugHud() {
+    const hud = ensureCore5ProjectionDebugHud();
+
+    if (!hud) {
+      return;
+    }
+
+    const snapshot = getCore5ProjectionSnapshot();
+
+    if (!snapshot) {
+      hud.innerHTML = "Core5 projection<br>no movement model";
+      return;
+    }
+
+    const walker = snapshot.walker;
+    const destX = walker ? walker.destination.x : core5ProjectionDebugState.destX;
+    const destZ = walker ? walker.destination.z : core5ProjectionDebugState.destZ;
+    const dx = Number.isFinite(Number(destX)) ? Number(destX) - Number(snapshot.weevil.x) : null;
+    const dz = Number.isFinite(Number(destZ)) ? Number(destZ) - Number(snapshot.weevil.z) : null;
+
+    const lines = [
+      "Core5 projection debug",
+      "screen click: " + (
+        core5ProjectionDebugState.hasClick
+          ? formatCore5ProjectionValue(core5ProjectionDebugState.clickX) + " / " + formatCore5ProjectionValue(core5ProjectionDebugState.clickY)
+          : "-"
+      ),
+      "core current x/z: " + formatCore5ProjectionValue(snapshot.weevil.x) + " / " + formatCore5ProjectionValue(snapshot.weevil.z),
+      "core dest x/z: " + formatCore5ProjectionValue(destX) + " / " + formatCore5ProjectionValue(destZ),
+      "core delta x/z: " + formatCore5ProjectionValue(dx) + " / " + formatCore5ProjectionValue(dz),
+      "core rotY: " + formatCore5ProjectionValue(snapshot.weevil.rotY),
+      "renderer yaw: " + (Number.isFinite(lastRendererYaw) ? formatCore5ProjectionValue(lastRendererYaw) : "default"),
+      "walking: " + snapshot.weevil.walking
+    ];
+
+    hud.innerHTML = lines
+      .map((line) => String(line)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;"))
+      .join("<br>");
+  }
+
+  function captureCore5ProjectionClick(event) {
+    const stageElement = document.getElementById("stage");
+
+    if (!stageElement || !stageElement.contains(event.target)) {
+      return;
+    }
+
+    const rect = stageElement.getBoundingClientRect();
+    const snapshotBefore = getCore5ProjectionSnapshot();
+
+    core5ProjectionDebugState.hasClick = true;
+    core5ProjectionDebugState.clickX = event.clientX - rect.left;
+    core5ProjectionDebugState.clickY = event.clientY - rect.top;
+
+    if (snapshotBefore) {
+      core5ProjectionDebugState.beforeX = snapshotBefore.weevil.x;
+      core5ProjectionDebugState.beforeZ = snapshotBefore.weevil.z;
+    }
+
+    setTimeout(() => {
+      const snapshotAfter = getCore5ProjectionSnapshot();
+
+      if (snapshotAfter) {
+        core5ProjectionDebugState.afterX = snapshotAfter.weevil.x;
+        core5ProjectionDebugState.afterZ = snapshotAfter.weevil.z;
+        core5ProjectionDebugState.rotY = snapshotAfter.weevil.rotY;
+        core5ProjectionDebugState.rendererYaw = Number.isFinite(lastRendererYaw) ? lastRendererYaw : null;
+
+        if (snapshotAfter.walker) {
+          core5ProjectionDebugState.destX = snapshotAfter.walker.destination.x;
+          core5ProjectionDebugState.destZ = snapshotAfter.walker.destination.z;
+          core5ProjectionDebugState.dx = snapshotAfter.walker.destination.x - snapshotAfter.weevil.x;
+          core5ProjectionDebugState.dz = snapshotAfter.walker.destination.z - snapshotAfter.weevil.z;
+        }
+      }
+
+      updateCore5ProjectionDebugHud();
+    }, 0);
+  }
+
+  ensureCore5ProjectionDebugHud();
+  updateCore5ProjectionDebugHud();
+  setInterval(updateCore5ProjectionDebugHud, 100);
+  document.addEventListener("click", captureCore5ProjectionClick, true);
+</script>
+</body>
+</html>

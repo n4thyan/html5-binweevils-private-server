@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Nest Hall Door Audit</title>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#151515;color:#f4e9bd}
+    body{margin:0;padding:24px;background:#151515}
+    h1{margin:0 0 8px;font-size:26px}
+    p{margin:0 0 14px;color:#d2c48b;max-width:1180px}
+    .wrap{display:inline-block;border:2px solid #8f7f44;background:#0d0d0d;padding:12px;max-width:calc(100vw - 72px);overflow:auto}
+    #stage{position:relative;width:614px;height:366px;background:#1b211b;overflow:hidden}
+    #renderRoot{position:absolute;left:0;top:0;width:825px;height:490px;transform:scale(0.7442424242,0.7469387755);transform-origin:0 0}
+    .layer{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;pointer-events:none}
+    .doorBox{position:absolute;z-index:9998;border:2px solid rgba(255,230,120,.9);background:rgba(255,230,120,.12);color:#fff2a8;font:10px Consolas,monospace;box-sizing:border-box;pointer-events:none}
+    .doorLabel{position:absolute;left:0;top:0;transform:translate(-1px,-100%);background:rgba(0,0,0,.75);border:1px solid rgba(255,230,120,.7);padding:2px 4px;white-space:nowrap}
+    .box{border:1px solid #8f7f44;background:#211f16;padding:12px 14px;margin:14px 0;max-width:1180px}
+    .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
+  </style>
+</head>
+<body>
+  <h1>Nest Hall Door Audit</h1>
+  <p>This overlays every mapped Hall door layer so we can verify the 2011 Hall art against the nestLocDefs door numbering.</p>
+
+  <div id="status" class="box">Loading...</div>
+
+  <div class="wrap">
+    <div id="stage">
+      <div id="renderRoot"></div>
+    </div>
+  </div>
+
+  <div id="legend" class="box legend"></div>
+
+<script type="module">
+import { NEST_HALL_RENDER_BASICS_LAYER_PLAN } from "/src/rooms/NestHallRenderBasicsLayerPlan.js";
+import {
+  NEST_HALL_DOOR_TO_LAYER_KEY,
+  getNestDoorTarget
+} from "/src/rooms/NestNavigationManifest.js";
+
+const stage = document.getElementById("stage");
+const renderRoot = document.getElementById("renderRoot");
+const status = document.getElementById("status");
+const legend = document.getElementById("legend");
+
+window.addEventListener("error", event => fail(event.error || event.message));
+window.addEventListener("unhandledrejection", event => fail(event.reason));
+
+const res = await fetch("/generated/nestHall_03_06_11-xml-scene.json?cacheBust=" + Date.now());
+
+if (!res.ok) {
+  throw new Error("Missing /generated/nestHall_03_06_11-xml-scene.json");
+}
+
+const scene = await res.json();
+const placements = scene.placements || [];
+const rendered = [];
+
+for (const item of NEST_HALL_RENDER_BASICS_LAYER_PLAN) {
+  const placement = findPlacement(item, placements);
+
+  if (!placement?.spritePath) continue;
+
+  const img = new Image();
+  img.className = "layer";
+  img.alt = item.key;
+  img.style.zIndex = String(placement.depth);
+  img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
+  img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
+  renderRoot.appendChild(img);
+
+  const doorId = getDoorIdForLayer(item.key);
+  rendered.push({ item, placement, img, doorId });
+
+  img.addEventListener("load", () => {
+    if (doorId) overlayDoorBox(img, item, placement, doorId);
+  });
+}
+
+status.innerHTML = '<span class="ok">Loaded Hall audit. Use this to check whether labels match the visible 2011 doors.</span>';
+
+window.setTimeout(updateLegend, 450);
+
+function overlayDoorBox(img, item, placement, doorId) {
+  const target = getNestDoorTarget(5, doorId);
+  const targetLabel = target?.targetLocation?.label || "unknown";
+  const stageRect = stage.getBoundingClientRect();
+  const rect = img.getBoundingClientRect();
+
+  const box = document.createElement("div");
+  box.className = "doorBox";
+  box.style.left = Math.round(rect.left - stageRect.left) + "px";
+  box.style.top = Math.round(rect.top - stageRect.top) + "px";
+  box.style.width = Math.round(rect.width) + "px";
+  box.style.height = Math.round(rect.height) + "px";
+
+  const label = document.createElement("div");
+  label.className = "doorLabel";
+  label.textContent = `door ${doorId} -> ${targetLabel} | ${item.key} | cid ${placement.characterId} | depth ${placement.depth}`;
+  box.appendChild(label);
+
+  stage.appendChild(box);
+}
+
+function updateLegend() {
+  const lines = [];
+
+  lines.push("Hall visual door layer audit");
+  lines.push("");
+
+  for (const entry of rendered.filter(entry => entry.doorId)) {
+    const target = getNestDoorTarget(5, entry.doorId);
+    const rect = entry.img.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+
+    lines.push([
+      `door ${entry.doorId}`,
+      `target=${target?.targetLocation?.label || "unknown"}`,
+      `layer=${entry.item.key}`,
+      `cid=${entry.placement.characterId}`,
+      `depth=${entry.placement.depth}`,
+      `screen=${Math.round(rect.left - stageRect.left)},${Math.round(rect.top - stageRect.top)},${Math.round(rect.width)},${Math.round(rect.height)}`
+    ].join(" | "));
+  }
+
+  lines.push("");
+  lines.push("Expected source map:");
+  for (const [doorId, layerKey] of Object.entries(NEST_HALL_DOOR_TO_LAYER_KEY)) {
+    const target = getNestDoorTarget(5, Number(doorId));
+    lines.push(`door ${doorId} -> ${target?.targetLocation?.label || "unknown"} | current layer ${layerKey}`);
+  }
+
+  legend.textContent = lines.join("\n");
+}
+
+function getDoorIdForLayer(layerKey) {
+  for (const [doorId, key] of Object.entries(NEST_HALL_DOOR_TO_LAYER_KEY)) {
+    if (key === layerKey) return Number(doorId);
+  }
+
+  return null;
+}
+
+function findPlacement(item, placements) {
+  return placements.find(p => {
+    if (item.name && p.name !== item.name) return false;
+    if (item.characterId && p.characterId !== item.characterId) return false;
+    return true;
+  }) || placements.find(p => item.characterId && p.characterId === item.characterId) || null;
+}
+
+function cssMatrixWithRegistration(m, registration) {
+  const scaleX = m?.scaleX ?? 1;
+  const rotateSkew0 = m?.rotateSkew0 ?? 0;
+  const rotateSkew1 = m?.rotateSkew1 ?? 0;
+  const scaleY = m?.scaleY ?? 1;
+  const x = m?.x ?? m?.translateXPixels ?? ((m?.translateX ?? 0) / 20);
+  const y = m?.y ?? m?.translateYPixels ?? ((m?.translateY ?? 0) / 20);
+
+  const regX = registration?.x ?? 0;
+  const regY = registration?.y ?? 0;
+
+  const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
+  const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
+
+  return `matrix(${scaleX}, ${rotateSkew0}, ${rotateSkew1}, ${scaleY}, ${correctedX}, ${correctedY})`;
+}
+
+function fail(error) {
+  console.error(error);
+  status.innerHTML = '<span class="fail">Failed.</span><br><code>' + String(error?.stack || error?.message || error) + "</code>";
+}
+</script>
+</body>
+</html>

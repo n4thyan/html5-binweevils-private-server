@@ -1,0 +1,630 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nest Coordinate Lab</title>
+  <style>
+    :root{color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#151515;color:#f4e9bd}
+    body{margin:0;padding:24px;background:#151515}
+    h1{margin:0 0 8px;font-size:26px}
+    p{margin:0 0 14px;color:#d2c48b;max-width:1180px}
+    code{color:#fff2a8}
+    button{border:1px solid #8f7f44;background:#3a321d;color:#fff2a8;border-radius:6px;padding:7px 10px;cursor:pointer}
+    button:hover{background:#574823}
+    input{width:78px;background:#0f0f0f;color:#fff2a8;border:1px solid #8f7f44;border-radius:4px;padding:5px}
+    textarea{width:100%;min-height:145px;background:#0f0f0f;color:#fff2a8;border:1px solid #8f7f44;border-radius:4px;padding:8px;font:12px Consolas,monospace}
+    label{font:12px Consolas,monospace;color:#fff2a8;display:inline-flex;flex-direction:column;gap:3px}
+    .layout{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+    .box{border:1px solid #8f7f44;background:#211f16;padding:12px 14px;margin:0 0 14px;max-width:1180px}
+    .panel{width:430px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+    .wrap{display:inline-block;border:2px solid #8f7f44;background:#0d0d0d;padding:12px;max-width:calc(100vw - 72px);overflow:auto}
+    #stage{position:relative;width:614px;height:366px;background:#1b211b;overflow:hidden;cursor:crosshair}
+    #renderRoot{position:absolute;left:0;top:0;transform-origin:0 0}
+    .layer{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;pointer-events:none}
+    .hud{position:absolute;left:8px;top:8px;z-index:9999;background:rgba(0,0,0,.72);padding:7px;font:11px Consolas,monospace;pointer-events:none}
+    .marker{position:absolute;z-index:9998;transform:translate(-50%,-50%);pointer-events:none}
+    .dot{width:14px;height:14px;border-radius:50%;box-shadow:0 2px 7px rgba(0,0,0,.7);border:2px solid #111}
+    .dot.approach{background:#ffd34d}
+    .dot.spawn{background:#55ddff}
+    .dot.click{background:#ff6969}
+    .dot.default{background:#ffffff}
+    .dot.auto{background:#b277ff}
+    .markerLabel{position:absolute;left:12px;top:-3px;background:rgba(0,0,0,.78);border:1px solid rgba(255,230,120,.7);border-radius:4px;padding:2px 4px;white-space:nowrap;font:10px Consolas,monospace;color:#fff2a8}
+    .hitbox{position:absolute;z-index:9997;border:1px dashed rgba(255,255,255,.35);background:rgba(255,255,255,.04);pointer-events:none}
+    .gridLine{position:absolute;background:rgba(255,255,255,.12);pointer-events:none}
+    .legend{font:12px Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .ok{color:#9fd36b}.fail{color:#ff8e8e}.warn{color:#ffd36b}
+  </style>
+</head>
+<body>
+  <h1>Nest Coordinate Lab</h1>
+  <p>Debug page for Flash <code>x/z</code> to browser stage positioning. This is separate from the navigation demo.</p>
+
+  <div class="layout">
+    <div>
+      <div id="status" class="box">Loading...</div>
+      <div class="wrap">
+        <div id="stage">
+          <div id="renderRoot"></div>
+          <div id="overlayRoot"></div>
+          <div id="hud" class="hud">loading</div>
+        </div>
+      </div>
+      <div id="legend" class="box legend"></div>
+    </div>
+
+    <div class="box panel">
+      <strong>Locations</strong>
+      <div id="locationButtons" class="row"></div>
+
+      <hr>
+      <strong>Calibration for current room</strong>
+      <div class="row">
+        <label>originX<input id="originXInput" type="number" step="1"></label>
+        <label>originY<input id="originYInput" type="number" step="1"></label>
+        <label>scaleX<input id="scaleXInput" type="number" step="0.01"></label>
+        <label>scaleZ<input id="scaleZInput" type="number" step="0.01"></label>
+      </div>
+      <div class="row">
+        <button id="saveProfileButton">Save room profile</button>
+        <button id="resetProfileButton">Reset room profile</button>
+      </div>
+
+      <hr>
+      <strong>Clicked source point</strong>
+      <div class="row">
+        <label>x<input id="sourceXInput" type="number" step="1"></label>
+        <label>z<input id="sourceZInput" type="number" step="1"></label>
+        <button id="moveClickMarkerButton">Move marker</button>
+      </div>
+
+      <hr>
+      <strong>Export</strong>
+      <div class="row">
+        <button id="copyExportButton">Copy JSON</button>
+      </div>
+      <textarea id="exportBox" spellcheck="false"></textarea>
+    </div>
+  </div>
+
+<script type="module">
+import {
+  NEST_LOCATIONS,
+  NEST_HALL_DOOR_TO_LAYER_KEY,
+  getNestDoorTarget,
+  getNestLocation
+} from "/src/rooms/NestNavigationManifest.js";
+
+import {
+  getNestRenderableLocation
+} from "/src/rooms/NestRenderRegistry.js";
+
+import { NEST_HALL_2011_VISUAL_HITBOXES } from "/src/rooms/NestHall2011VisualHitboxes.js";
+
+import {
+  getNestLocationDoorVisualTargets
+} from "/src/rooms/NestDoorVisualTargets.js";
+
+const stage = document.getElementById("stage");
+const renderRoot = document.getElementById("renderRoot");
+const overlayRoot = document.getElementById("overlayRoot");
+const status = document.getElementById("status");
+const hud = document.getElementById("hud");
+const legend = document.getElementById("legend");
+const locationButtons = document.getElementById("locationButtons");
+
+const originXInput = document.getElementById("originXInput");
+const originYInput = document.getElementById("originYInput");
+const scaleXInput = document.getElementById("scaleXInput");
+const scaleZInput = document.getElementById("scaleZInput");
+const sourceXInput = document.getElementById("sourceXInput");
+const sourceZInput = document.getElementById("sourceZInput");
+const exportBox = document.getElementById("exportBox");
+
+const saveProfileButton = document.getElementById("saveProfileButton");
+const resetProfileButton = document.getElementById("resetProfileButton");
+const moveClickMarkerButton = document.getElementById("moveClickMarkerButton");
+const copyExportButton = document.getElementById("copyExportButton");
+
+const STORAGE_KEY = "nest-coordinate-lab-profiles-v1";
+
+const DEFAULT_PROFILES = Object.freeze({
+  5: Object.freeze({ originX: 307, originY: 120, scaleX: 1.5, scaleZ: 0.56 }),
+  default: Object.freeze({ originX: 307, originY: 72, scaleX: 0.82, scaleZ: 0.52 })
+});
+
+let profiles = loadStoredProfiles();
+let currentLocationId = 5;
+let currentConfig = null;
+let currentLayers = [];
+let loaded = 0;
+let failed = 0;
+let clickedSourcePoint = { x: 0, z: 220 };
+
+window.addEventListener("error", (event) => showFatal(event.error || event.message));
+window.addEventListener("unhandledrejection", (event) => showFatal(event.reason));
+
+buildLocationButtons();
+bindControls();
+await loadLocation(5);
+
+function buildLocationButtons() {
+  const order = [5, 1, 2, 3, 4, 6, 7, 8, 9];
+
+  for (const locationId of order) {
+    const location = getNestLocation(locationId);
+    const button = document.createElement("button");
+    button.textContent = location.label;
+    button.addEventListener("click", () => loadLocation(locationId));
+    locationButtons.appendChild(button);
+  }
+}
+
+function bindControls() {
+  for (const input of [originXInput, originYInput, scaleXInput, scaleZInput]) {
+    input.addEventListener("input", () => {
+      setCurrentProfile(readProfileInputs());
+      rebuildCoordinateOverlay();
+    });
+  }
+
+  stage.addEventListener("click", (event) => {
+    const rect = stage.getBoundingClientRect();
+    const stageX = event.clientX - rect.left;
+    const stageY = event.clientY - rect.top;
+    clickedSourcePoint = stageToSourcePoint(currentLocationId, stageX, stageY);
+
+    sourceXInput.value = Math.round(clickedSourcePoint.x);
+    sourceZInput.value = Math.round(clickedSourcePoint.z);
+
+    rebuildCoordinateOverlay();
+  });
+
+  moveClickMarkerButton.addEventListener("click", () => {
+    clickedSourcePoint = {
+      x: Number(sourceXInput.value),
+      z: Number(sourceZInput.value)
+    };
+    rebuildCoordinateOverlay();
+  });
+
+  saveProfileButton.addEventListener("click", () => {
+    setCurrentProfile(readProfileInputs());
+    saveStoredProfiles();
+    setStatus("Saved calibration profile for current room.", "ok");
+    rebuildCoordinateOverlay();
+  });
+
+  resetProfileButton.addEventListener("click", () => {
+    delete profiles[currentLocationId];
+    saveStoredProfiles();
+    loadProfileInputs(getCurrentProfile());
+    setStatus("Reset calibration profile for current room.", "warn");
+    rebuildCoordinateOverlay();
+  });
+
+  copyExportButton.addEventListener("click", async () => {
+    exportBox.select();
+    await navigator.clipboard.writeText(exportBox.value);
+    setStatus("Copied coordinate profile JSON.", "ok");
+  });
+}
+
+async function loadLocation(locationId) {
+  const config = getNestRenderableLocation(locationId);
+  const location = getNestLocation(locationId);
+
+  if (!config || !location) {
+    setStatus(`No render config for loc ${locationId}`, "fail");
+    return;
+  }
+
+  currentLocationId = locationId;
+  currentConfig = config;
+  currentLayers = [];
+  loaded = 0;
+  failed = 0;
+
+  renderRoot.innerHTML = "";
+  overlayRoot.innerHTML = "";
+
+  renderRoot.style.width = `${config.renderWidth}px`;
+  renderRoot.style.height = `${config.renderHeight}px`;
+  renderRoot.style.transform = `scale(${config.scaleX}, ${config.scaleY})`;
+
+  loadProfileInputs(getCurrentProfile());
+
+  setStatus(`Loading ${location.label}...`, "warn");
+
+  const res = await fetch(config.sceneJson + "?cacheBust=" + Date.now());
+  if (!res.ok) {
+    throw new Error(`Missing generated JSON for ${location.label}: ${config.sceneJson}`);
+  }
+
+  const scene = await res.json();
+  buildScene(config, scene.placements || []);
+
+  clickedSourcePoint = getDefaultClickedPoint(locationId);
+  sourceXInput.value = Math.round(clickedSourcePoint.x);
+  sourceZInput.value = Math.round(clickedSourcePoint.z);
+
+  rebuildCoordinateOverlay();
+  updateHud();
+  updateLegend();
+
+  setStatus(`Loaded ${location.label}. Click the stage to read source x/z.`, "ok");
+}
+
+function buildScene(config, placements) {
+  for (const item of config.layerPlan) {
+    const placement = findPlacement(item, placements);
+
+    if (!placement || !placement.spritePath) {
+      currentLayers.push({ item, placement, image: null, status: placement ? "missing-asset" : "missing-placement" });
+      continue;
+    }
+
+    const img = new Image();
+
+    img.className = "layer";
+    img.alt = item.key;
+    img.title = item.key;
+    img.style.zIndex = String(placement.depth);
+    img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
+
+    img.addEventListener("load", () => { loaded += 1; updateHud(); });
+    img.addEventListener("error", () => { failed += 1; updateHud(); });
+    img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
+    renderRoot.appendChild(img);
+    currentLayers.push({ item, placement, image: img, status: "mapped" });
+  }
+}
+
+function rebuildCoordinateOverlay() {
+  overlayRoot.innerHTML = "";
+
+  buildGrid();
+  buildHallVisualHitboxes();
+  buildDoorApproachMarkers();
+  buildAutoDoorVisualTargets();
+  buildArrivalSpawnMarkers();
+  buildClickedMarker();
+  updateHud();
+  updateLegend();
+  updateExport();
+}
+
+function buildGrid() {
+  for (let x = -300; x <= 300; x += 100) {
+    const p1 = sourceToStagePoint(currentLocationId, x, -80);
+    const p2 = sourceToStagePoint(currentLocationId, x, 520);
+    addLine(p1.x, p1.y, p2.x, p2.y);
+  }
+
+  for (let z = -80; z <= 520; z += 100) {
+    const p1 = sourceToStagePoint(currentLocationId, -320, z);
+    const p2 = sourceToStagePoint(currentLocationId, 320, z);
+    addLine(p1.x, p1.y, p2.x, p2.y);
+  }
+}
+
+function addLine(x1, y1, x2, y2) {
+  const line = document.createElement("div");
+  line.className = "gridLine";
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const length = Math.sqrt(dx * dx + dy * dy);
+
+  line.style.left = x1 + "px";
+  line.style.top = y1 + "px";
+  line.style.width = length + "px";
+  line.style.height = "1px";
+  line.style.transformOrigin = "0 0";
+  line.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+
+  overlayRoot.appendChild(line);
+}
+
+function buildHallVisualHitboxes() {
+  if (currentLocationId !== 5) {
+    return;
+  }
+
+  for (const [doorId, hitbox] of Object.entries(NEST_HALL_2011_VISUAL_HITBOXES)) {
+    const box = document.createElement("div");
+    box.className = "hitbox";
+    box.style.left = hitbox.x + "px";
+    box.style.top = hitbox.y + "px";
+    box.style.width = hitbox.width + "px";
+    box.style.height = hitbox.height + "px";
+    box.title = `visual hitbox door ${doorId}`;
+    overlayRoot.appendChild(box);
+  }
+}
+
+function buildDoorApproachMarkers() {
+  const location = getNestLocation(currentLocationId);
+
+  for (const door of location.doors || []) {
+    const target = getNestDoorTarget(currentLocationId, door.id);
+    const label = `door ${door.id} x1/z1 ${door.x1}/${door.z1} -> ${target?.targetLocation?.label || "loc " + door.toLoc}`;
+    addMarker(door.x1, door.z1, "approach", label);
+  }
+}
+
+function buildAutoDoorVisualTargets() {
+  const targets = getNestLocationDoorVisualTargets(currentLocationId);
+
+  for (const target of targets) {
+    addStageMarker(
+      target.stage.x,
+      target.stage.y,
+      "auto",
+      `AUTO door ${target.doorId} visual ${target.stage.x}/${target.stage.y}`
+    );
+  }
+}
+
+function buildArrivalSpawnMarkers() {
+  for (const location of Object.values(NEST_LOCATIONS)) {
+    for (const door of location.doors || []) {
+      if (door.toLoc !== currentLocationId) {
+        continue;
+      }
+
+      const label = `arrival x2/z2 from loc ${location.id} door ${door.id}: ${door.x2}/${door.z2}`;
+      addMarker(door.x2, door.z2, "spawn", label);
+    }
+  }
+
+  const def = getDefaultClickedPoint(currentLocationId);
+  addMarker(def.x, def.z, "default", `default spawn/check point ${def.x}/${def.z}`);
+}
+
+function buildClickedMarker() {
+  addMarker(clickedSourcePoint.x, clickedSourcePoint.z, "click", `clicked ${Math.round(clickedSourcePoint.x)}/${Math.round(clickedSourcePoint.z)}`);
+}
+
+function addStageMarker(x, y, kind, label) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    return;
+  }
+
+  const marker = document.createElement("div");
+  marker.className = "marker";
+  marker.style.left = x + "px";
+  marker.style.top = y + "px";
+
+  const dot = document.createElement("div");
+  dot.className = `dot ${kind}`;
+  marker.appendChild(dot);
+
+  const text = document.createElement("div");
+  text.className = "markerLabel";
+  text.textContent = label;
+  marker.appendChild(text);
+
+  overlayRoot.appendChild(marker);
+}
+
+function addMarker(x, z, kind, label) {
+  if (!Number.isFinite(x) || !Number.isFinite(z)) {
+    return;
+  }
+
+  const p = sourceToStagePoint(currentLocationId, x, z);
+  const marker = document.createElement("div");
+  marker.className = "marker";
+  marker.style.left = p.x + "px";
+  marker.style.top = p.y + "px";
+
+  const dot = document.createElement("div");
+  dot.className = `dot ${kind}`;
+  marker.appendChild(dot);
+
+  const text = document.createElement("div");
+  text.className = "markerLabel";
+  text.textContent = label;
+  marker.appendChild(text);
+
+  overlayRoot.appendChild(marker);
+}
+
+function sourceToStagePoint(locationId, x, z) {
+  const profile = getProfile(locationId);
+
+  return {
+    x: profile.originX + x * profile.scaleX,
+    y: profile.originY + z * profile.scaleZ
+  };
+}
+
+function stageToSourcePoint(locationId, stageX, stageY) {
+  const profile = getProfile(locationId);
+
+  return {
+    x: (stageX - profile.originX) / profile.scaleX,
+    z: (stageY - profile.originY) / profile.scaleZ
+  };
+}
+
+function getDefaultClickedPoint(locationId) {
+  const location = getNestLocation(locationId);
+  const firstDoor = location?.doors?.[0];
+
+  if (firstDoor) {
+    return { x: firstDoor.x1, z: firstDoor.z1 };
+  }
+
+  return locationId === 5 ? { x: 0, z: 260 } : { x: 0, z: 220 };
+}
+
+function getProfile(locationId) {
+  return profiles[locationId] || DEFAULT_PROFILES[locationId] || DEFAULT_PROFILES.default;
+}
+
+function getCurrentProfile() {
+  return getProfile(currentLocationId);
+}
+
+function setCurrentProfile(profile) {
+  profiles[currentLocationId] = {
+    originX: Number(profile.originX),
+    originY: Number(profile.originY),
+    scaleX: Number(profile.scaleX),
+    scaleZ: Number(profile.scaleZ)
+  };
+}
+
+function readProfileInputs() {
+  return {
+    originX: Number(originXInput.value),
+    originY: Number(originYInput.value),
+    scaleX: Number(scaleXInput.value),
+    scaleZ: Number(scaleZInput.value)
+  };
+}
+
+function loadProfileInputs(profile) {
+  originXInput.value = profile.originX;
+  originYInput.value = profile.originY;
+  scaleXInput.value = profile.scaleX;
+  scaleZInput.value = profile.scaleZ;
+}
+
+function loadStoredProfiles() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveStoredProfiles() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(profiles, null, 2));
+}
+
+function updateExport() {
+  exportBox.value = JSON.stringify({
+    source: "manual Nest Coordinate Lab calibration",
+    profiles
+  }, null, 2);
+}
+
+function getDoorIdForLayer(locationId, layerKey) {
+  if (locationId === 5) {
+    for (const [doorId, key] of Object.entries(NEST_HALL_DOOR_TO_LAYER_KEY)) {
+      if (key === layerKey) return Number(doorId);
+    }
+  }
+
+  const match = /^door(\d+)_mc$/.exec(layerKey);
+  return match ? Number(match[1]) : null;
+}
+
+function findPlacement(item, placements) {
+  return placements.find(p => {
+    if (item.name && p.name !== item.name) return false;
+    if (item.characterId && p.characterId !== item.characterId) return false;
+    return true;
+  }) || placements.find(p => item.characterId && p.characterId === item.characterId) || null;
+}
+
+function updateHud() {
+  const mapped = currentLayers.filter(l => l.status === "mapped").length;
+  const location = getNestLocation(currentLocationId);
+  const profile = getCurrentProfile();
+
+  hud.innerHTML = [
+    location?.label || `loc ${currentLocationId}`,
+    "mapped: " + mapped,
+    "loaded: " + loaded,
+    "failed: " + failed,
+    "",
+    "origin: " + Math.round(profile.originX) + "/" + Math.round(profile.originY),
+    "scale: " + profile.scaleX + "/" + profile.scaleZ,
+    "clicked x/z: " + Math.round(clickedSourcePoint.x) + "/" + Math.round(clickedSourcePoint.z)
+  ].join("<br>");
+}
+
+function updateLegend() {
+  const location = getNestLocation(currentLocationId);
+  const lines = [];
+
+  lines.push(`${location.label} / loc ${location.id}`);
+  lines.push("");
+  lines.push("Yellow = current room door approach x1/z1");
+  lines.push("Blue = spawn/entry x2/z2 from doors that target this room");
+  lines.push("Red = last clicked source point");
+  lines.push("White = default test point");
+  lines.push("Purple = auto visual door target used for screen movement");
+  lines.push("");
+
+  lines.push("Auto visual door targets:");
+  for (const target of getNestLocationDoorVisualTargets(location.id)) {
+    lines.push(`door ${target.doorId}: stage ${target.stage.x}/${target.stage.y} from ${target.stage.method}`);
+  }
+
+  lines.push("");
+  lines.push("Door approach points:");
+  for (const door of location.doors || []) {
+    const target = getNestDoorTarget(location.id, door.id);
+    lines.push(`door ${door.id}: x1/z1 ${door.x1}/${door.z1} -> loc ${door.toLoc} (${target?.targetLocation?.label || "unknown"})`);
+  }
+
+  lines.push("");
+  lines.push("Arrival points into this room:");
+  for (const sourceLocation of Object.values(NEST_LOCATIONS)) {
+    for (const door of sourceLocation.doors || []) {
+      if (door.toLoc === location.id) {
+        lines.push(`from loc ${sourceLocation.id} door ${door.id}: x2/z2 ${door.x2}/${door.z2}`);
+      }
+    }
+  }
+
+  lines.push("");
+  lines.push("Next: when these dots line up with floor/doors, we move the calibration into a source module.");
+
+  legend.textContent = lines.join("\n");
+}
+
+function cssMatrixWithRegistration(m, registration) {
+  const scaleX = m?.scaleX ?? 1;
+  const rotateSkew0 = m?.rotateSkew0 ?? 0;
+  const rotateSkew1 = m?.rotateSkew1 ?? 0;
+  const scaleY = m?.scaleY ?? 1;
+  const x = m?.x ?? m?.translateXPixels ?? ((m?.translateX ?? 0) / 20);
+  const y = m?.y ?? m?.translateYPixels ?? ((m?.translateY ?? 0) / 20);
+
+  const regX = registration?.x ?? 0;
+  const regY = registration?.y ?? 0;
+
+  const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
+  const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
+
+  return `matrix(${scaleX}, ${rotateSkew0}, ${rotateSkew1}, ${scaleY}, ${correctedX}, ${correctedY})`;
+}
+
+function setStatus(message, type = "ok") {
+  status.innerHTML = `<span class="${type}">${escapeHtml(message)}</span>`;
+}
+
+function showFatal(error) {
+  console.error(error);
+  status.innerHTML = '<span class="fail">Failed.</span><br><code>' + escapeHtml(String(error?.stack || error?.message || error)) + "</code>";
+  hud.innerHTML = "failed";
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+</script>
+</body>
+</html>

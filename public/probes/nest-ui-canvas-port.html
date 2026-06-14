@@ -1,0 +1,788 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nest UI Canvas Port</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #111;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 18px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: #fff2a8;
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: #d2c48b;
+      max-width: 946px;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    code {
+      color: #fff2a8;
+    }
+
+    #portCanvas {
+      position: relative;
+      width: 946px;
+      height: 653px;
+      background: #050505;
+      overflow: hidden;
+      border: 2px solid #8f7f44;
+      box-shadow: 0 12px 28px rgba(0,0,0,.55);
+    }
+
+    #mainShellSourceLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 946px;
+      height: 653px;
+      z-index: 1;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #viewportSlot {
+      position: absolute;
+      left: 166px;
+      top: 78px;
+      width: 614px;
+      height: 366px;
+      overflow: hidden;
+      background: #1b211b;
+      border: 1px solid rgba(255,242,168,.25);
+      z-index: 10;
+    }
+
+    #slimeFrameSourceLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 614px;
+      height: 366px;
+      z-index: 20;
+      object-fit: fill;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #roomStage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 614px;
+      height: 366px;
+      overflow: hidden;
+      background: #1b211b;
+    }
+
+    #renderRoot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+    }
+
+    .layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      transform-origin: 0 0;
+      max-width: none;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #weevilMarker {
+      position: absolute;
+      z-index: 500;
+      left: 230px;
+      top: 175px;
+      width: 140px;
+      height: 140px;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 5px rgba(0,0,0,.38));
+    }
+
+    #sourceHudLayer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 946px;
+      height: 653px;
+      z-index: 850;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .sourceHudPiece {
+      position: absolute;
+      display: block;
+      object-fit: contain;
+      max-width: none;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #minimalHud {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      z-index: 1000;
+      background: rgba(0,0,0,.58);
+      color: #fff2a8;
+      padding: 7px 9px;
+      font: 11px Consolas, Monaco, monospace;
+      border: 1px solid rgba(255,242,168,.35);
+      pointer-events: none;
+    }
+
+    .toolbar {
+      width: 946px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 12px 0 0;
+    }
+
+    button {
+      border: 1px solid #8f7f44;
+      background: #3a321d;
+      color: #fff2a8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #574823;
+    }
+
+    #status {
+      width: 946px;
+      margin-top: 8px;
+      color: #9fd36b;
+      font: 12px Consolas, Monaco, monospace;
+    }
+
+    .calibrationReadout {
+      border: 1px solid #8f7f44;
+      background: #211f16;
+      color: #fff2a8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font: 12px Consolas, Monaco, monospace;
+    }
+
+    .warn {
+      color: #ffd36b;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nest UI Canvas Port</h1>
+  <p>
+    Clean 1:1 UI reconstruction canvas. First pass: source-backed Nest room render plus a static real rendered weevil.
+    Main/root source candidate is placed as a backdrop layer. Source slime frame candidates 244, 245 and 246 are now available as real mainDEV661 overlays. Chatbox, level icons, hunger bars and controls will be ported over in later passes from real source assets.
+  </p>
+
+  <div id="portCanvas">
+    <img id="mainShellSourceLayer" alt="main/root shell source candidate" />
+    <div id="viewportSlot">
+      <div id="roomStage">
+        <div id="renderRoot"></div>
+        <canvas id="weevilMarker" width="140" height="140"></canvas>
+      </div>
+    </div>
+    <img id="slimeFrameSourceLayer" alt="mainDEV661 slime frame source sprite" />
+    <div id="sourceHudLayer" aria-label="source-backed HUD candidate overlay"></div>
+    <div id="minimalHud">loading</div>
+  </div>
+
+  <div class="toolbar" id="roomButtons"></div>
+  <div class="toolbar" id="viewportControls"></div>
+  <div id="status">Loading...</div>
+
+  <script type="module">
+    import {
+      getNestRenderableLocation
+    } from "/src/rooms/NestRenderRegistry.js";
+
+    import {
+      getNestLocation
+    } from "/src/rooms/NestNavigationManifest.js";
+
+    import {
+      getNestWeevilScale,
+      getNestWeevilScaleDisplaySize
+    } from "/src/rooms/NestWeevilScaleProfiles.js";
+
+    import {
+      getNestWeevilSpawnProfile
+    } from "/src/rooms/NestWeevilSpawnProfiles.js";
+
+    import { AvatarState } from "/src/avatar/AvatarState.js";
+    import { WeevilCanvasRenderer } from "/src/avatar/WeevilCanvasRenderer.js";
+    import { SAMPLE_WEEVIL_DEF } from "/src/avatar/WeevilDefSamples.js";
+
+    import {
+      getCore5UiCanvasFirstPassLayout
+    } from "/src/ui/Core5UiCanvasFirstPassLayout.js";
+
+    const mainShellSourceLayer = document.getElementById("mainShellSourceLayer");
+    const slimeFrameSourceLayer = document.getElementById("slimeFrameSourceLayer");
+    const viewportSlot = document.getElementById("viewportSlot");
+    const renderRoot = document.getElementById("renderRoot");
+    const weevilMarker = document.getElementById("weevilMarker");
+    const weevilContext = weevilMarker.getContext("2d");
+    const roomButtons = document.getElementById("roomButtons");
+    const viewportControls = document.getElementById("viewportControls");
+    const statusEl = document.getElementById("status");
+    const minimalHud = document.getElementById("minimalHud");
+    const sourceHudLayer = document.getElementById("sourceHudLayer");
+
+    let currentLocationId = 5;
+    let currentLayers = [];
+    let loaded = 0;
+    let failed = 0;
+    let weevilAvatar = null;
+    let weevilRenderer = null;
+
+    const MAIN_SHELL_SOURCE_CANDIDATE = Object.freeze({
+      key: "fullMainShellSprite",
+      path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_113/1.svg",
+      note: "source candidate from ViewportSlimeFrameSourceMap; not final slime shell split yet"
+    });
+
+    const DEFAULT_UI_VIEWPORT_SLOT = Object.freeze({
+      x: 166,
+      y: 78,
+      width: 614,
+      height: 366
+    });
+
+    const SLIME_FRAME_SOURCE_CANDIDATES = Object.freeze({
+      244: {
+        key: "DefineSprite_244",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_244/1.svg"
+      },
+      245: {
+        key: "DefineSprite_245",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_245/1.svg"
+      },
+      246: {
+        key: "DefineSprite_246",
+        path: "/reference/decompiled-dumpassets/dumpassets/mainDEV661.swf/sprites/DefineSprite_246/1.svg"
+      }
+    });
+
+    const DEFAULT_SLIME_FRAME_SLOT = Object.freeze({
+      candidate: "245",
+      x: 150,
+      y: 68,
+      width: 646,
+      height: 386
+    });
+
+    let slimeFrameSlot = loadSlimeFrameSlot();
+
+    let uiViewportSlot = loadViewportSlot();
+
+    window.addEventListener("error", (event) => {
+      setStatus(event.error?.message || event.message || "Unknown error", "fail");
+    });
+
+    loadMainShellSourceCandidate();
+    applyViewportSlot();
+    applySlimeFrameSlot();
+    loadSlimeFrameSourceCandidate();
+    buildRoomButtons();
+    buildViewportControls();
+    buildSlimeFrameControls();
+    await initWeevilRenderer();
+    renderFirstPassHudCandidates();
+    await loadLocation(5);
+
+    function renderFirstPassHudCandidates() {
+      sourceHudLayer.innerHTML = "";
+
+      for (const item of getCore5UiCanvasFirstPassLayout()) {
+        if (!item.path) {
+          continue;
+        }
+
+        const img = new Image();
+        img.className = "sourceHudPiece";
+        img.alt = item.label + " source candidate";
+        img.title = item.label + " - DefineSprite " + item.defineSpriteId;
+        img.dataset.uiKey = item.key;
+        img.style.left = Math.round(item.x) + "px";
+        img.style.top = Math.round(item.y) + "px";
+        img.style.width = Math.round(item.width) + "px";
+        img.style.height = Math.round(item.height) + "px";
+        img.style.zIndex = String(item.zIndex || 1);
+        img.src = "/" + item.path + "?cacheBust=" + Date.now();
+
+        sourceHudLayer.appendChild(img);
+      }
+    }
+
+    function loadMainShellSourceCandidate() {
+      mainShellSourceLayer.src = MAIN_SHELL_SOURCE_CANDIDATE.path + "?cacheBust=" + Date.now();
+      mainShellSourceLayer.title = MAIN_SHELL_SOURCE_CANDIDATE.key + " - " + MAIN_SHELL_SOURCE_CANDIDATE.note;
+
+      mainShellSourceLayer.addEventListener("load", () => {
+        console.log("Loaded main shell source candidate:", MAIN_SHELL_SOURCE_CANDIDATE.path);
+      });
+
+      mainShellSourceLayer.addEventListener("error", () => {
+        setStatus("Main shell source candidate did not load: " + MAIN_SHELL_SOURCE_CANDIDATE.path, "fail");
+      });
+    }
+
+    function loadSlimeFrameSlot() {
+      try {
+        const raw = localStorage.getItem("nestUiCanvasSlimeFrameSlot");
+
+        if (!raw) {
+          return { ...DEFAULT_SLIME_FRAME_SLOT };
+        }
+
+        const parsed = JSON.parse(raw);
+
+        return {
+          candidate: SLIME_FRAME_SOURCE_CANDIDATES[String(parsed.candidate)] ? String(parsed.candidate) : DEFAULT_SLIME_FRAME_SLOT.candidate,
+          x: Number.isFinite(parsed.x) ? parsed.x : DEFAULT_SLIME_FRAME_SLOT.x,
+          y: Number.isFinite(parsed.y) ? parsed.y : DEFAULT_SLIME_FRAME_SLOT.y,
+          width: Number.isFinite(parsed.width) ? parsed.width : DEFAULT_SLIME_FRAME_SLOT.width,
+          height: Number.isFinite(parsed.height) ? parsed.height : DEFAULT_SLIME_FRAME_SLOT.height
+        };
+      } catch {
+        return { ...DEFAULT_SLIME_FRAME_SLOT };
+      }
+    }
+
+    function saveSlimeFrameSlot() {
+      localStorage.setItem("nestUiCanvasSlimeFrameSlot", JSON.stringify(slimeFrameSlot));
+    }
+
+    function loadSlimeFrameSourceCandidate() {
+      const candidate = SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate];
+      slimeFrameSourceLayer.src = candidate.path + "?cacheBust=" + Date.now();
+      slimeFrameSourceLayer.title = candidate.key + " - mainDEV661 source slime/frame candidate";
+    }
+
+    function applySlimeFrameSlot() {
+      slimeFrameSourceLayer.style.left = Math.round(slimeFrameSlot.x) + "px";
+      slimeFrameSourceLayer.style.top = Math.round(slimeFrameSlot.y) + "px";
+      slimeFrameSourceLayer.style.width = Math.round(slimeFrameSlot.width) + "px";
+      slimeFrameSourceLayer.style.height = Math.round(slimeFrameSlot.height) + "px";
+
+      const readout = document.getElementById("slimeFrameSlotReadout");
+      if (readout) {
+        readout.textContent = "slime " + SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate].key
+          + " x:" + Math.round(slimeFrameSlot.x)
+          + " y:" + Math.round(slimeFrameSlot.y)
+          + " w:" + Math.round(slimeFrameSlot.width)
+          + " h:" + Math.round(slimeFrameSlot.height);
+      }
+    }
+
+    function adjustSlimeFrameSlot(key, delta) {
+      slimeFrameSlot = {
+        ...slimeFrameSlot,
+        [key]: slimeFrameSlot[key] + delta
+      };
+
+      saveSlimeFrameSlot();
+      applySlimeFrameSlot();
+    }
+
+    function setSlimeFrameCandidate(candidate) {
+      slimeFrameSlot = {
+        ...slimeFrameSlot,
+        candidate: String(candidate)
+      };
+
+      saveSlimeFrameSlot();
+      loadSlimeFrameSourceCandidate();
+      applySlimeFrameSlot();
+    }
+
+    function resetSlimeFrameSlot() {
+      slimeFrameSlot = { ...DEFAULT_SLIME_FRAME_SLOT };
+      saveSlimeFrameSlot();
+      loadSlimeFrameSourceCandidate();
+      applySlimeFrameSlot();
+    }
+
+    function loadViewportSlot() {
+      try {
+        const raw = localStorage.getItem("nestUiCanvasViewportSlot");
+
+        if (!raw) {
+          return { ...DEFAULT_UI_VIEWPORT_SLOT };
+        }
+
+        const parsed = JSON.parse(raw);
+
+        return {
+          x: Number.isFinite(parsed.x) ? parsed.x : DEFAULT_UI_VIEWPORT_SLOT.x,
+          y: Number.isFinite(parsed.y) ? parsed.y : DEFAULT_UI_VIEWPORT_SLOT.y,
+          width: Number.isFinite(parsed.width) ? parsed.width : DEFAULT_UI_VIEWPORT_SLOT.width,
+          height: Number.isFinite(parsed.height) ? parsed.height : DEFAULT_UI_VIEWPORT_SLOT.height
+        };
+      } catch {
+        return { ...DEFAULT_UI_VIEWPORT_SLOT };
+      }
+    }
+
+    function saveViewportSlot() {
+      localStorage.setItem("nestUiCanvasViewportSlot", JSON.stringify(uiViewportSlot));
+    }
+
+    function applyViewportSlot() {
+      viewportSlot.style.left = Math.round(uiViewportSlot.x) + "px";
+      viewportSlot.style.top = Math.round(uiViewportSlot.y) + "px";
+      viewportSlot.style.width = Math.round(uiViewportSlot.width) + "px";
+      viewportSlot.style.height = Math.round(uiViewportSlot.height) + "px";
+
+      const readout = document.getElementById("viewportSlotReadout");
+      if (readout) {
+        readout.textContent = "viewport x:" + Math.round(uiViewportSlot.x)
+          + " y:" + Math.round(uiViewportSlot.y)
+          + " w:" + Math.round(uiViewportSlot.width)
+          + " h:" + Math.round(uiViewportSlot.height);
+      }
+    }
+
+    function buildViewportControls() {
+      const title = document.createElement("span");
+      title.className = "calibrationReadout";
+      title.textContent = "Viewport calibration";
+      viewportControls.appendChild(title);
+
+      const readout = document.createElement("span");
+      readout.id = "viewportSlotReadout";
+      readout.className = "calibrationReadout";
+      viewportControls.appendChild(readout);
+
+      const controls = [
+        ["x -5", () => adjustViewportSlot("x", -5)],
+        ["x +5", () => adjustViewportSlot("x", 5)],
+        ["y -5", () => adjustViewportSlot("y", -5)],
+        ["y +5", () => adjustViewportSlot("y", 5)],
+        ["w -5", () => adjustViewportSlot("width", -5)],
+        ["w +5", () => adjustViewportSlot("width", 5)],
+        ["h -5", () => adjustViewportSlot("height", -5)],
+        ["h +5", () => adjustViewportSlot("height", 5)],
+        ["reset", resetViewportSlot]
+      ];
+
+      for (const [label, handler] of controls) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", handler);
+        viewportControls.appendChild(button);
+      }
+
+      applyViewportSlot();
+    }
+
+    function buildSlimeFrameControls() {
+      const title = document.createElement("span");
+      title.className = "calibrationReadout";
+      title.textContent = "Slime frame";
+      viewportControls.appendChild(title);
+
+      const readout = document.createElement("span");
+      readout.id = "slimeFrameSlotReadout";
+      readout.className = "calibrationReadout";
+      viewportControls.appendChild(readout);
+
+      for (const candidate of ["244", "245", "246"]) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "sprite " + candidate;
+        button.addEventListener("click", () => setSlimeFrameCandidate(candidate));
+        viewportControls.appendChild(button);
+      }
+
+      const controls = [
+        ["sx -5", () => adjustSlimeFrameSlot("x", -5)],
+        ["sx +5", () => adjustSlimeFrameSlot("x", 5)],
+        ["sy -5", () => adjustSlimeFrameSlot("y", -5)],
+        ["sy +5", () => adjustSlimeFrameSlot("y", 5)],
+        ["sw -5", () => adjustSlimeFrameSlot("width", -5)],
+        ["sw +5", () => adjustSlimeFrameSlot("width", 5)],
+        ["sh -5", () => adjustSlimeFrameSlot("height", -5)],
+        ["sh +5", () => adjustSlimeFrameSlot("height", 5)],
+        ["reset slime", resetSlimeFrameSlot]
+      ];
+
+      for (const [label, handler] of controls) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", handler);
+        viewportControls.appendChild(button);
+      }
+
+      applySlimeFrameSlot();
+    }
+
+    function adjustViewportSlot(key, delta) {
+      uiViewportSlot = {
+        ...uiViewportSlot,
+        [key]: uiViewportSlot[key] + delta
+      };
+
+      saveViewportSlot();
+      applyViewportSlot();
+    }
+
+    function resetViewportSlot() {
+      uiViewportSlot = { ...DEFAULT_UI_VIEWPORT_SLOT };
+      saveViewportSlot();
+      applyViewportSlot();
+    }
+
+    function buildRoomButtons() {
+      const order = [5, 1, 2, 3, 4, 6, 7, 8, 9];
+
+      for (const locationId of order) {
+        const location = getNestLocation(locationId);
+        const config = getNestRenderableLocation(locationId);
+
+        if (!location || !config) {
+          continue;
+        }
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = location.label;
+        button.addEventListener("click", () => loadLocation(locationId));
+        roomButtons.appendChild(button);
+      }
+    }
+
+    async function initWeevilRenderer() {
+      weevilAvatar = AvatarState.fromUserVars({
+        userId: 1,
+        idx: 1,
+        name: "ui_port_static_weevil",
+        weevilDef: SAMPLE_WEEVIL_DEF,
+        x: 0,
+        y: 0,
+        z: 0,
+        r: 180,
+        ps: 0,
+        ex: 0,
+        locID: currentLocationId
+      });
+
+      weevilRenderer = new WeevilCanvasRenderer({ mode: "legacy-demo-assets" });
+      await weevilRenderer.legacyDemoAssetRenderer.preload();
+    }
+
+    async function loadLocation(locationId) {
+      const config = getNestRenderableLocation(locationId);
+      const location = getNestLocation(locationId);
+
+      if (!config || !location) {
+        setStatus("Location not renderable in UI canvas yet: loc " + locationId, "warn");
+        return;
+      }
+
+      currentLocationId = locationId;
+      currentLayers = [];
+      loaded = 0;
+      failed = 0;
+      renderRoot.innerHTML = "";
+
+      setStatus("Loading " + location.label + "...", "warn");
+
+      renderRoot.style.width = config.renderWidth + "px";
+      renderRoot.style.height = config.renderHeight + "px";
+      renderRoot.style.transform = "scale(" + config.scaleX + ", " + config.scaleY + ")";
+      renderRoot.style.transformOrigin = "0 0";
+
+      const response = await fetch(config.sceneJson + "?cacheBust=" + Date.now());
+
+      if (!response.ok) {
+        throw new Error("Missing generated JSON for " + location.label + ": " + config.sceneJson);
+      }
+
+      const scene = await response.json();
+      buildScene(config, scene.placements || []);
+      drawStaticWeevil(locationId);
+      updateHud(config, location);
+      setStatus("Loaded " + location.label + " in clean UI canvas.", "ok");
+    }
+
+    function buildScene(config, placements) {
+      for (const item of config.layerPlan) {
+        const placement = findPlacement(item, placements);
+
+        if (!placement || !placement.spritePath) {
+          currentLayers.push({
+            item,
+            placement,
+            status: placement ? "missing-asset" : "missing-placement"
+          });
+          continue;
+        }
+
+        const img = new Image();
+        img.className = "layer";
+        img.alt = item.key;
+        img.title = item.key;
+        img.style.zIndex = String(placement.depth);
+        img.style.transform = cssMatrixWithRegistration(placement.matrix, item.registration);
+
+        img.addEventListener("load", () => {
+          loaded += 1;
+          updateHud(config, getNestLocation(currentLocationId));
+        });
+
+        img.addEventListener("error", () => {
+          failed += 1;
+          updateHud(config, getNestLocation(currentLocationId));
+        });
+
+        img.src = "/" + placement.spritePath + "?cacheBust=" + Date.now();
+
+        renderRoot.appendChild(img);
+        currentLayers.push({
+          item,
+          placement,
+          image: img,
+          status: "mapped"
+        });
+      }
+    }
+
+    function drawStaticWeevil(locationId) {
+      const spawn = getNestWeevilSpawnProfile(locationId);
+      const displaySize = getNestWeevilScaleDisplaySize(locationId, {
+        baseWidth: 238,
+        baseHeight: 238
+      });
+
+      const displayWidth = displaySize.width;
+      const displayHeight = displaySize.height;
+      const markerWidth = 140;
+      const markerHeight = 140;
+      const footX = Math.round(markerWidth / 2);
+      const footY = Math.round(markerHeight * 0.9);
+
+      weevilMarker.width = markerWidth;
+      weevilMarker.height = markerHeight;
+      weevilMarker.style.width = markerWidth + "px";
+      weevilMarker.style.height = markerHeight + "px";
+      weevilMarker.style.left = Math.round(spawn.x - footX) + "px";
+      weevilMarker.style.top = Math.round(spawn.y - footY) + "px";
+
+      weevilContext.clearRect(0, 0, markerWidth, markerHeight);
+
+      if (!weevilRenderer || !weevilAvatar) {
+        return;
+      }
+
+      weevilAvatar.scale = getNestWeevilScale(locationId);
+      weevilAvatar.locID = locationId;
+      weevilAvatar.r = 180;
+
+      const plan = weevilAvatar.createRenderPlan();
+
+      weevilRenderer.render(
+        weevilContext,
+        plan,
+        Math.round((markerWidth - displayWidth) / 2),
+        Math.round((markerHeight - displayHeight) / 2),
+        {
+          mode: "legacy-demo-assets",
+          displayWidth,
+          displayHeight,
+          pitch: 16
+        }
+      );
+    }
+
+    function findPlacement(item, placements) {
+      return placements.find((placement) => {
+        if (item.name && placement.name !== item.name) return false;
+        if (item.characterId && placement.characterId !== item.characterId) return false;
+        return true;
+      }) || placements.find((placement) => item.characterId && placement.characterId === item.characterId) || null;
+    }
+
+    function cssMatrixWithRegistration(m, registration) {
+      const scaleX = m?.scaleX ?? 1;
+      const rotateSkew0 = m?.rotateSkew0 ?? 0;
+      const rotateSkew1 = m?.rotateSkew1 ?? 0;
+      const scaleY = m?.scaleY ?? 1;
+      const x = m?.x ?? m?.translateXPixels ?? ((m?.translateX ?? 0) / 20);
+      const y = m?.y ?? m?.translateYPixels ?? ((m?.translateY ?? 0) / 20);
+
+      const regX = registration?.x ?? 0;
+      const regY = registration?.y ?? 0;
+
+      const correctedX = x + (scaleX * regX) + (rotateSkew1 * regY);
+      const correctedY = y + (rotateSkew0 * regX) + (scaleY * regY);
+
+      return "matrix(" + scaleX + ", " + rotateSkew0 + ", " + rotateSkew1 + ", " + scaleY + ", " + correctedX + ", " + correctedY + ")";
+    }
+
+    function updateHud(config, location) {
+      const mapped = currentLayers.filter((layer) => layer.status === "mapped").length;
+      const missing = currentLayers.length - mapped;
+
+      minimalHud.innerHTML = [
+        location?.label || "loc " + currentLocationId,
+        "source layers: " + mapped + "/" + currentLayers.length,
+        "shell: " + MAIN_SHELL_SOURCE_CANDIDATE.key,
+        "viewport: " + Math.round(uiViewportSlot.x) + "," + Math.round(uiViewportSlot.y) + " " + Math.round(uiViewportSlot.width) + "x" + Math.round(uiViewportSlot.height),
+        "slime: " + SLIME_FRAME_SOURCE_CANDIDATES[slimeFrameSlot.candidate].key,
+        "loaded: " + loaded,
+        "failed: " + failed,
+        "missing: " + missing
+      ].join("<br>");
+    }
+
+    function setStatus(message, type = "ok") {
+      statusEl.className = type;
+      statusEl.textContent = message;
+    }
+  </script>
+</body>
+</html>
