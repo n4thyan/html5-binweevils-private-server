@@ -33,8 +33,8 @@ RumsCove/RumsAirport is now treated as a complex research checkpoint, not the fi
 Nest room export has been inspected and selected as the simpler active room family
 Nest navigation demo has source-backed room/door/scale/spawn movement probes
 Core5 Walk.as behaviour ids, walking snapshot state, yaw bridge calibration, and floor projection module are checkpointed
-Core5 gameplay UI sprite ids for level, mulch, Dosh, hunger and chatbar are registered and smoke-tested
-Nest UI canvas now uses a 640x360 gameplay-reference layout instead of the earlier oversized green shell experiment
+Core5 gameplay UI sprite ids are tracked in a source-led registry
+The current gameplay UI pass is narrowed to the user-confirmed Level icon and XP bar candidates only
 ```
 
 Not implemented yet:
@@ -145,17 +145,25 @@ tests/core5-ui-sprite-ids-smoke.mjs
 tests/core5-ui-canvas-first-pass-layout-smoke.mjs
 docs/core5-first-pass-ui-sprite-registry.md
 public/probes/nest-ui-canvas-port.html
+public/probes/core5-ui-level-xp-candidate.html
 ```
 
-First-pass gameplay UI targets:
+Current active gameplay UI targets:
 
 ```text
-level: DefineSprite 1680, 1681, 1682, 1684, 1685
+level icon: DefineSprite 1704
+XP bar below level icon: DefineSprite 1681
+```
+
+Parked source leads:
+
+```text
+other level parts: DefineSprite 1680, 1682, 1684, 1685
 mulch: DefineSprite 1686, 1688
 Dosh: DefineSprite 1701, 1706, 1708
 hunger: DefineSprite 1697, 1699
 chatbar: DefineSprite 1716, 1718, 1724, 1725
-map: sidebar Map button source ID still pending; DefineSprite 1757 is documented as a wrong map-panel candidate, not the HUD button
+map: DefineSprite 1786 / 1790 are visible source-grid leads; DefineSprite 1757 is documented as a wrong map-panel candidate, not the HUD button
 ```
 
 Playercard icons/assets are a separate core/playercard target. Recent playercard icon screenshots should not be used as slime-frame sources.
@@ -199,16 +207,34 @@ core5.swf/symbolClass/symbols.csv
 Room audit docs:
 
 ```text
+docs/rooms/rums-cove-source-audit.md
+docs/rooms/rums-cove-layer-plan.md
+docs/rooms/rums-cove-static-layout.md
+docs/rooms/rums-cove-v2-layer-plan.md
 docs/rooms/nest-room-port-plan.md
-docs/rooms/rums-cove-video-pod-audit.md
-docs/rooms/videoPod1_10_05_12-audit.md
-docs/rooms/videoPod1-locationDefinitions-link.md
 ```
 
-## Repository roles
+## Local development
+
+```powershell
+npm.cmd install
+npm.cmd run dev
+```
+
+Useful current probes:
 
 ```text
-src/                    Clean HTML5 port source code.
-tests/                  Smoke tests that pin source-backed behaviour and paths.
-docs/                   Port rules, architecture notes, source audits, and roadmap.
+/probes/nest-navigation-demo.html
+/probes/nest-coordinate-lab.html
+/probes/nest-ui-canvas-port.html
+/probes/core5-ui-level-xp-candidate.html
+```
+
+Useful current tests:
+
+```powershell
+npm.cmd test
+node .\tests\core5-ui-sprite-ids-smoke.mjs
+node .\tests\core5-ui-canvas-first-pass-layout-smoke.mjs
+node .\tests\core5-floor-projection-smoke.mjs
 ```
