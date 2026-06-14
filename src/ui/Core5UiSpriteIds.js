@@ -8,8 +8,9 @@
 export const CORE5_UI_SOURCE_SWF = 'reference/decompiled-dumpassets/dumpassets/core5.swf';
 export const CORE5_UI_SPRITE_BASE_PATH = `${CORE5_UI_SOURCE_SWF}/sprites`;
 
-export function getCore5UiSpritePath(defineSpriteId) {
-  return `${CORE5_UI_SPRITE_BASE_PATH}/DefineSprite_${defineSpriteId}/1.svg`;
+export function getCore5UiSpritePath(defineSpriteId, folderName = null) {
+  const folder = folderName || `DefineSprite_${defineSpriteId}`;
+  return `${CORE5_UI_SPRITE_BASE_PATH}/${folder}/1.svg`;
 }
 
 export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
@@ -18,11 +19,18 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     priority: 1,
     candidates: Object.freeze([
       Object.freeze({ key: 'levelMeterBarEmpty', defineSpriteId: 1680, role: 'empty level meter bar source lead', firstPassVerified: false }),
-      Object.freeze({ key: 'levelXpBar', defineSpriteId: 1681, role: 'XP bar that sits under the level icon', firstPassVerified: true }),
+      Object.freeze({ key: 'levelXpBarPreviewLead', defineSpriteId: 1681, role: 'JPEXS preview looked like an XP bar, but the exported SVG is not the usable XP bar', firstPassVerified: false }),
       Object.freeze({ key: 'levelStarPlain', defineSpriteId: 1682, role: 'plain level star source lead', firstPassVerified: false }),
       Object.freeze({ key: 'levelStarNumber', defineSpriteId: 1684, role: 'level star with digits source lead', firstPassVerified: false }),
-      Object.freeze({ key: 'levelIcon', defineSpriteId: 1704, role: 'user-selected first-pass level icon candidate', firstPassVerified: true }),
-      Object.freeze({ key: 'levelBadgeComposite', defineSpriteId: 1685, role: 'full level badge with star and bar source lead; not active for this pass', firstPassVerified: false })
+      Object.freeze({ key: 'levelIcon', defineSpriteId: 1704, role: 'user-confirmed first-pass level icon candidate', firstPassVerified: true }),
+      Object.freeze({ key: 'levelBadgeComposite', defineSpriteId: 1685, role: 'full level badge with star and bar source lead; not active for this pass', firstPassVerified: false }),
+      Object.freeze({
+        key: 'levelXpBar',
+        defineSpriteId: 1699,
+        folderName: 'DefineSprite_1699_core390_fla.levelBar_110',
+        role: 'user-confirmed exported XP bar that sits under the level icon',
+        firstPassVerified: true
+      })
     ])
   }),
 
@@ -49,8 +57,7 @@ export const CORE5_UI_SPRITE_GROUPS = Object.freeze({
     label: 'Hunger / food meter',
     priority: 4,
     candidates: Object.freeze([
-      Object.freeze({ key: 'hungerCutlery', defineSpriteId: 1697, role: 'fork and knife icon', firstPassVerified: false }),
-      Object.freeze({ key: 'hungerMeterComposite', defineSpriteId: 1699, role: 'fork and knife with horizontal meter', firstPassVerified: false })
+      Object.freeze({ key: 'hungerCutlery', defineSpriteId: 1697, role: 'fork and knife icon source lead', firstPassVerified: false })
     ])
   }),
 
@@ -96,7 +103,7 @@ function enrichCandidate(groupKey, group, candidate) {
     groupKey,
     groupLabel: group.label,
     sourceSwf: CORE5_UI_SOURCE_SWF,
-    path: getCore5UiSpritePath(candidate.defineSpriteId)
+    path: getCore5UiSpritePath(candidate.defineSpriteId, candidate.folderName)
   });
 }
 
