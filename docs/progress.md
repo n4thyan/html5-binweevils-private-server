@@ -21,7 +21,7 @@ Nest navigation demo has source-backed loc, door, spawn, scale, movement snapsho
 Core5 Walk.as behaviour ids and walking snapshot state are ported/tested
 Core5 getFloorClickCoords-style floor projection module exists and is smoke-tested
 mainDEV661.swf green loading/shell candidates are separated from core5 gameplay HUD work
-core5 gameplay HUD sprite registry is now source-led but the active render pass is deliberately limited to Level and Mulch only
+core5 gameplay HUD sprite registry is source-led and the active render pass is narrowed to the user-selected Level icon and XP bar only
 ```
 
 ## Current UI shell direction
@@ -36,20 +36,21 @@ src/ui/Core5UiCanvasFirstPassLayout.js
 tests/core5-ui-sprite-ids-smoke.mjs
 tests/core5-ui-canvas-first-pass-layout-smoke.mjs
 docs/core5-first-pass-ui-sprite-registry.md
+public/probes/core5-ui-level-xp-candidate.html
 ```
 
 Current active UI pass:
 
 ```text
-Level: DefineSprite 1685
-Mulch: DefineSprite 1688
+Level icon: DefineSprite 1704
+XP bar below level icon: DefineSprite 1681
 ```
 
 Source leads for later passes:
 
 ```text
-Level parts: DefineSprite 1680, 1681, 1682, 1684
-Mulch large pile: DefineSprite 1686
+Other level parts: DefineSprite 1680, 1682, 1684, 1685
+Mulch: DefineSprite 1686, 1688
 Dosh: DefineSprite 1701, 1706, 1708
 Hunger: DefineSprite 1697, 1699
 Chatbar: DefineSprite 1716, 1718, 1724, 1725
@@ -64,6 +65,7 @@ Do not invent UI art.
 Use the registry and original exported SVGs.
 Screenshots/JPEXS grids are identification aids only.
 Do not stretch later candidates into the canvas before confirming them.
+Verify the raw Level/XP candidates before placing more HUD elements into the main Nest UI canvas.
 ```
 
 ## Movement status
@@ -96,6 +98,7 @@ legaliseClick/isForbidden/walk-mask integration
 /probes/nest-navigation-demo.html
 /probes/nest-coordinate-lab.html
 /probes/nest-ui-canvas-port.html
+/probes/core5-ui-level-xp-candidate.html
 ```
 
 ## Current test suite additions
@@ -121,10 +124,10 @@ node tests/nest-door-visual-targets-smoke.mjs
 ```text
 1. Pull latest nest-room-demo.
 2. Run npm.cmd test.
-3. Open /probes/nest-ui-canvas-port.html.
-4. Visually compare only the Level and Mulch placements against the gameplay reference.
-5. Adjust Level/Mulch placement until they look right.
-6. Then move to the next UI group.
+3. Open /probes/core5-ui-level-xp-candidate.html.
+4. Confirm DefineSprite 1704 and DefineSprite 1681 visibly load from the local core5 export.
+5. Only after that, place those two confirmed pieces into /probes/nest-ui-canvas-port.html.
+6. Then move to Mulch as the next UI group.
 7. Keep movement parked unless explicitly resumed.
 8. Do not add public/generated, xml, or local decompiled scratch folders to commits.
 ```
