@@ -39,21 +39,26 @@ for (const key of requiredFirstPassKeys) {
   assert(candidate, `${key} candidate should exist`);
   assert(Number.isInteger(candidate.defineSpriteId), `${key} should have an integer DefineSprite id`);
   assert(candidate.firstPassVerified === true, `${key} should be marked first-pass verified`);
-  assert(candidate.path === getCore5UiSpritePath(candidate.defineSpriteId), `${key} should resolve to the expected SVG path`);
 }
 
 assert(getCore5UiSpriteCandidateByKey('levelIcon').defineSpriteId === 1704, 'Level icon should use DefineSprite_1704 for this pass');
-assert(getCore5UiSpriteCandidateByKey('levelXpBar').defineSpriteId === 1681, 'XP bar should use DefineSprite_1681 for this pass');
+assert(getCore5UiSpriteCandidateByKey('levelXpBar').defineSpriteId === 1699, 'XP bar should use DefineSprite_1699 for this pass');
+assert(getCore5UiSpriteCandidateByKey('levelXpBar').path === getCore5UiSpritePath(1699, 'DefineSprite_1699_core390_fla.levelBar_110'), 'XP bar should resolve to the named levelBar export folder');
 
 const knownFirstPassIds = new Set(CORE5_UI_FIRST_PASS_CANDIDATES.map((candidate) => candidate.defineSpriteId));
 
-for (const id of [1704, 1681]) {
+for (const id of [1704, 1699]) {
   assert(knownFirstPassIds.has(id), `first-pass UI sprite ids should include DefineSprite_${id}`);
 }
 
-for (const id of [1685, 1688, 1708, 1699, 1716, 1724, 1786, 1790]) {
+for (const id of [1681, 1685, 1688, 1708, 1716, 1724, 1786, 1790]) {
   assert(!knownFirstPassIds.has(id), `DefineSprite_${id} should remain a later source lead, not a rendered first-pass sprite`);
 }
+
+const xpPreviewLead = getCore5UiSpriteCandidateByKey('levelXpBarPreviewLead');
+assert(xpPreviewLead, 'old 1681 XP preview lead should remain documented');
+assert(xpPreviewLead.defineSpriteId === 1681, 'old 1681 lead should remain documented by id');
+assert(xpPreviewLead.firstPassVerified === false, 'old 1681 lead must not render in the first pass');
 
 const mapButtonCandidate = getCore5UiSpriteCandidateByKey('mapButtonCandidate');
 assert(mapButtonCandidate, 'map button source-grid lead should remain documented');
