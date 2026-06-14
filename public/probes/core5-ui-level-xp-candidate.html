@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Core5 Level + XP Candidate</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #111;
+      color: #f4e9bd;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 18px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      color: #fff2a8;
+    }
+
+    p {
+      margin: 0 0 12px;
+      max-width: 760px;
+      color: #d2c48b;
+      font-size: 13px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    #candidateStage {
+      position: relative;
+      width: 240px;
+      height: 210px;
+      background: #6acb1d;
+      border: 2px solid #8f7f44;
+      box-shadow: 0 12px 28px rgba(0,0,0,.55);
+      overflow: hidden;
+    }
+
+    .sourceSprite {
+      position: absolute;
+      object-fit: contain;
+      image-rendering: auto;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #levelIcon {
+      left: 18px;
+      top: 26px;
+      width: 52px;
+      height: 52px;
+    }
+
+    #levelXpBar {
+      left: 12px;
+      top: 76px;
+      width: 70px;
+      height: 16px;
+    }
+
+    .guideLine {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      border-top: 1px dashed rgba(0,0,0,.35);
+      pointer-events: none;
+    }
+
+    #status {
+      width: 760px;
+      margin-top: 12px;
+      color: #9fd36b;
+      font: 12px Consolas, Monaco, monospace;
+      white-space: pre-wrap;
+    }
+
+    .fail {
+      color: #ff8e8e;
+    }
+  </style>
+</head>
+<body>
+  <h1>Core5 Level + XP Candidate</h1>
+  <p>
+    Static verification page for the current one-piece-at-a-time HUD pass. It loads only the user-selected
+    Level icon candidate <code>DefineSprite_1704</code> and XP bar candidate <code>DefineSprite_1681</code> from the local FFDec core5 export.
+  </p>
+
+  <div id="candidateStage">
+    <div class="guideLine" style="top:76px"></div>
+    <img id="levelIcon" class="sourceSprite" alt="DefineSprite 1704 level icon" />
+    <img id="levelXpBar" class="sourceSprite" alt="DefineSprite 1681 XP bar" />
+  </div>
+
+  <div id="status">Loading...</div>
+
+  <script type="module">
+    import {
+      getCore5UiSpriteCandidateByKey
+    } from '/src/ui/Core5UiSpriteIds.js';
+
+    const statusEl = document.getElementById('status');
+    const levelIconEl = document.getElementById('levelIcon');
+    const levelXpBarEl = document.getElementById('levelXpBar');
+
+    const candidates = [
+      { key: 'levelIcon', element: levelIconEl },
+      { key: 'levelXpBar', element: levelXpBarEl }
+    ];
+
+    let loaded = 0;
+    let failed = 0;
+
+    for (const item of candidates) {
+      const candidate = getCore5UiSpriteCandidateByKey(item.key);
+
+      if (!candidate) {
+        failed += 1;
+        updateStatus();
+        continue;
+      }
+
+      item.element.title = `${candidate.key} DefineSprite_${candidate.defineSpriteId} ${candidate.path}`;
+      item.element.src = '/' + candidate.path + '?cacheBust=' + Date.now();
+      item.element.addEventListener('load', () => {
+        loaded += 1;
+        updateStatus();
+      });
+      item.element.addEventListener('error', () => {
+        failed += 1;
+        statusEl.className = 'fail';
+        updateStatus();
+      });
+    }
+
+    function updateStatus() {
+      const lines = candidates.map((item) => {
+        const candidate = getCore5UiSpriteCandidateByKey(item.key);
+        return candidate
+          ? `${candidate.key}: DefineSprite_${candidate.defineSpriteId} ${candidate.path}`
+          : `${item.key}: missing registry candidate`;
+      });
+
+      lines.push(`loaded: ${loaded}`);
+      lines.push(`failed: ${failed}`);
+      statusEl.textContent = lines.join('\n');
+    }
+
+    updateStatus();
+  </script>
+</body>
+</html>
